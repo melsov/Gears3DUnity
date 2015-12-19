@@ -47,7 +47,6 @@ public class CursorInput : MonoBehaviour {
             print(rayHit);
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
-                print("no cursor interaction?");
                 return;
             }
             ci.mouseDown(new VectorXZ(rayHit.point));

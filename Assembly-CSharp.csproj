@@ -52,6 +52,8 @@
      <Compile Include="Assets\Scripts\Gear.cs" />
      <Compile Include="Assets\Scripts\GearSettings.cs" />
      <Compile Include="Assets\Scripts\Motor.cs" />
+     <Compile Include="Assets\Scripts\Peg.cs" />
+     <Compile Include="Assets\Scripts\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\VectorXZ.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

@@ -12,16 +12,11 @@ public class CursorInteraction : MonoBehaviour {
         List<CursorInteractable> cis = new List<CursorInteractable>();
         foreach(MonoBehaviour mb in mbs) {
             if (mb is CursorInteractable) {
-                print("got a ci");
                 cis.Add((CursorInteractable) mb);
             }
         }
         interactables = cis.ToArray();
-	}
-	
-	void Update () {
-	
-	}
+	}	
 
     public void mouseDown(VectorXZ worldPoint) {
         foreach (CursorInteractable ci  in interactables) {
@@ -30,7 +25,7 @@ public class CursorInteraction : MonoBehaviour {
         mouseLocal = worldPoint - new VectorXZ(transform.position); 
     }
 
-    public void drag(VectorXZ worldPoint) {
+    public virtual void drag(VectorXZ worldPoint) {
         foreach (CursorInteractable ci  in interactables) {
             ci.cursorInteracting();
         }

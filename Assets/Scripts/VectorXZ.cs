@@ -25,6 +25,10 @@ public struct VectorXZ  {
         }
     }
 
+    public float magnitudeSquared {
+        get { return v.x * v.x + v.y * v.y; }
+    }
+
     public VectorXZ(Vector3 v3) {
         v = new Vector2(v3.x, v3.z);
     }

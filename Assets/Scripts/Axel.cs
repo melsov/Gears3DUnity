@@ -1,18 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Axel : MonoBehaviour {
+public class Axel : Peg {
 
-    public Vector3 orientation = Vector3.up;
-
-    private float lastAxisRotation;
     private AngleStep _angleStep;
-    private float timestamp;
 
     public float axisRotation {
         get {
             return transform.rotation.eulerAngles.y;
         }
+    }
+    private bool _occupied;
+    public bool occupied {
+        get { return _occupied; } 
+        set { _occupied = value; }
+    }
+
+    public AngleStep angleStep {
+        get { return _angleStep; }
     }
 
     public float angularVelocity {
@@ -20,40 +25,57 @@ public class Axel : MonoBehaviour {
     }
 
 	void Awake () {
-        _angleStep = new AngleStep(0f, 1f);
-        timestamp = Time.fixedTime;
-	}
-	
-	void LateUpdate () {
-        lastAxisRotation = axisRotation;
+       // _angleStep = new AngleStep(axisRotation);
 	}
 
     public float turnTo(float d) {
-        lastAxisRotation = axisRotation;
         transform.eulerAngles = new Vector3(0f, d, 0f);
-
-        _angleStep.deltaAngle = d - lastAxisRotation;
-        _angleStep.deltaTime = Time.fixedTime - timestamp;
-        timestamp = Time.fixedTime;
-
+        _angleStep.update(axisRotation);
         return d;
     }
 }
 
 public struct AngleStep
 {
-    public float deltaAngle;
-    public float deltaTime;
-
-    public AngleStep(float _deltaAngle, float _deltaTime) {
-        deltaAngle = _deltaAngle; deltaTime = _deltaTime;
+    public float deltaAngle {
+        get {
+            float delta = angle - lastAngle;
+            if (Mathf.Abs(delta) < 180f) { // CONSIDER: limits angVelocity to < 180. Is this OK?
+                return delta;
+            }
+            // Correct deltas where angle has jumped over 360 limit
+            return delta + -1f * Mathf.Sign(delta) * 360f;
+        }
+    }
+    public float deltaTime {
+        get { return timestamp; }
     }
 
-    public float angularVelocity() { return deltaAngle / deltaTime; }
+    public float angularVelocity() {
+        if (deltaTime > 0f)
+            return deltaAngle / deltaTime;
+        return 0f;
+    }
+
+    private float timestamp;
+    private float lastAngle;
+    private float angle;
+
+    public AngleStep(float _angle) {
+        lastAngle = 0f;
+        timestamp = Time.fixedTime; angle = _angle;
+    }
+
+    public void update(float nextAngle) {
+        lastAngle = angle;
+        timestamp = Time.deltaTime;
+        angle = nextAngle;
+    }
 
     public void debug() {
         MonoBehaviour.print("Angle Step: deltaAngle: " + deltaAngle + " deltaTime: " + deltaTime);
     }
+
 }
 
 
