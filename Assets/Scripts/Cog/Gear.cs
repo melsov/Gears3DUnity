@@ -5,16 +5,6 @@ using System.Collections.Generic;
 
 public class Gear : Drivable  { 
 
-
-    //public float angularVelocity {
-    //    get {
-    //        //if (isDrivenFromAxel()) {
-    //            return angleStep.angularVelocity() * radius;
-    //        //}
-    //        //return 0f;
-    //    }
-    //}
-
 //TODO: account for tooth size 
 //TODO: want radius to be a public method of Drivable: radius at position?   
 
@@ -77,7 +67,7 @@ public struct Drive
     }
 }
 
-public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetContainer
+public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSetContainer
 {
     protected AngleStep _angleStep;
     protected AngleStep angleStep {
@@ -89,7 +79,6 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetC
         }
     }
     protected Socket connectedSocket;
-    //protected Socket[] sockets = new Socket[] { };
     protected SocketSet backendSocketSet;
     protected SocketSet frontendSocketSet;
 
@@ -110,6 +99,10 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetC
 
     public virtual bool isOnAxel() {
         return connectedSocket != null && connectedSocket.axel != null && transform.parent != null;
+    }
+
+    public Transform getTransform() {
+        return transform;
     }
 
     public SocketSet getBackendSocketSet() {
@@ -151,44 +144,29 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetC
         }
     }
 
-    //public Socket getSocketClosestTo(Vector3 global, RotationMode rm) { return getSocketClosestTo(global, false, false, rm); }
-    //public Socket getSocketWithPegClosestTo(Vector3 global, RotationMode rm) { return getSocketClosestTo(global, false, true, rm); }
-    //public Socket getSocketWithoutPegClosestTo(Vector3 global, RotationMode rm) { return getSocketClosestTo(global, true, false, rm);  }
-
-    //public virtual Socket getSocketClosestTo(Vector3 global, bool needOpenPegSlot, bool needPegInPegSlot, RotationMode rotationMode) {
-    //    Socket closest = null;
-    //    Vector3 dist = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-    //    foreach(Socket socket in sockets) {
-    //        if (needOpenPegSlot && (socket.hasChildPeg())) { continue; }
-    //        if (needPegInPegSlot && !socket.hasChildPeg()) { continue; }
-    //        if (!RotationModeHelper.CompatibleModes(rotationMode, socket.socketIsChildRotationMode)) { continue; } //TODO: socket Is Child not nec. true. make sep class: SocketDJ
-    //        Vector3 nextdDist = socket.transform.position - global;
-    //        if (nextdDist.magnitude < dist.magnitude) {
-    //            dist = nextdDist;
-    //            closest = socket;
-    //        }
-    //    }
-    //    return closest;
-    //}
-
     protected virtual void setSocketClosestToAxel(Axel axel) {
         connectedSocket = backendSocketSet.getOpenChildSocketClosestTo(axel.transform.position, axel.pegIsParentRotationMode); // getSocketClosestTo(axel.transform.position, axel.pegIsParentRotationMode);
-        connectedSocket.axel = axel;
-        connectedSocket.axel.occupiedByChild = true;
-        parentToAxel();
+        setSocketToPeg(connectedSocket, axel);
+        //parentToAxel();
     }
 
     protected virtual void setSocketToPeg(Socket socket, Peg peg) {
-        peg.occupiedByChild = true;
-        TransformUtil.ParentToAndAlignXZ(transform, peg.transform, socket.transform);
+        socket.drivingPeg = peg;
+        //TransformUtil.ParentToAndAlignXZ(transform, peg.transform, socket.transform);
     }
 
-    protected virtual void parentToAxel() {
-        if (connectedSocket == null || isOnAxel()) {
-            return;
-        }
-        TransformUtil.ParentToAndAlignXZ(transform, connectedSocket.axel.transform, connectedSocket.transform);
-    }
+    //protected virtual void parentToAxel() {
+    //    if (connectedSocket == null || isOnAxel()) {
+    //        return;
+    //    }
+
+    //    if (connectedSocket.axel == null) {
+    //        print("conn sock axel is null");
+
+    //        return;
+    //    }
+    //    //TransformUtil.ParentToAndAlignXZ(transform, connectedSocket.axel.transform, connectedSocket.transform);
+    //}
 
     public virtual void addDrivable(Drivable _drivable) {
         if (!drivables.Contains(_drivable))
@@ -226,38 +204,33 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetC
     }
 
     protected virtual void detachFromAxel() {
-        if(isOnAxel()) {
-            connectedSocket.axel.occupiedByChild = false; 
-        }
         transform.SetParent(null);
         connectedSocket = null;
     }
 
     public bool connectTo(Collider other) {
-        print("drivable connectTo");
         return vConnectTo(other);
     }
 
     //TODO: disconnect all pegs/sockets on disconnect
-    protected virtual Peg closestOpenPegOn(Collider other, out Socket closestSocket) {
-        Peg aPeg = null;
-        closestSocket = null;
-        SocketSetContainer ssc = other.GetComponent<SocketSetContainer>();
-        if (ssc == null) return null;
-        Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-        foreach(Socket s in ssc.getBackendSocketSet().sockets) {
-            if (s.childPeg != null && !s.childPeg.occupiedByChild ) {
-                Socket soc = backendSocketSet.getOpenChildSocketClosestTo(s.childPeg.transform.position, s.childPeg.pegIsChildRotationMode);
-//                    getSocketClosestTo(s.childPeg.transform.position, s.childPeg.pegIsParentRotationMode);
-                if (distance.magnitude > (s.childPeg.transform.position - soc.transform.position).magnitude) {
-                    distance = s.childPeg.transform.position - soc.transform.position;
-                    aPeg = s.childPeg;
-                    closestSocket = soc;
-                }
-            }
-        }
-        return aPeg;
-    }
+    //protected virtual Peg closestOpenPegOn(Collider other, out Socket closestSocket) {
+    //    Peg aPeg = null;
+    //    closestSocket = null;
+    //    SocketSetContainer ssc = other.GetComponent<SocketSetContainer>();
+    //    if (ssc == null) return null;
+    //    Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+    //    foreach(Socket s in ssc.getBackendSocketSet().sockets) {
+    //        if (s.childPeg != null && !s.childPeg.occupiedByChild ) {
+    //            Socket soc = backendSocketSet.getOpenChildSocketClosestTo(s.childPeg.transform.position, s.childPeg.pegIsChildRotationMode);
+    //            if (distance.magnitude > (s.childPeg.transform.position - soc.transform.position).magnitude) {
+    //                distance = s.childPeg.transform.position - soc.transform.position;
+    //                aPeg = s.childPeg;
+    //                closestSocket = soc;
+    //            }
+    //        }
+    //    }
+    //    return aPeg;
+    //}
     
     //TODO: motor still can't connect to pegs?
     protected virtual bool vConnectTo(Collider other) {
@@ -267,8 +240,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetC
  
         // Connect to any peg or axel
         Socket aSocket;
-        Peg peg = closestOpenPegOn(other, out aSocket);
-        print("Drivable vConnect: peg null: " + (peg == null));
+        Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
             setSocketToPeg(aSocket, peg);
             return true;
@@ -354,8 +326,9 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , SocketSetC
     }
 }
 
-public interface SocketSetContainer
+public interface ISocketSetContainer
 {
+    Transform getTransform();
     SocketSet getBackendSocketSet();
     SocketSet getFrontendSocketSet();
 }

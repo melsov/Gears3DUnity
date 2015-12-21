@@ -12,13 +12,18 @@ public class Motor : Drivable
     }
 
     public bool isPowered = true;
-    public Axel axel;
+    protected Axel _axel;
+    public Axel axel {
+        get { return _axel;  }
+    }
 
     private float angle;
     
 	void Awake () {
         base.awake();
-        axel = GetComponentInChildren<Axel>();
+        _axel = GetComponentInChildren<Axel>();
+        UnityEngine.Assertions.Assert.IsTrue(frontendSocketSet.sockets.Length == 1);
+        axel.beChildOf(frontendSocketSet.sockets[0]);
 	}
 
 	protected override void update () {

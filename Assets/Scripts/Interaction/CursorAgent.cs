@@ -42,13 +42,6 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
         return _cursorInteracting;
     }
     private void connectToColliders() {
-        //if (preservedCollider != null) {
-        //    if (client.connectTo(preservedCollider)) {
-        //        colliderDropper.removeAll();
-        //        return;
-        //    }
-        //    print("didnt connect to preserve");
-        //}
         while(colliderDropper.colliders.Count > 0) {
             Collider c = colliderDropper.colliders[0];
             colliderDropper.colliders.RemoveAt(0);

@@ -12,11 +12,18 @@ public class Pole : Drivable
 
     protected override bool vConnectTo(Collider other) {
         Socket aSocket;
-        Peg peg = closestOpenPegOn(other, out aSocket);
+        Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
-            //if peg is parent rotation mode is fixed, parent pole to peg
-            if (true) { // if peg parent ro mode fixed
+            //if peg parent rotation mode is fixed or 'free or fixed'
+
+            //CONSIDER: POLE CASES:
+            // FIXED ONLY (connected to an axel )
+            // FREE 
+            // in all cases: only one parent but poles can be pushed around possibly
+            // also: make poles mouse rotatable
+            if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, RotationMode.FIXED_ONLY)) { 
                 setSocketToPeg(aSocket, peg);
+                return true;
             }
         }
         return false;

@@ -12,14 +12,11 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         get { return RotationMode.FREE_OR_FIXED; }
     }
 
-    private bool _occupied;
     public bool occupiedByChild {
-        get { return _occupied; } 
-        set { _occupied = value; }
-    }
-
-    public void disconnectChildSocket() {
-        occupiedByChild = false;
+        get {
+            if (transform.childCount == 0) return false;
+            return transform.GetComponentInChildren<Drivable>() != null;
+        }
     }
 
     public void disconnect() {
@@ -36,11 +33,15 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         if (drivable != null) {
             Socket socket = drivable.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode); 
             if (socket == null) return false;
-            socket.childPeg = this;
-            TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
-            return true;
+            return beChildOf(socket);
         }
         return false;
+    }
+
+    public bool beChildOf(Socket socket) {
+        socket.childPeg = this;
+        TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
+        return true;
     }
 
     public void suspendConnection() {

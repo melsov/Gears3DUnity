@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 
 public class Socket : MonoBehaviour {
@@ -18,13 +19,19 @@ public class Socket : MonoBehaviour {
 
     public Axel axel {
         get { return (Axel) drivingPeg; }
-        set { drivingPeg = (Axel) value;  }
     }
+
+    public ISocketSetContainer parentContainer;
 
     private Peg _drivingPeg;
     public Peg drivingPeg {
-        get { return _drivingPeg; }
-        set { _drivingPeg = value; }
+        get {
+            return _drivingPeg;
+        }
+        set {
+            _drivingPeg = value;
+            TransformUtil.ParentToAndAlignXZ(parentContainer.getTransform(), _drivingPeg.transform, transform);
+        }
     }
 
     void Awake() {
@@ -32,14 +39,12 @@ public class Socket : MonoBehaviour {
     }
 
     protected virtual void awake() {
-
+        parentContainer = GetComponentInParent<ISocketSetContainer>();
+        Assert.IsTrue(parentContainer != null);
     }
 
     public void disconnectDrivingPeg() {
-        if (drivingPeg != null) {
-            drivingPeg.disconnectChildSocket();
-        }
-        drivingPeg = null;
+        parentContainer.getTransform().SetParent(null);
     }
 
     private Peg _childPeg;

@@ -59,4 +59,29 @@ public class SocketSet
         }
         return closest;
     }
+
+    public virtual Peg closestOpenPegOnFrontendOf(Collider other, out Socket closestSocket) {
+        Peg aPeg = null;
+        closestSocket = null;
+        Bug.printComponents(other.gameObject);
+        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        MonoBehaviour.print("ssc null is: " + (ssc == null));
+        if (ssc == null) return null;
+        Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        foreach(Socket s in ssc.getFrontendSocketSet().sockets) {
+            MonoBehaviour.print("got a front socket");
+            if (s.childPeg != null)
+                MonoBehaviour.print("peg occ by child: " + s.childPeg.occupiedByChild);
+            if (s.childPeg != null && !s.childPeg.occupiedByChild ) {
+                MonoBehaviour.print("peg not occ by child and not null");
+                Socket soc = getOpenChildSocketClosestTo(s.childPeg.transform.position, s.childPeg.pegIsChildRotationMode);
+                if (distance.magnitude > (s.childPeg.transform.position - soc.transform.position).magnitude) {
+                    distance = s.childPeg.transform.position - soc.transform.position;
+                    aPeg = s.childPeg;
+                    closestSocket = soc;
+                }
+            }
+        }
+        return aPeg;
+    }
 }
