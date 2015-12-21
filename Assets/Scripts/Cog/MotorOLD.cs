@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Motor : MonoBehaviour
+public class MotorOLD : MonoBehaviour
 {
     public float angularVelocity = 10f;
     public bool isPowered = true;

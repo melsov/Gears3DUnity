@@ -5,16 +5,18 @@ public class Axel : Peg {
 
     private AngleStep _angleStep;
 
+    public override RotationMode pegIsParentRotationMode {
+        get {
+            return RotationMode.FIXED_ONLY;
+        }
+    }
+
     public float axisRotation {
         get {
             return transform.rotation.eulerAngles.y;
         }
     }
-    private bool _occupied;
-    public bool occupied {
-        get { return _occupied; } 
-        set { _occupied = value; }
-    }
+
 
     public AngleStep angleStep {
         get { return _angleStep; }

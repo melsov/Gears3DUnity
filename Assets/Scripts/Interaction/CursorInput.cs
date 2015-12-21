@@ -44,7 +44,6 @@ public class CursorInput : MonoBehaviour {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         line.SetPosition(0, ray.origin);
         if (Physics.Raycast(ray, out rayHit, 100f)) { 
-            print(rayHit);
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
                 return;

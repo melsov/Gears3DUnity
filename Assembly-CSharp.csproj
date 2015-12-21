@@ -45,16 +45,23 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\Axel.cs" />
-     <Compile Include="Assets\Scripts\AxelSocket.cs" />
-     <Compile Include="Assets\Scripts\CursorInput.cs" />
-     <Compile Include="Assets\Scripts\CursorInteraction.cs" />
-     <Compile Include="Assets\Scripts\Gear.cs" />
-     <Compile Include="Assets\Scripts\GearSettings.cs" />
-     <Compile Include="Assets\Scripts\Motor.cs" />
-     <Compile Include="Assets\Scripts\Peg.cs" />
-     <Compile Include="Assets\Scripts\TransformUtil.cs" />
-     <Compile Include="Assets\Scripts\VectorXZ.cs" />
+     <Compile Include="Assets\Scripts\Cog\Axel.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\Peg.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
+     <Compile Include="Assets\Scripts\Cog\Gear.cs" />
+     <Compile Include="Assets\Scripts\Cog\GearSettings.cs" />
+     <Compile Include="Assets\Scripts\Cog\Motor.cs" />
+     <Compile Include="Assets\Scripts\Cog\MotorOLD.cs" />
+     <Compile Include="Assets\Scripts\Cog\Pole.cs" />
+     <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
+     <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
+     <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
+     <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
+     <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
+     <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

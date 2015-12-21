@@ -8,8 +8,8 @@ public class CursorInteraction : MonoBehaviour {
     private CursorInteractable[] interactables;
 
 	void Awake () {
-        MonoBehaviour[] mbs = GetComponents<MonoBehaviour>();
         List<CursorInteractable> cis = new List<CursorInteractable>();
+        MonoBehaviour[] mbs = GetComponents<MonoBehaviour>();
         foreach(MonoBehaviour mb in mbs) {
             if (mb is CursorInteractable) {
                 cis.Add((CursorInteractable) mb);
@@ -20,28 +20,28 @@ public class CursorInteraction : MonoBehaviour {
 
     public void mouseDown(VectorXZ worldPoint) {
         foreach (CursorInteractable ci  in interactables) {
-            ci.startCursorInteraction();
+            ci.startCursorInteraction(worldPoint);
         }
         mouseLocal = worldPoint - new VectorXZ(transform.position); 
     }
 
     public virtual void drag(VectorXZ worldPoint) {
         foreach (CursorInteractable ci  in interactables) {
-            ci.cursorInteracting();
+            ci.cursorInteracting(worldPoint);
         }
         transform.position =(worldPoint - mouseLocal).vector3(transform.position.y);
     }
 
-    public void mouseUp(VectorXZ xzPoint) {
+    public void mouseUp(VectorXZ worldPoint) {
         foreach (CursorInteractable ci in interactables) {
-            ci.endCursorInteraction();
+            ci.endCursorInteraction(worldPoint);
         }
     }
 }
 
 public interface CursorInteractable
 {
-    void startCursorInteraction();
-    void cursorInteracting();
-    void endCursorInteraction();
+    void startCursorInteraction(VectorXZ cursorGlobal);
+    void cursorInteracting(VectorXZ cursorGlobal);
+    void endCursorInteraction(VectorXZ cursorGlobal);
 }
