@@ -47,7 +47,9 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\Cog\Axel.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\Hinge.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Peg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
@@ -61,6 +63,7 @@
      <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
      <Compile Include="Assets\Scripts\Utility\Bug.cs" />
+     <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
  <Reference Include="UnityEngine.UI">

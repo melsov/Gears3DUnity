@@ -105,6 +105,23 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         return transform;
     }
 
+    public Rigidbody getRigidbodyWithGravity() {
+        Rigidbody r = GetComponent<Rigidbody>();
+        if (r == null) {
+            r = gameObject.AddComponent<Rigidbody>();
+        }
+        r.useGravity = true;
+        return r;
+    }
+
+    public void unsetRigidbodyWithGravity() {
+        Rigidbody r = GetComponent<Rigidbody>();
+        if (r != null) {
+            r.useGravity = false;
+            print("unset rig body");
+        }
+    }
+
     public SocketSet getBackendSocketSet() {
         return backendSocketSet;
     }
@@ -212,32 +229,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         return vConnectTo(other);
     }
 
-    //TODO: disconnect all pegs/sockets on disconnect
-    //protected virtual Peg closestOpenPegOn(Collider other, out Socket closestSocket) {
-    //    Peg aPeg = null;
-    //    closestSocket = null;
-    //    SocketSetContainer ssc = other.GetComponent<SocketSetContainer>();
-    //    if (ssc == null) return null;
-    //    Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-    //    foreach(Socket s in ssc.getBackendSocketSet().sockets) {
-    //        if (s.childPeg != null && !s.childPeg.occupiedByChild ) {
-    //            Socket soc = backendSocketSet.getOpenChildSocketClosestTo(s.childPeg.transform.position, s.childPeg.pegIsChildRotationMode);
-    //            if (distance.magnitude > (s.childPeg.transform.position - soc.transform.position).magnitude) {
-    //                distance = s.childPeg.transform.position - soc.transform.position;
-    //                aPeg = s.childPeg;
-    //                closestSocket = soc;
-    //            }
-    //        }
-    //    }
-    //    return aPeg;
-    //}
-    
-    //TODO: motor still can't connect to pegs?
     protected virtual bool vConnectTo(Collider other) {
-        //if (!isInConnectionRange(other)) {
-        //    return false;
-        //}
- 
         // Connect to any peg or axel
         Socket aSocket;
         Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
@@ -329,6 +321,8 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
 public interface ISocketSetContainer
 {
     Transform getTransform();
+    Rigidbody getRigidbodyWithGravity();
+    void unsetRigidbodyWithGravity();
     SocketSet getBackendSocketSet();
     SocketSet getFrontendSocketSet();
 }

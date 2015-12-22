@@ -3,6 +3,8 @@ using System.Collections;
 using System;
 using UnityEngine.Assertions;
 
+//TODO: connectTo method will apply for any free-rotatable drivable
+// make class FreeRotatableDrivabe
 public class Pole : Drivable
 {
     protected override void awake() {
@@ -16,12 +18,13 @@ public class Pole : Drivable
         if (peg != null) {
             //if peg parent rotation mode is fixed or 'free or fixed'
 
-            //CONSIDER: POLE CASES:
+            // CONSIDER: POLE CASES:
             // FIXED ONLY (connected to an axel )
             // FREE 
             // in all cases: only one parent but poles can be pushed around possibly
             // also: make poles mouse rotatable
-            if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, RotationMode.FIXED_ONLY)) { 
+            if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
+                print("compatible peg");
                 setSocketToPeg(aSocket, peg);
                 return true;
             }

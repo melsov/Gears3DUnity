@@ -29,8 +29,15 @@ public class Socket : MonoBehaviour {
             return _drivingPeg;
         }
         set {
-            _drivingPeg = value;
-            TransformUtil.ParentToAndAlignXZ(parentContainer.getTransform(), _drivingPeg.transform, transform);
+            if (value != null) {
+                _drivingPeg = value;
+                _drivingPeg.receiveChild(this);
+                //TransformUtil.ParentToAndAlignXZ(parentContainer.getTransform(), _drivingPeg.transform, transform);
+            } else {
+                _drivingPeg.releaseChild(this);
+                _drivingPeg = value;
+                parentContainer.getTransform().SetParent(null);
+            }
         }
     }
 
@@ -44,7 +51,7 @@ public class Socket : MonoBehaviour {
     }
 
     public void disconnectDrivingPeg() {
-        parentContainer.getTransform().SetParent(null);
+        _drivingPeg = null;
     }
 
     private Peg _childPeg;
