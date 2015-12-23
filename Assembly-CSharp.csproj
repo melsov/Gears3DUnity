@@ -53,10 +53,10 @@
      <Compile Include="Assets\Scripts\Cog\Connection\Peg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable.cs" />
      <Compile Include="Assets\Scripts\Cog\Gear.cs" />
      <Compile Include="Assets\Scripts\Cog\GearSettings.cs" />
      <Compile Include="Assets\Scripts\Cog\Motor.cs" />
-     <Compile Include="Assets\Scripts\Cog\MotorOLD.cs" />
      <Compile Include="Assets\Scripts\Cog\Pole.cs" />
      <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />

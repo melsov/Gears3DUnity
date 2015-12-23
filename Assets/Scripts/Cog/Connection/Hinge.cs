@@ -3,8 +3,12 @@ using System.Collections;
 
 public class Hinge : MonoBehaviour {
 
+    protected HingeJoint _hingeJoint;
     public HingeJoint getHingeJoint () {
-        return GetComponentInChildren<HingeJoint>();
+        if (_hingeJoint == null) {
+            _hingeJoint = GetComponentInChildren<HingeJoint>();
+        }
+        return _hingeJoint;
     }
 
     public void connect(Rigidbody rb) {
@@ -16,14 +20,4 @@ public class Hinge : MonoBehaviour {
     public void disconnectObject() {
         getHingeJoint().connectedBody = null;
     }
-
-    //public Transform getConnectedObjectColliderTransform() {
-    //    HingeJoint hj = getHingeJoint();
-    //    Collider collider = hj.connectedBody.gameObject.GetComponentInChildren<Collider>();
-    //    if (collider.name == "HingeCollider") {
-    //        print("got the hinge collider");
-    //        return collider.transform;
-    //    }
-    //    return null;
-    //}
 }
