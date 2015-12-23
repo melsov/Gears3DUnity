@@ -4,7 +4,13 @@ using System.Collections;
 public struct VectorXZ  {
 
     private Vector2 v;
-    
+
+    public static VectorXZ maxValue = new VectorXZ(new Vector3(float.MaxValue, float.MaxValue, float.MaxValue));
+    public static VectorXZ fakeNull = maxValue;
+    public bool isFakeNull() {
+        return this == fakeNull;
+    }
+
     public float x {
         get { return v.x; }
         set { v.x = value; }
@@ -37,11 +43,27 @@ public struct VectorXZ  {
         v = v2;
     }
 
+    public VectorXZ(float n) {
+        v = new Vector2(n, n);
+    }
+
     public static VectorXZ operator +(VectorXZ a, VectorXZ b) {
         return new VectorXZ(a.v + b.v);
     }
     public static VectorXZ operator -(VectorXZ a, VectorXZ b) {
         return new VectorXZ(a.v - b.v);
+    }
+    public static bool operator == (VectorXZ a, VectorXZ b) {
+        return a.v == b.v;
+    }
+    public static bool operator != (VectorXZ a, VectorXZ b) {
+        return a.v != b.v;
+    }
+    public override bool Equals(object obj) {
+        return v.Equals(obj);
+    }
+    public override int GetHashCode() {
+        return v.GetHashCode();
     }
 
 }

@@ -48,6 +48,7 @@ public class Socket : MonoBehaviour {
     }
 
     protected virtual void awake() {
+        gameObject.layer = LayerMask.NameToLayer("CogComponent");
         parentContainer = GetComponentInParent<ISocketSetContainer>();
         Assert.IsTrue(parentContainer != null);
     }

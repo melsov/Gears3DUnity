@@ -9,6 +9,16 @@ public class SocketSet
         sockets = _sockets;
     }
 
+    public bool contains(Socket s) {
+        foreach (Socket soc in sockets) {
+            if (soc == s) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     //public Socket getSocketClosestTo(Vector3 global, RotationMode rm) { return getSocketClosestTo(global, false, false, rm); }
 
     public Socket getOpenChildSocketClosestTo(Vector3 global, RotationMode rm) {
@@ -50,7 +60,7 @@ public class SocketSet
             if (!RelationshipConstraintUtil.Compatible(socketRelationshipConstraint, socket.relationshipConstraint)) { continue; }
             RotationMode relevantSocketRotationMode = socketRelationshipConstraint == RigidRelationshipConstraint.CAN_ONLY_BE_PARENT ? 
                 socket.socketIsParentRotationMode : socket.socketIsChildRotationMode;
-            if (!RotationModeHelper.CompatibleModes(requiredSocketRotationMode, socket.socketIsChildRotationMode)) { continue; } //TODO: socket Is Child not nec. true. make sep class: SocketDJ
+            if (!RotationModeHelper.CompatibleModes(requiredSocketRotationMode, relevantSocketRotationMode)) { continue; } //TODO: socket Is Child not nec. true. make sep class: SocketDJ
             Vector3 nextdDist = socket.transform.position - global;
             if (nextdDist.magnitude < dist.magnitude) {
                 dist = nextdDist;

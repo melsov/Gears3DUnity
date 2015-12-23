@@ -117,7 +117,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         }
     }
 
-    //iCursorAgentClient
+    #region iCursorAgentClient methods
     public void disconnect() {
         vDisconnect();
     }
@@ -188,6 +188,50 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         return null;
     }
 
+    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+        vStartDragOverride(cursorGlobal, dragOverrideCollider);
+    }
+    public void dragOverride(VectorXZ cursorGlobal) { 
+        vDragOverride(cursorGlobal);
+    }
+    public void endDragOverride(VectorXZ cursorGlobal) {
+        vEndDragOverride(cursorGlobal);
+    }
+    protected Transform _cursorRotationPivot = null;
+    protected Transform _cursorRotationHandle = null;
+
+    protected virtual void updateCursorRotationPivot(Collider dragOverrideCollider) {
+        if (_cursorRotationPivot == null) {
+            _cursorRotationPivot = this.transform;
+            HandleSet handleSet = dragOverrideCollider.GetComponentInParent<HandleSet>();
+            if (handleSet == null) {
+                return;
+            }
+            if (handleSet != null) {
+                Handle other = handleSet.getAnotherThatIsntThisOne(dragOverrideCollider.GetComponent<Handle>());
+                if (other != null) {
+                    _cursorRotationPivot = other.transform;
+                }
+            }
+        }
+    }
+
+    protected virtual void vStartDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+        _cursorRotationHandle = dragOverrideCollider.transform;
+        _cursorRotationPivot = null;
+        updateCursorRotationPivot (dragOverrideCollider);
+    }
+    protected virtual void vDragOverride(VectorXZ cursorGlobal) {
+        // rotate around the pivot
+        Vector3 current = _cursorRotationHandle.position - _cursorRotationPivot.position;
+        Vector3 target = cursorGlobal.vector3(_cursorRotationPivot.position.y) - _cursorRotationPivot.position;
+        transform.RotateAround(_cursorRotationPivot.position, EnvironmentSettings.towardsCameraDirection, Quaternion.FromToRotation(current, target).eulerAngles.y);
+    }
+
+    protected virtual void vEndDragOverride(VectorXZ cursorGlobal) {
+    }
+    #endregion
+
     //TODO: make this less 'hacky' when we make a parent Drivable class (replace interface)
     protected virtual bool isInConnectionRange(Collider other) {
         if (other == null) {
@@ -246,6 +290,8 @@ public interface ISocketSetContainer
     SocketSet getBackendSocketSet();
     SocketSet getFrontendSocketSet();
 }
+
+
 
 public struct Drive
 {

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 
 public class CursorInput : MonoBehaviour {
@@ -9,9 +10,12 @@ public class CursorInput : MonoBehaviour {
 
     private CursorInteraction ci;
 
+    private LayerMask layerMask;
+
     // Use this for initialization
     void Awake () {
         line = GetComponent<LineRenderer>();
+        layerMask = ~(LayerMask.GetMask("DragOverride") | LayerMask.GetMask("CogComponent"));
 	}
 	
 	// Update is called once per frame
@@ -43,7 +47,7 @@ public class CursorInput : MonoBehaviour {
     private void getInteractable() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         line.SetPosition(0, ray.origin);
-        if (Physics.Raycast(ray, out rayHit, 100f)) { 
+        if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) { 
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
                 return;

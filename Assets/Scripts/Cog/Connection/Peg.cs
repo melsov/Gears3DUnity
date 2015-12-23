@@ -127,6 +127,15 @@ public class Peg : MonoBehaviour , ICursorAgentClient
     public Collider shouldPreserveConnection() {
         return null;
     }
+
+    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+    }
+
+    public void dragOverride(VectorXZ cursorGlobal) {
+    }
+
+    public void endDragOverride(VectorXZ cursorGlobal) {
+    }
 }
 
 public enum RotationMode

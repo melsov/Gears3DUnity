@@ -62,8 +62,11 @@
      <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
+     <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
+     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
      <Compile Include="Assets\Scripts\Utility\Bug.cs" />
      <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
+     <Compile Include="Assets\Scripts\Utility\RayCastUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
  <Reference Include="UnityEngine.UI">
