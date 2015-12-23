@@ -3,10 +3,20 @@ using System.Collections;
 
 public class HandleSet : MonoBehaviour {
 
-    public Handle[] handles;
+    private Handle[] _handles;
+    public Handle[] handles {
+        get {
+            if (_handles == null) {
+                _handles = GetComponentsInChildren<Handle>();
+            }
+            return _handles;
+        }
+    }
+    
+    
 
     void Awake() {
-        handles = GetComponentsInChildren<Handle>();
+
     }
 
     public bool contains(Handle h) {

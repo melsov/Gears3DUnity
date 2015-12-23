@@ -17,9 +17,9 @@ public class Motor : Drivable
         get { return _axel;  }
     }
 
-    private float angle;
+    protected float angle;
     
-	void Awake () {
+	protected override void awake () {
         base.awake();
         _axel = GetComponentInChildren<Axel>();
         UnityEngine.Assertions.Assert.IsTrue(frontendSocketSet.sockets.Length == 1);

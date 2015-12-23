@@ -17,7 +17,6 @@ public class Axel : Peg {
         }
     }
 
-
     public AngleStep angleStep {
         get { return _angleStep; }
     }
@@ -25,10 +24,6 @@ public class Axel : Peg {
     public float angularVelocity {
         get { return _angleStep.angularVelocity(); }
     }
-
-	void Awake () {
-       // _angleStep = new AngleStep(axisRotation);
-	}
 
     public float turnTo(float d) {
         transform.eulerAngles = new Vector3(0f, d, 0f);

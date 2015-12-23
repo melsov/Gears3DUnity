@@ -16,15 +16,7 @@ public class Pole : Drivable
         Socket aSocket;
         Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
-            //if peg parent rotation mode is fixed or 'free or fixed'
-
-            // CONSIDER: POLE CASES:
-            // FIXED ONLY (connected to an axel )
-            // FREE 
-            // in all cases: only one parent but poles can be pushed around possibly
-            // also: make poles mouse rotatable
             if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
-                print("compatible peg");
                 setSocketToPeg(aSocket, peg);
                 return true;
             }

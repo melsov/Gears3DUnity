@@ -10,12 +10,14 @@ public class CursorInput : MonoBehaviour {
 
     private CursorInteraction ci;
 
-    private LayerMask layerMask;
+    private int layerMask;
+    private int dragOverrideMask;
 
     // Use this for initialization
     void Awake () {
         line = GetComponent<LineRenderer>();
         layerMask = ~(LayerMask.GetMask("DragOverride") | LayerMask.GetMask("CogComponent"));
+        dragOverrideMask = LayerMask.GetMask("DragOverride");
 	}
 	
 	// Update is called once per frame
@@ -45,15 +47,28 @@ public class CursorInput : MonoBehaviour {
     }
 
     private void getInteractable() {
+        releaseInteractable();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         line.SetPosition(0, ray.origin);
-        if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) { 
+        if (Physics.Raycast(ray, out rayHit, 100f, dragOverrideMask)) {
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
-                return;
+                ci = TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
             }
-            ci.mouseDown(new VectorXZ(rayHit.point));
-        } 
+        }
+
+        if (ci == null) {
+            if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) {
+                ci = rayHit.collider.GetComponent<CursorInteraction>();
+                if (ci == null) {
+                    ci = TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
+                }
+            }
+        }
+        if (ci == null) {
+            return;
+        }
+        ci.mouseDown(new VectorXZ(rayHit.point));
         line.SetPosition(1, ray.origin + ray.direction * 20f);
     }
 
