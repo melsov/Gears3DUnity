@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SocketSet 
 {
@@ -60,7 +61,7 @@ public class SocketSet
             if (!RelationshipConstraintUtil.Compatible(socketRelationshipConstraint, socket.relationshipConstraint)) { continue; }
             RotationMode relevantSocketRotationMode = socketRelationshipConstraint == RigidRelationshipConstraint.CAN_ONLY_BE_PARENT ? 
                 socket.socketIsParentRotationMode : socket.socketIsChildRotationMode;
-            if (!RotationModeHelper.CompatibleModes(requiredSocketRotationMode, relevantSocketRotationMode)) { continue; } //TODO: socket Is Child not nec. true. make sep class: SocketDJ
+            if (!RotationModeHelper.CompatibleModes(requiredSocketRotationMode, relevantSocketRotationMode)) { continue; } 
             Vector3 nextdDist = socket.transform.position - global;
             if (nextdDist.magnitude < dist.magnitude) {
                 dist = nextdDist;
@@ -70,10 +71,50 @@ public class SocketSet
         return closest;
     }
 
+    public List<Socket> socketsWithOpenChildPegs() {
+        List<Socket> result = new List<Socket>(sockets.Length);
+        foreach (Socket socket in sockets) {
+            if (socket.hasChildPeg() && !socket.childPeg.occupiedByChild) {
+                result.Add(socket);
+            }
+        }
+        return result;
+    }
+
+    public List<Socket> openChildableSockets() {
+        List<Socket> result = new List<Socket>(sockets.Length);
+        foreach (Socket socket in sockets) {
+            if (RelationshipConstraintUtil.CanBeAChild(socket.relationshipConstraint) && !socket.hasDrivingPeg()) {
+                result.Add(socket);
+            }
+        }
+        return result;
+    }
+
+    public virtual Socket openBackendSocketOnOtherClosestToOpenPegOnThis(Transform other, out Peg closestPeg) {
+        Socket aSocket = null;
+        closestPeg = null;
+        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        if (ssc == null) return null;
+        Vector3 distance = VectorXZ.maxVector3;
+        List<Socket> openBackendSockets = ssc.getBackendSocketSet().openChildableSockets();
+        List<Socket> openChildPegSockets = socketsWithOpenChildPegs();
+        foreach(Socket openBackSocket in openBackendSockets) {
+            foreach(Socket childPegSocket in openChildPegSockets) {
+                Vector3 nextDist = openBackSocket.transform.position - childPegSocket.transform.position;
+                if (distance.magnitude > nextDist.magnitude) {
+                    distance = nextDist;
+                    aSocket = openBackSocket;
+                    closestPeg = childPegSocket.childPeg;
+                }
+            }
+        }
+        return aSocket;
+    }
+
     public virtual Peg closestOpenPegOnFrontendOf(Collider other, out Socket closestSocket) {
         Peg aPeg = null;
         closestSocket = null;
-        Bug.printComponents(other.gameObject);
         ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
         if (ssc == null) return null;
         Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);

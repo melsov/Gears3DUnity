@@ -6,6 +6,7 @@ public struct VectorXZ  {
     private Vector2 v;
 
     public static VectorXZ maxValue = new VectorXZ(new Vector3(float.MaxValue, float.MaxValue, float.MaxValue));
+    public static Vector3 maxVector3 = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
     public static VectorXZ fakeNull = maxValue;
     public bool isFakeNull() {
         return this == fakeNull;

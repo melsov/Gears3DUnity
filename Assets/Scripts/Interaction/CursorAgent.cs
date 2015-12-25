@@ -24,12 +24,18 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
 
     public void startCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = true;
-        client.disconnect();
         dragOverrideCollider = null;
         dragOverrideCollider = RayCastUtil.getColliderUnderCursor(dragOverrideLayer, out rayHit);
-        if(overridingDrag) {
+        if (overridingDrag) {
             client.startDragOverride(cursorGlobal, dragOverrideCollider);
+        } else {
+            client.disconnect();
+            disableCollider(true);
         }
+    }
+
+    private void disableCollider(bool disable) {
+        client.mainCollider().enabled = !disable;
     }
 
     public bool shouldOverrideDrag(VectorXZ cursorGlobal) {
@@ -39,6 +45,7 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
     //TODO: fix problem with drags that never leave their former drivable/parent's collider: can't reconnect to them
     //TODO: add drag overriding mechanism to CursorInteractable
     public void cursorInteracting(VectorXZ cursorGlobal) {
+        disableCollider(false);
         if (overridingDrag) {
             client.dragOverride(cursorGlobal);
         }
@@ -49,8 +56,8 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
         if (overridingDrag) {
             client.endDragOverride(cursorGlobal);
         } else {
-            connectToColliders();
         }
+        connectToColliders();
     }
 
     public bool cursorInteracting() {
@@ -61,10 +68,20 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
         while(colliderDropper.colliders.Count > 0) {
             Collider c = colliderDropper.colliders[0];
             colliderDropper.colliders.RemoveAt(0);
-            if (client.connectTo(c)) {
+            unhighlight(c);
+            bool done = !overridingDrag ? client.connectTo(c) : client.makeConnectionWithAfterCursorOverride(c);
+            if (done) { 
                 colliderDropper.removeAll();
                 return;
             }
+        }
+    }
+
+// CONSIDER: the need for this function shows problems with the collider dropper / cursor agent system : for now: 'oh well'
+    private void unhighlight(Collider c) {
+        Highlighter h = c.GetComponent<Highlighter>();
+        if (h != null) {
+            h.unhighlight();
         }
     }
 
@@ -76,7 +93,9 @@ public interface ICursorAgentClient
     Collider shouldPreserveConnection();
     void disconnect();
     bool connectTo(Collider other);
+    bool makeConnectionWithAfterCursorOverride(Collider other);
     void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider);
     void dragOverride(VectorXZ cursorGlobal);
     void endDragOverride(VectorXZ cursorGlobal);
+    Collider mainCollider();
 }

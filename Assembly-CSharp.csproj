@@ -58,6 +58,7 @@
      <Compile Include="Assets\Scripts\Cog\GearSettings.cs" />
      <Compile Include="Assets\Scripts\Cog\HandCrank.cs" />
      <Compile Include="Assets\Scripts\Cog\Motor.cs" />
+     <Compile Include="Assets\Scripts\Cog\Pegboard.cs" />
      <Compile Include="Assets\Scripts\Cog\Pole.cs" />
      <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
@@ -67,6 +68,7 @@
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
      <Compile Include="Assets\Scripts\Utility\Bug.cs" />
      <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
+     <Compile Include="Assets\Scripts\Utility\Highlighter.cs" />
      <Compile Include="Assets\Scripts\Utility\RayCastUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />

@@ -88,4 +88,12 @@ public static class RelationshipConstraintUtil
     public static bool Compatible(RelationshipConstraint a, RigidRelationshipConstraint b) {
         return Compatible(b, a);
     }
+
+    public static bool CanBeAChild(RelationshipConstraint rc) {
+        return rc != RelationshipConstraint.CAN_ONLY_BE_PARENT;
+    }
+
+    public static bool CanBeAParent(RelationshipConstraint rc) {
+        return rc != RelationshipConstraint.CAN_ONLY_BE_CHILD;
+    }
 }

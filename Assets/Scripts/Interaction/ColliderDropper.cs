@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 
 public class ColliderDropper : MonoBehaviour {
-    //TODO: decide whether anyone needs this: maybe require users to implement an interface ColliderHandler
     
     public List<Collider> colliders = new List<Collider>();
     private ColliderDropperClient client;
@@ -14,17 +13,29 @@ public class ColliderDropper : MonoBehaviour {
     void OnTriggerEnter(Collider other) {
         if (client.cursorInteracting()) {
             if (!colliders.Contains(other)) {
+                highlight(other, true);
                 colliders.Add(other);
             }
         }
     }
 
     void OnTriggerExit(Collider other) {
+        highlight(other, false);
         colliders.Remove(other);
     }
 
     public void removeAll() {
         colliders.RemoveRange(0, colliders.Count);
+    }
+    
+    private void highlight(Collider other, bool wantHighlight) {
+        Highlighter h = other.GetComponent<Highlighter>();
+        if (h == null) return;
+        if (wantHighlight) {
+            h.highlight();
+        } else {
+            h.unhighlight();
+        }
     }
 }
 

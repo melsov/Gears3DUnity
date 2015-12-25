@@ -29,6 +29,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
     protected virtual void awake() {
         backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
         frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
+        gameObject.AddComponent<Highlighter>();
     }
 
     public virtual bool isOnAxel() {
@@ -154,9 +155,18 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         Socket aSocket;
         Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
+            //TODO: check socket/peg compatiblity?
             setSocketToPeg(aSocket, peg);
             return true;
         }
+        return false;
+    }
+
+    public bool makeConnectionWithAfterCursorOverride(Collider other) {
+        return vMakeConnectionWithAfterCursorOverride(other);
+    }
+    
+    protected virtual bool vMakeConnectionWithAfterCursorOverride(Collider other) {
         return false;
     }
 
@@ -229,6 +239,17 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
     }
 
     protected virtual void vEndDragOverride(VectorXZ cursorGlobal) {
+    }
+
+    public Collider mainCollider() {
+        return vMainCollider();
+    }
+    protected virtual Collider vMainCollider() {
+        Collider c = GetComponent<Collider>();
+        if (c == null) {
+            c = GetComponentInChildren<Collider>();
+        }
+        return c;
     }
     #endregion
 

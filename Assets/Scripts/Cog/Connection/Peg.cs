@@ -114,6 +114,10 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         return false;
     }
 
+    public bool makeConnectionWithAfterCursorOverride(Collider other) {
+        return false;
+    }
+
     public bool beChildOf(Socket socket) {
         socket.childPeg = this;
         TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
@@ -136,6 +140,8 @@ public class Peg : MonoBehaviour , ICursorAgentClient
 
     public void endDragOverride(VectorXZ cursorGlobal) {
     }
+
+    public Collider mainCollider() { return GetComponent<Collider>(); }
 }
 
 public enum RotationMode
