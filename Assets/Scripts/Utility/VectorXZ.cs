@@ -36,6 +36,21 @@ public struct VectorXZ  {
         get { return v.x * v.x + v.y * v.y; }
     }
 
+    public float magnitude {
+        get { return v.magnitude; }
+    }
+
+    public VectorXZ normalized {
+        get { return new VectorXZ(v.normalized); }
+    }
+
+    public VectorXZ normal {
+        get {
+            VectorXZ ized = normalized;
+            return new VectorXZ(ized.z, ized.x);
+        }
+    }
+
     public VectorXZ(Vector3 v3) {
         v = new Vector2(v3.x, v3.z);
     }
@@ -46,6 +61,14 @@ public struct VectorXZ  {
 
     public VectorXZ(float n) {
         v = new Vector2(n, n);
+    }
+
+    public VectorXZ(float _x, float _z) {
+        v = new Vector2(_x, _z);
+    }
+
+    public float dot(VectorXZ other) {
+        return Vector2.Dot(v, other.v);
     }
 
     public static VectorXZ operator +(VectorXZ a, VectorXZ b) {
@@ -60,11 +83,15 @@ public struct VectorXZ  {
     public static bool operator != (VectorXZ a, VectorXZ b) {
         return a.v != b.v;
     }
+    public static VectorXZ operator *(VectorXZ a, float b) {
+        return new VectorXZ(a.v * b);
+    }
+
     public override bool Equals(object obj) {
         return v.Equals(obj);
     }
     public override int GetHashCode() {
         return v.GetHashCode();
     }
-
+    
 }

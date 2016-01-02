@@ -8,8 +8,15 @@ public class TransformUtil : MonoBehaviour
         child.transform.SetParent(parent, true);
     }
 
+// CONSIDER: this seems to fail sometimes? maybe do some tests... use local scale as well?
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
-        Vector3 localOffset = localOffsetObject == null ? Vector3.zero : child.transform.rotation * localOffsetObject.transform.localPosition;
+        Vector3 localOffset = Vector3.zero;
+        if (localOffsetObject != null) {
+            localOffset = localOffsetObject.transform.localPosition;
+            localOffset.Scale(child.transform.localScale);
+            localOffset = child.transform.rotation * localOffset;
+        }
+
         child.transform.position = new Vector3(
             -localOffset.x +
             parent.position.x,

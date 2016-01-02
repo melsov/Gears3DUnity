@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperClient {
+public class CursorAgent : MonoBehaviour, CursorInteractable, IColliderDropperClient {
 
     private ColliderDropper colliderDropper;
     private bool _cursorInteracting;
@@ -11,23 +11,31 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
     private Collider preservedCollider;
     private int dragOverrideLayer;
     private RaycastHit rayHit;
+    
     private bool overridingDrag {
-        get { return dragOverrideCollider != null; }
+        get { return _dragOverrideCollider != null; }
     }
-    private Collider dragOverrideCollider;
+    private Collider _dragOverrideCollider;
+    public Collider dragOverrideCollider {
+        get { return _dragOverrideCollider; }
+    }
 
     void Awake() {
         colliderDropper = GetComponent<ColliderDropper>();
+        if (colliderDropper == null) {
+            colliderDropper = GetComponentInChildren<ColliderDropper>();
+        }
         client = GetComponent<ICursorAgentClient>();
         dragOverrideLayer = LayerMask.GetMask("DragOverride");
     }
 
+    //TODO: pegs on top of handles are hard to grab/remove from their parent sockets: give them priority over handles when selecting
     public void startCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = true;
-        dragOverrideCollider = null;
-        dragOverrideCollider = RayCastUtil.getColliderUnderCursor(dragOverrideLayer, out rayHit);
+        _dragOverrideCollider = null;
+        _dragOverrideCollider = RayCastUtil.getColliderUnderCursor(dragOverrideLayer, out rayHit);
         if (overridingDrag) {
-            client.startDragOverride(cursorGlobal, dragOverrideCollider);
+            client.startDragOverride(cursorGlobal, _dragOverrideCollider);
         } else {
             client.disconnect();
             disableCollider(true);
@@ -51,33 +59,42 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, ColliderDropperCli
         }
     }
 
+    public void handleTriggerExit(Collider other) {
+        client.triggerExitDuringDrag(other);
+    }
+
     public void endCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = false;
         if (overridingDrag) {
             client.endDragOverride(cursorGlobal);
-        } else {
-        }
-        connectToColliders();
+            //if (handle != null && handle.GetComponent<ColliderDropper>() != null) {
+            //    print("got component collider dropper from handle");
+            //    connectToColliders(handle.GetComponent<ColliderDropper>());
+            //    Destroy(handle.GetComponent<ColliderDropper>());
+            //    return;
+            //}
+        } 
+        connectToColliders(colliderDropper);
     }
 
-    public bool cursorInteracting() {
+    public bool isCursorInteracting() {
         return _cursorInteracting;
     }
 
-    private void connectToColliders() {
-        while(colliderDropper.colliders.Count > 0) {
-            Collider c = colliderDropper.colliders[0];
-            colliderDropper.colliders.RemoveAt(0);
+    private void connectToColliders(ColliderDropper dropper) {
+        while(dropper.colliders.Count > 0) {
+            Collider c = dropper.colliders[0];
+            dropper.colliders.RemoveAt(0);
             unhighlight(c);
             bool done = !overridingDrag ? client.connectTo(c) : client.makeConnectionWithAfterCursorOverride(c);
             if (done) { 
-                colliderDropper.removeAll();
+                dropper.removeAll();
                 return;
             }
         }
     }
 
-// CONSIDER: the need for this function shows problems with the collider dropper / cursor agent system : for now: 'oh well'
+    // CONSIDER: the need for this function shows problems with the collider dropper / cursor agent system : for now: 'oh well'
     private void unhighlight(Collider c) {
         Highlighter h = c.GetComponent<Highlighter>();
         if (h != null) {
@@ -98,4 +115,5 @@ public interface ICursorAgentClient
     void dragOverride(VectorXZ cursorGlobal);
     void endDragOverride(VectorXZ cursorGlobal);
     Collider mainCollider();
+    void triggerExitDuringDrag(Collider other);
 }

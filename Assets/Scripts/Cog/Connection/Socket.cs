@@ -4,6 +4,8 @@ using System.Collections;
 
 public class Socket : MonoBehaviour {
 
+    public Peg autoconnectPeg;
+
     public virtual RotationMode socketIsChildRotationMode {
         get { return RotationMode.FREE_OR_FIXED; }
     }
@@ -52,6 +54,19 @@ public class Socket : MonoBehaviour {
         parentContainer = GetComponentInParent<ISocketSetContainer>();
         Assert.IsTrue(parentContainer != null);
     }
+    void Start() {
+        if (autoconnectPeg != null) {
+            drivingPeg = autoconnectPeg;
+        }
+
+    }
+    
+    void LateUpdate() {
+        //TEST!
+        //if (autoconnectPeg != null) {
+        //    parentContainer.getTransform().position = autoconnectPeg.transform.position + (parentContainer.getTransform().position - transform.position);
+        //}
+    }
 
     public void disconnectDrivingPeg() {
         drivingPeg = null;
@@ -65,6 +80,29 @@ public class Socket : MonoBehaviour {
 
     public bool hasDrivingPeg() { return drivingPeg != null; }
     public bool hasChildPeg() { return childPeg != null; }
+    public bool isConnected() {
+        return hasChildPeg() || hasDrivingPeg();
+    }
+
+    public bool isFreeRotatingOnPeg() {
+        return hasDrivingPeg() && drivingPeg.pegIsParentRotationMode == RotationMode.FREE_ONLY;
+    }
+
+    public virtual ConstraintTarget getConstraintTargetForChildPegConstraint() {
+        return getConstraintTarget(true);
+    }
+    public virtual ConstraintTarget getConstraintTargetForParentPegConstratin() {
+        return getConstraintTarget(false);
+    }
+
+    protected virtual ConstraintTarget getConstraintTarget(bool forChild) {
+        ConstratintTargetSet cts = GetComponent<ConstratintTargetSet>();
+        if (cts != null) {
+            return forChild ? cts.forChildConstraintTarget : cts.forParentConstratintTarget;
+        }
+        return new ConstraintTarget(transform, null);
+    }
+
 }
 
 public enum RelationshipConstraint {

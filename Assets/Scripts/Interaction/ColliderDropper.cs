@@ -1,17 +1,22 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections.Generic;
 
 public class ColliderDropper : MonoBehaviour {
     
     public List<Collider> colliders = new List<Collider>();
-    private ColliderDropperClient client;
+    private IColliderDropperClient client;
 
     void Awake() {
-        client = GetComponent<ColliderDropperClient>();
+        client = GetComponent<IColliderDropperClient>();
+        if (client == null) {
+            client = GetComponentInParent<IColliderDropperClient>();
+            Assert.IsTrue(client != null);
+        }
     }
 
     void OnTriggerEnter(Collider other) {
-        if (client.cursorInteracting()) {
+        if (client.isCursorInteracting()) {
             if (!colliders.Contains(other)) {
                 highlight(other, true);
                 colliders.Add(other);
@@ -22,6 +27,9 @@ public class ColliderDropper : MonoBehaviour {
     void OnTriggerExit(Collider other) {
         highlight(other, false);
         colliders.Remove(other);
+        if (client.isCursorInteracting()) {
+            client.handleTriggerExit(other);
+        }
     }
 
     public void removeAll() {
@@ -37,9 +45,11 @@ public class ColliderDropper : MonoBehaviour {
             h.unhighlight();
         }
     }
+
 }
 
-public interface ColliderDropperClient
+public interface IColliderDropperClient
 {
-    bool cursorInteracting();
+    bool isCursorInteracting();
+    void handleTriggerExit(Collider other);
 }

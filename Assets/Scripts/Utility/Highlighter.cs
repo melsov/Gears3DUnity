@@ -7,7 +7,6 @@ public class Highlighter : MonoBehaviour {
     private Color defaultColor;
     public Color highlightColor = Color.red;
 
-	// Use this for initialization
 	void Awake () {
         _renderer = GetComponent<Renderer>();
         if (_renderer == null) {
@@ -24,6 +23,10 @@ public class Highlighter : MonoBehaviour {
 	
     public void highlight() {
         material.color = highlightColor;
+    }
+
+    public void highlight(Color color) {
+        material.color = color;
     }
 
     public void unhighlight() {

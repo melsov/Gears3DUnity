@@ -28,4 +28,10 @@ public class Bug : MonoBehaviour {
         print(compos);
         
     }
+
+    public static void debugIfHas<T>(GameObject go, string s) {
+        if (go.GetComponent<AddOn>() != null) {
+            print(s);
+        }
+    }
 }

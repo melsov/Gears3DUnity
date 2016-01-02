@@ -45,6 +45,15 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Scripts\Camera\ViewControls.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\AddOn.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Switch.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ToggleButton.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\Indicator.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\LightSwitchIndicator.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffIndicator.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Receiver\ReceiverAddOn.cs" />
      <Compile Include="Assets\Scripts\Cog\Axel.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
@@ -53,23 +62,32 @@
      <Compile Include="Assets\Scripts\Cog\Connection\Peg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
-     <Compile Include="Assets\Scripts\Cog\Drivable.cs" />
-     <Compile Include="Assets\Scripts\Cog\Gear.cs" />
-     <Compile Include="Assets\Scripts\Cog\GearSettings.cs" />
-     <Compile Include="Assets\Scripts\Cog\HandCrank.cs" />
-     <Compile Include="Assets\Scripts\Cog\Motor.cs" />
-     <Compile Include="Assets\Scripts\Cog\Pegboard.cs" />
-     <Compile Include="Assets\Scripts\Cog\Pole.cs" />
+     <Compile Include="Assets\Scripts\Cog\Constraint\Constraint.cs" />
+     <Compile Include="Assets\Scripts\Cog\Constraint\ConstratintTargetSet.cs" />
+     <Compile Include="Assets\Scripts\Cog\Constraint\LineSegment.cs" />
+     <Compile Include="Assets\Scripts\Cog\Constraint\LinearConstraint.cs" />
+     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\Gear.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\HandCrank.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />
+     <Compile Include="Assets\Scripts\Cog\Proxy\CollisionProxy.cs" />
+     <Compile Include="Assets\Scripts\Cog\Proxy\TriggerProxy.cs" />
      <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
      <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
+     <Compile Include="Assets\Scripts\UI\Pause.cs" />
      <Compile Include="Assets\Scripts\Utility\Bug.cs" />
      <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
      <Compile Include="Assets\Scripts\Utility\Highlighter.cs" />
+     <Compile Include="Assets\Scripts\Utility\LayerLookup.cs" />
      <Compile Include="Assets\Scripts\Utility\RayCastUtil.cs" />
+     <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
  <Reference Include="UnityEngine.UI">

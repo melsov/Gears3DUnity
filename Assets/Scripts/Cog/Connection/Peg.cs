@@ -24,6 +24,11 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         return hinge;
     }
 
+    private Constraint _isChildConstraint;
+    public virtual Constraint isChildConstraint {
+        get { return _isChildConstraint; }
+    }
+
     protected RotationMode _pegIsParentRotationMode {
         get { return __pegIsParentRotationMode; }
         set {
@@ -93,6 +98,9 @@ public class Peg : MonoBehaviour , ICursorAgentClient
 
     protected virtual void awake() {
         setMaterial();
+        _isChildConstraint = GetComponent<Constraint>();
+        gameObject.AddComponent<Highlighter>();
+        GetComponent<Highlighter>().highlightColor = Color.green;
     }
 
     public void disconnect() {
@@ -101,6 +109,15 @@ public class Peg : MonoBehaviour , ICursorAgentClient
             socket.childPeg = null;
         }
         transform.SetParent(null);
+        GetComponent<Highlighter>().unhighlight();
+    }
+
+    public void removeIsChildConstraintAndItsParentConstraint(Socket parent) { 
+        if (isChildConstraint != null) {
+            isChildConstraint.removeTarget();
+            GameObject.Destroy(isChildConstraint.constraintTarget.parentConstraint);
+            parent.childPeg = null;
+        }
     }
 
     public bool connectTo(Collider other) {
@@ -118,9 +135,22 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         return false;
     }
 
+    public virtual bool hasParentSocket {
+        get {
+            return transform.parent.GetComponent<Socket>() != null;
+        }
+    }
+
     public bool beChildOf(Socket socket) {
         socket.childPeg = this;
-        TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
+        if (isChildConstraint != null) {
+            isChildConstraint.constraintTarget = socket.getConstraintTargetForChildPegConstraint();
+            isChildConstraint.constraintTarget.parentConstraint = socket.parentContainer.getTransform().GetComponent<Drivable>().parentConstraintFor(isChildConstraint, transform);
+            // TODO: let parent constraint align the child?
+            GetComponent<Highlighter>().highlight(Color.cyan);
+        } else {
+            TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
+        }
         return true;
     }
 
@@ -142,6 +172,9 @@ public class Peg : MonoBehaviour , ICursorAgentClient
     }
 
     public Collider mainCollider() { return GetComponent<Collider>(); }
+
+    public void triggerExitDuringDrag(Collider other) {
+    }
 }
 
 public enum RotationMode
