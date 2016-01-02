@@ -81,6 +81,7 @@
      <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
      <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
+     <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
      <Compile Include="Assets\Scripts\UI\Pause.cs" />
      <Compile Include="Assets\Scripts\Utility\Bug.cs" />
      <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />

@@ -12,12 +12,6 @@ public class HandleSet : MonoBehaviour {
             return _handles;
         }
     }
-    
-    
-
-    void Awake() {
-
-    }
 
     public bool contains(Handle h) {
         foreach (Handle handle in handles) { 
@@ -39,4 +33,6 @@ public class HandleSet : MonoBehaviour {
         }
         return null;
     }
+
+    
 }

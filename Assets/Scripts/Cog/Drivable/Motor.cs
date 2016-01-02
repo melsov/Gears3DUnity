@@ -8,9 +8,9 @@ public class Motor : Drivable
     protected float _power = 1f;
     public virtual float power {
         get { return _power; }
-        set { _power = Mathf.Clamp(value, 0f, 1f); }
+        set { _power = Mathf.Clamp(value, -1f, 1f); }
     }
-    public bool isPowered { get { return _power > 0f; } }
+    //public bool isPowered { get { return _power > 0f; } }
 
     protected Axel _axel;
     public Axel axel {
@@ -27,9 +27,9 @@ public class Motor : Drivable
 	}
 
 	protected override void update () {
-        if (!isPowered) {
-            return;
-        }
+        //if (!isPowered) {
+        //    return;
+        //}
         angle += maxAngularVelocity * Time.deltaTime * power; // driveScalar();
         axel.turnTo(angle);
 	}

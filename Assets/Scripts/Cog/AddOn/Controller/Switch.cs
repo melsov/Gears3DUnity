@@ -4,15 +4,23 @@ using System;
 
 public class Switch : ControllerAddOn  {
 
+    public bool isReverseSwitch;
+
     protected OnOffIndicator onOffIndicator;
     private RaycastHit rch;
 
-    protected bool on;
+    protected ISwitchStateToggle on;
+
 
     protected override void awake() {
         base.awake();
+        if (isReverseSwitch) {
+            on = new ForwardReverseSwitchState(SwitchState.ON);
+        } else {
+            on = new OnOffSwitchState(SwitchState.ON);
+        }
         onOffIndicator = GetComponentInChildren<OnOffIndicator>();
-        onOffIndicator.gameObject.layer = LayerLookup.DragOverride;
+        if (onOffIndicator != null) onOffIndicator.gameObject.layer = LayerLookup.DragOverride;
     }
 
     protected override bool vConnectTo(Collider other) {
@@ -26,23 +34,27 @@ public class Switch : ControllerAddOn  {
 // to do: make this independant of indicator?
     protected override void vEndDragOverride(VectorXZ cursorGlobal) {
         // cursor still over indicator?
-        OnOffIndicator ooi = RayCastUtil.getColliderUnderCursor(out rch).GetComponent<OnOffIndicator>();
+        Collider underCursor = RayCastUtil.getColliderUnderCursor(out rch);
+        if (underCursor == null) {
+            return;
+        }
+        OnOffIndicator ooi = underCursor.GetComponent<OnOffIndicator>();
         if (ooi == onOffIndicator) {
             toggleOn();
         }
     }
 
     protected virtual void toggleOn() {
-        on = !on;
+        on.nextState();
         if (onOffIndicator != null) {
-            onOffIndicator.state = on;
+            onOffIndicator.state = on.getState();
         }
         updateClient();
     }
 
     protected virtual void updateClient() {
         if (client != null) {
-            setScalar(on ? 1f : 0f);
+            setScalar((int)on.getState());
         }
     }
 
@@ -81,4 +93,57 @@ public class Switch : ControllerAddOn  {
     }
 */
     #endregion
+}
+
+public enum SwitchState
+{
+    REVERSE = -1, OFF, ON
+};
+
+public interface ISwitchStateToggle
+{
+    void nextState();
+    SwitchState getState();
+}
+
+public struct OnOffSwitchState : ISwitchStateToggle
+{
+    private SwitchState state; // = SwitchState.OFF;
+    
+    public OnOffSwitchState(SwitchState state_) {
+        state = state_;
+    }
+
+    public SwitchState getState() {
+        return state;
+    }
+
+    public void nextState() {
+        if (state == SwitchState.OFF) {
+            state = SwitchState.ON;
+        } else {
+            state = SwitchState.OFF;
+        }
+    }
+}
+
+public struct ForwardReverseSwitchState : ISwitchStateToggle
+{
+    private SwitchState state;
+    public ForwardReverseSwitchState(SwitchState state_) {
+        state = state_;
+    }
+
+    public SwitchState getState() {
+        return state;
+    }
+
+    public void nextState() {
+        if (state == SwitchState.REVERSE) {
+            state = SwitchState.ON;
+        } else {
+            state = SwitchState.REVERSE;
+        }
+    }
+
 }

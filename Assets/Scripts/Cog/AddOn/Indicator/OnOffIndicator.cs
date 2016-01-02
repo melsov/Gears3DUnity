@@ -3,8 +3,8 @@ using System.Collections;
 
 public class OnOffIndicator : Indicator {
 
-    protected bool _state;
-    public bool state {
+    protected SwitchState _state;
+    public SwitchState state {
         set {
             _state = value;
             updateIndicator();
@@ -12,8 +12,10 @@ public class OnOffIndicator : Indicator {
     }
 
     protected override void updateIndicator() {
-        if (_state) {
+        if (_state == SwitchState.ON) {
             _renderer.material.SetColor("_Color", onColor);
+        } else if (_state == SwitchState.REVERSE) {
+            _renderer.material.SetColor("_Color", reverseColor);
         } else {
             _renderer.material.SetColor("_Color", offColor);
         }

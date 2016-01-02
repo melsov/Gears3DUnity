@@ -5,6 +5,7 @@ using System.Collections;
 public class Socket : MonoBehaviour {
 
     public Peg autoconnectPeg;
+    //public bool matePermanently; //TODO: implement permanency // consider whether you need a var for it here?
 
     public virtual RotationMode socketIsChildRotationMode {
         get { return RotationMode.FREE_OR_FIXED; }
@@ -31,6 +32,9 @@ public class Socket : MonoBehaviour {
             return _drivingPeg;
         }
         set {
+            if (matePermanently && _drivingPeg != null) {
+                return;
+            }
             if (value != null) {
                 _drivingPeg = value;
                 _drivingPeg.receiveChild(this);
@@ -58,7 +62,6 @@ public class Socket : MonoBehaviour {
         if (autoconnectPeg != null) {
             drivingPeg = autoconnectPeg;
         }
-
     }
     
     void LateUpdate() {
@@ -75,7 +78,12 @@ public class Socket : MonoBehaviour {
     private Peg _childPeg;
     public Peg childPeg {
         get { return _childPeg; } 
-        set { _childPeg = value;  }
+        set {
+            if (matePermanently && _childPeg != null) {
+                return;
+            }
+            _childPeg = value;
+        }
     }
 
     public bool hasDrivingPeg() { return drivingPeg != null; }

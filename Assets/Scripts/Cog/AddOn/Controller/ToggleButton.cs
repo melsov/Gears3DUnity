@@ -25,7 +25,8 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         get { return anchor.position - button.position; }
     }
 
-    void Awake () {
+    protected override void awake() {
+        base.awake();
         Assert.IsTrue(button.GetComponent<CollisionProxy>() != null);
         rb = button.GetComponent<Rigidbody>();
         Assert.IsTrue(rb.constraints == (RigidbodyConstraints.FreezeAll ^ RigidbodyConstraints.FreezePositionX ^ RigidbodyConstraints.FreezePositionZ)); // only x, z pos is not constrained
@@ -35,12 +36,10 @@ public class ToggleButton : Switch , ICollisionProxyClient {
 	}
     
     public void proxyCollisionEnter(Collision collision) {
-        float checktScale =  Vector3.Dot(collision.impulse.normalized, -buttonTravel.normalized);
         if (shouldTrackPress) {
-            float travelScale = checktScale; // Vector3.Dot(collision.impulse.normalized, -buttonTravel.normalized);
+            float travelScale =  Vector3.Dot(collision.impulse.normalized, buttonTravel.normalized);
             if (travelScale > sensitivity) {
                 shouldTrackPress = false;
-                print("got toggle on: " + on);
                 toggleOn();
             }
         }
@@ -63,7 +62,8 @@ public class ToggleButton : Switch , ICollisionProxyClient {
 	}
 
     void FixedUpdate() {
-        rb.AddForce(lineSegment.normalized.vector3(0f) * bounce * rb.drag * Mathf.Clamp(1f - (buttonTravel.sqrMagnitude) / (restDistance * restDistance), 0f, 1f));
+        rb.angularVelocity = Vector3.zero;
+        rb.AddForce(lineSegment.normalized.vector3(0f) * rb.mass * 120f); // TODO: indicator light // TODO: scale the pushback to distance (or is this not needed)?
     }
 
 }

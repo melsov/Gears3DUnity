@@ -6,6 +6,7 @@ public class Indicator : MonoBehaviour {
     protected Renderer _renderer;
     public Color onColor = Color.green;
     public Color offColor = Color.gray;
+    public Color reverseColor = Color.red;
 
     protected AddOn addOn;
 
