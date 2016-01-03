@@ -22,8 +22,8 @@ public class Motor : Drivable
 	protected override void awake () {
         base.awake();
         _axel = GetComponentInChildren<Axel>();
-        UnityEngine.Assertions.Assert.IsTrue(frontendSocketSet.sockets.Length == 1);
-        axel.beChildOf(frontendSocketSet.sockets[0]);
+        UnityEngine.Assertions.Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 1);
+        axel.beChildOf(_pegboard.getFrontendSocketSet().sockets[0]);
 	}
 
 	protected override void update () {

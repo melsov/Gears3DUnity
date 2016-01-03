@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections.Generic;
 using System;
 
-public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSetContainer, IAddOnClient
+public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClient // ISocketSetContainer,
 {
     protected AngleStep _angleStep;
     protected AngleStep angleStep {
@@ -14,8 +15,9 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         }
     }
     protected Socket connectedSocket;
-    protected SocketSet backendSocketSet;
-    protected SocketSet frontendSocketSet;
+    protected Pegboard _pegboard;
+    //protected SocketSet backendSocketSet;
+    //protected SocketSet frontendSocketSet;
 
     protected Drivable _driver;
     protected List<Drivable> drivables = new List<Drivable>();
@@ -31,45 +33,19 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
         awake();
 	}
     protected virtual void awake() {
-        backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
-        frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
+        _pegboard = GetComponent<Pegboard>();
+        if (_pegboard== null) {
+            _pegboard = GetComponentInChildren<Pegboard>();
+            if (_pegboard == null) {
+                _pegboard = gameObject.AddComponent<Pegboard>();
+            }
+        }
         gameObject.AddComponent<Highlighter>();
     }
 
     public virtual bool isOnAxel() {
         return connectedSocket != null && connectedSocket.axel != null && transform.parent != null;
     }
-
-    public Transform getTransform() {
-        return transform;
-    }
-
-    public Rigidbody getRigidbodyWithGravity() {
-        Rigidbody r = GetComponent<Rigidbody>();
-        if (r == null) {
-            r = gameObject.AddComponent<Rigidbody>();
-        }
-        r.useGravity = true;
-        return r;
-    }
-
-    public void unsetRigidbodyWithGravity() {
-        Rigidbody r = GetComponent<Rigidbody>();
-        if (r != null) {
-            r.useGravity = false;
-            r.velocity = Vector3.zero;
-            r.angularVelocity = Vector3.zero;
-        }
-    }
-
-    public SocketSet getBackendSocketSet() {
-        return backendSocketSet;
-    }
-
-    public SocketSet getFrontendSocketSet() {
-        return frontendSocketSet;
-    }
-
 
     protected float axisRotation {
         get { return transform.rotation.eulerAngles.y; }
@@ -101,7 +77,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
     }
 
     protected virtual void setSocketClosestToAxel(Axel axel) {
-        connectedSocket = backendSocketSet.getOpenChildSocketClosestTo(axel.transform.position, axel.pegIsParentRotationMode); 
+        connectedSocket = _pegboard.getBackendSocketSet().getOpenChildSocketClosestTo(axel.transform.position, axel.pegIsParentRotationMode); 
         setSocketToPeg(connectedSocket, axel);
     }
 
@@ -133,13 +109,17 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
             _driver.removeDrivable(this);
         disconnectFromDriver();
         disconnectSockets();
+        transform.SetParent(null);
     }
 
     protected virtual void disconnectSockets() {
-        foreach (Socket soc in getBackendSocketSet().sockets) {
-            soc.disconnectDrivingPeg();
+        foreach (Socket soc in _pegboard.getBackendSocketSet().sockets) {
+            // do we own this peg?
+            if (soc.hasDrivingPeg() && soc.drivingPeg.owner != this) {
+                soc.disconnectDrivingPeg();
+            }
         }
-        foreach(Socket soc in getFrontendSocketSet().sockets) {
+        foreach(Socket soc in _pegboard.getFrontendSocketSet().sockets) {
             // remove any child constraints
             if (soc.hasChildPeg()) {
                 soc.childPeg.removeIsChildConstraintAndItsParentConstraint(soc);
@@ -152,7 +132,6 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
     }
 
     protected virtual void detachFromAxel() {
-        transform.SetParent(null);
         connectedSocket = null;
     }
 
@@ -163,7 +142,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
     protected virtual bool vConnectTo(Collider other) {
         // Connect to any peg or axel
         Socket aSocket;
-        Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
+        Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
             //TODO: check socket/peg compatiblity?
             setSocketToPeg(aSocket, peg);
@@ -262,7 +241,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , ISocketSet
             print("vTriggerExit: ssc null");
             return;
         }
-        Peg parentPeg = getBackendSocketSet().pegDrivingThisSetOnOther(ssc.getFrontendSocketSet());
+        Peg parentPeg = _pegboard.getBackendSocketSet().pegDrivingThisSetOnOther(ssc.getFrontendSocketSet());
         bool shouldDisconnect = false;
         if (parentPeg != null) {
             print("vTriggerExit: parent peg null");

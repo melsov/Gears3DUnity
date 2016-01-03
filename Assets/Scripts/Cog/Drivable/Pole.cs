@@ -9,13 +9,13 @@ public class Pole : Drivable
 {
     protected override void awake() {
         base.awake();
-        Assert.IsTrue(getBackendSocketSet().sockets.Length == 2);
-        Assert.IsTrue(getFrontendSocketSet().sockets.Length == 2);
+        Assert.IsTrue(_pegboard.getBackendSocketSet().sockets.Length == 2);
+        Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 2);
     }
 
     protected override bool vConnectTo(Collider other) {
         Socket aSocket;
-        Peg peg = backendSocketSet.closestOpenPegOnFrontendOf(other, out aSocket);
+        Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
             if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
                 setSocketToPeg(aSocket, peg);
@@ -34,7 +34,7 @@ public class Pole : Drivable
         // CASE 1: this is a socket that has a hinge connection such that 
         // we can connect to it and still keep any parent connection? 
         // CASE A:
-        if (!backendSocketSet.isConnected()) {
+        if (! _pegboard.getBackendSocketSet().isConnected()) {
             return vConnectTo(other);
         }
 
@@ -47,6 +47,11 @@ public class Pole : Drivable
 
         Peg aPeg = null;
         Socket aSocket = null;
+        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        if (ssc == null) {
+            print("no socket set on");
+            Bug.printComponents(other.gameObject);
+        }
         SocketSet otherBackendSet = other.GetComponent<ISocketSetContainer>().getBackendSocketSet();
         if (otherBackendSet == null) {
             print("other backend socket set null");
@@ -66,7 +71,7 @@ public class Pole : Drivable
             print("front soc no child peg");
             aSocket = frontSocket;
             // get a peg on backend of other
-            Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about rm?
+            Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
             if (childSocket != null) {
                 if (childSocket.drivingPeg != null) {
                     childSocket.drivingPeg.beChildOf(aSocket);
@@ -81,11 +86,11 @@ public class Pole : Drivable
     public override Constraint parentConstraintFor(Constraint childConstraint, Transform childTransform) {
         Socket socket = childConstraint.constraintTarget.target.GetComponent<Socket>();
 
-        if (!frontendSocketSet.contains(socket)) { // this would be queer
+        if (!_pegboard.getFrontendSocketSet().contains(socket)) { // this would be queer
             return null;
         }
         Socket freeRotatingBackendSocket = null;
-        foreach(Socket s in backendSocketSet.sockets) {
+        foreach(Socket s in _pegboard.getBackendSocketSet().sockets) {
             print("s has parent: " + s.hasDrivingPeg());
             if (s.isFreeRotatingOnPeg()) {
                 freeRotatingBackendSocket = s;
@@ -108,8 +113,8 @@ public class Pole : Drivable
 
     protected override void vDisconnect() {
         base.vDisconnect();
-        backendSocketSet.removeConstraintTargetSets();
-        frontendSocketSet.removeConstraintTargetSets();
+        _pegboard.getBackendSocketSet().removeConstraintTargetSets();
+        _pegboard.getFrontendSocketSet().removeConstraintTargetSets();
     }
 
     public override float driveScalar() {

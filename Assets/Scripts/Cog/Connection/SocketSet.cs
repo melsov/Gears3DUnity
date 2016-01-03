@@ -7,7 +7,11 @@ public class SocketSet
     public Socket[] sockets;
 
     public SocketSet(Socket[] _sockets) {
-        sockets = _sockets;
+        if (_sockets != null) {
+            sockets = _sockets;
+        } else {
+            sockets = new Socket[] { };
+        }
     }
 
     public bool contains(Socket s) {

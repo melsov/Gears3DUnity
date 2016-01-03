@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 using System;
 
@@ -26,6 +27,7 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, IColliderDropperCl
             colliderDropper = GetComponentInChildren<ColliderDropper>();
         }
         client = GetComponent<ICursorAgentClient>();
+        Assert.IsTrue(client != null);
         dragOverrideLayer = LayerMask.GetMask("DragOverride");
     }
 

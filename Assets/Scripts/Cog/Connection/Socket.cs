@@ -24,7 +24,16 @@ public class Socket : MonoBehaviour {
         get { return (Axel) drivingPeg; }
     }
 
-    public ISocketSetContainer parentContainer;
+    protected ISocketSetContainer _parentContainer;
+    public ISocketSetContainer parentContainer {
+        get {
+            if (_parentContainer == null) {
+                _parentContainer = GetComponentInParent<ISocketSetContainer>();
+                Assert.IsTrue(_parentContainer != null);
+            }
+            return _parentContainer;
+        }
+    }
 
     private Peg _drivingPeg;
     public Peg drivingPeg {
@@ -32,9 +41,6 @@ public class Socket : MonoBehaviour {
             return _drivingPeg;
         }
         set {
-            if (matePermanently && _drivingPeg != null) {
-                return;
-            }
             if (value != null) {
                 _drivingPeg = value;
                 _drivingPeg.receiveChild(this);
@@ -55,20 +61,12 @@ public class Socket : MonoBehaviour {
 
     protected virtual void awake() {
         gameObject.layer = LayerMask.NameToLayer("CogComponent");
-        parentContainer = GetComponentInParent<ISocketSetContainer>();
-        Assert.IsTrue(parentContainer != null);
     }
+
     void Start() {
         if (autoconnectPeg != null) {
             drivingPeg = autoconnectPeg;
         }
-    }
-    
-    void LateUpdate() {
-        //TEST!
-        //if (autoconnectPeg != null) {
-        //    parentContainer.getTransform().position = autoconnectPeg.transform.position + (parentContainer.getTransform().position - transform.position);
-        //}
     }
 
     public void disconnectDrivingPeg() {
@@ -79,9 +77,6 @@ public class Socket : MonoBehaviour {
     public Peg childPeg {
         get { return _childPeg; } 
         set {
-            if (matePermanently && _childPeg != null) {
-                return;
-            }
             _childPeg = value;
         }
     }

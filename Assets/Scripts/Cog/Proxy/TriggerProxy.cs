@@ -12,7 +12,7 @@ public class TriggerProxy : MonoBehaviour {
 	void Awake () {
         Assert.IsTrue(GetComponent<Collider>() != null);
         GetComponent<Collider>().isTrigger = true;
-        client = TransformUtil.FindTypeInParentRecursive<ITriggerProxyClient>(transform, 3);
+        client = GetComponentInParent<ITriggerProxyClient>(); // TransformUtil.FindTypeInParentRecursive<ITriggerProxyClient>(transform, 3);
         Assert.IsTrue(client != null);
 	}
 

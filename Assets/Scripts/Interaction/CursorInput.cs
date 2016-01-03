@@ -53,7 +53,7 @@ public class CursorInput : MonoBehaviour {
         if (Physics.Raycast(ray, out rayHit, 100f, dragOverrideMask)) {
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
-                ci = TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
+                ci = rayHit.collider.GetComponentInParent<CursorInteraction>(); // TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
             }
         }
 
@@ -61,7 +61,7 @@ public class CursorInput : MonoBehaviour {
             if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) {
                 ci = rayHit.collider.GetComponent<CursorInteraction>();
                 if (ci == null) {
-                    ci = TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
+                    ci = rayHit.collider.GetComponentInParent<CursorInteraction>();// TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
                 }
             }
         }

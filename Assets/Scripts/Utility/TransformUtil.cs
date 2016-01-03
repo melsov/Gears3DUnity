@@ -24,13 +24,13 @@ public class TransformUtil : MonoBehaviour
             -localOffset.z +
             parent.position.z);
     }
-
-    public static T FindTypeInParentRecursive<T>(Transform t, int levelLimit) {
-        if (levelLimit <= 0 || t == null ) { return default(T); }
-        T result = t.GetComponentInParent<T>();
-        if (result == null) {
-            return FindTypeInParentRecursive<T>(t.parent, --levelLimit);
-        }
-        return result;
-    }
+    //haha: Get Component in Parent is recursive already
+    //public static T FindTypeInParentRecursive<T>(Transform t, int levelLimit) {
+    //    if (levelLimit <= 0 || t == null ) { return default(T); }
+    //    T result = t.GetComponentInParent<T>();
+    //    if (result == null) {
+    //        return FindTypeInParentRecursive<T>(t.parent, --levelLimit);
+    //    }
+    //    return result;
+    //}
 }

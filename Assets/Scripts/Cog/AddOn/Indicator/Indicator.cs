@@ -15,7 +15,7 @@ public class Indicator : MonoBehaviour {
 	}
     protected virtual void awake() {
         _renderer = GetComponent<Renderer>();
-        addOn = TransformUtil.FindTypeInParentRecursive<AddOn>(transform, 3);
+        addOn = GetComponentInParent<AddOn>(); // TransformUtil.FindTypeInParentRecursive<AddOn>(transform, 3);
     }
 
     protected virtual void updateIndicator() { }

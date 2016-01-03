@@ -34,4 +34,10 @@ public class Bug : MonoBehaviour {
             print(s);
         }
     }
+
+    public static void debugIfIs<T>(MonoBehaviour o, string s) {
+        if (o is T) {
+            print(s);
+        }
+    }
 }

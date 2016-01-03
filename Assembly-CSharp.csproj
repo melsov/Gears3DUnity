@@ -70,6 +70,7 @@
      <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Gear.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\HandCrank.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\LinearActuator.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />

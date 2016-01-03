@@ -12,6 +12,11 @@ public class Peg : MonoBehaviour , ICursorAgentClient
 
     public Hinge hingePrefab;
 
+    protected Drivable _owner;
+    public Drivable owner {
+        get { return _owner; }
+    }
+
     protected Hinge getHinge() {
         Hinge hinge = GetComponentInChildren<Hinge>();
         if (hinge == null) {
@@ -101,6 +106,7 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         _isChildConstraint = GetComponent<Constraint>();
         gameObject.AddComponent<Highlighter>();
         GetComponent<Highlighter>().highlightColor = Color.green;
+        _owner = GetComponentInParent<Drivable>();
     }
 
     public void disconnect() {
@@ -122,9 +128,9 @@ public class Peg : MonoBehaviour , ICursorAgentClient
 
     public bool connectTo(Collider other) {
         if (other == null) return false;
-        Drivable drivable = other.GetComponent<Drivable>();
-        if (drivable != null) {
-            Socket socket = drivable.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode); 
+        Pegboard pegboard = other.GetComponent<Pegboard>();
+        if (pegboard != null) {
+            Socket socket = pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode); 
             if (socket == null) return false;
             return beChildOf(socket);
         }
