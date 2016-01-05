@@ -32,6 +32,9 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, IColliderDropperCl
     }
 
     //TODO: pegs on top of handles are hard to grab/remove from their parent sockets: give them priority over handles when selecting
+    //TODO: let drivable handle moving itself! get move code out of CursorInteraction: will need to add / rearrange some ICursorAgentClient methods
+    // Impetus for this: LinearActuator needs to test whether it should disconnect from its constraint pair thing as it moves (or at least at the end of the move)
+    //TODO: BUG: disconnecting pole sometimes causes it to fly away violently or glide gently. Ensure that velocity is zero when disconnecting?
     public void startCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = true;
         _dragOverrideCollider = null;
@@ -52,8 +55,6 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, IColliderDropperCl
         return overridingDrag;
     }
 
-    //TODO: fix problem with drags that never leave their former drivable/parent's collider: can't reconnect to them
-    //TODO: add drag overriding mechanism to CursorInteractable
     public void cursorInteracting(VectorXZ cursorGlobal) {
         disableCollider(false);
         if (overridingDrag) {
@@ -69,12 +70,6 @@ public class CursorAgent : MonoBehaviour, CursorInteractable, IColliderDropperCl
         _cursorInteracting = false;
         if (overridingDrag) {
             client.endDragOverride(cursorGlobal);
-            //if (handle != null && handle.GetComponent<ColliderDropper>() != null) {
-            //    print("got component collider dropper from handle");
-            //    connectToColliders(handle.GetComponent<ColliderDropper>());
-            //    Destroy(handle.GetComponent<ColliderDropper>());
-            //    return;
-            //}
         } 
         connectToColliders(colliderDropper);
     }

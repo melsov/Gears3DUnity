@@ -47,12 +47,13 @@ public class Pole : Drivable
 
         Peg aPeg = null;
         Socket aSocket = null;
-        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = TransformUtil.FindComponentInThisOrChildren<ISocketSetContainer>(other.transform); // other.GetComponent<ISocketSetContainer>();
         if (ssc == null) {
             print("no socket set on");
             Bug.printComponents(other.gameObject);
+            return false;
         }
-        SocketSet otherBackendSet = other.GetComponent<ISocketSetContainer>().getBackendSocketSet();
+        SocketSet otherBackendSet = ssc.getBackendSocketSet();
         if (otherBackendSet == null) {
             print("other backend socket set null");
             return false;

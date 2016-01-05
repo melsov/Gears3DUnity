@@ -11,4 +11,9 @@ public class LinearActuator : Drivable {
         return drive;
     }
 
+    // Linear Actuator never does the connecting itself?
+    protected override bool vConnectTo(Collider other) {
+        return false;
+    }
+
 }

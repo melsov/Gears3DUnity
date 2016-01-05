@@ -24,6 +24,13 @@ public class TransformUtil : MonoBehaviour
             -localOffset.z +
             parent.position.z);
     }
+    public static T FindComponentInThisOrChildren<T>(Transform t) {
+        T result = t.GetComponent<T>();
+        if (result == null) {
+            result = t.GetComponentInChildren<T>();
+        }
+        return result;
+    }
     //haha: Get Component in Parent is recursive already
     //public static T FindTypeInParentRecursive<T>(Transform t, int levelLimit) {
     //    if (levelLimit <= 0 || t == null ) { return default(T); }

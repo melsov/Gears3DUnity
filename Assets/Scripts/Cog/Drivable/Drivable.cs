@@ -104,6 +104,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     }
 
     protected virtual void vDisconnect() {
+        Bug.debugIfIs<LinearActuator>(this, "linear actuator vDisconnect");
         detachFromAxel();
         if (_driver != null)
             _driver.removeDrivable(this);
