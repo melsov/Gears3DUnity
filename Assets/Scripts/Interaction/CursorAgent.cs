@@ -3,7 +3,7 @@ using UnityEngine.Assertions;
 using System.Collections;
 using System;
 
-public class CursorAgent : MonoBehaviour, CursorInteractable, IColliderDropperClient {
+public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperClient {
 
     private ColliderDropper colliderDropper;
     private bool _cursorInteracting;
