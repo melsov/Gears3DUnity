@@ -109,6 +109,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
             rb.velocity = Vector3.zero;
         }
         Bug.debugIfIs<LinearActuator>(this, "linear actuator vDisconnect");
+        Bug.debugIfIs<Pole>(this, "pole vDisconnect");
         detachFromAxel();
         if (_driver != null)
             _driver.removeDrivable(this);
@@ -119,16 +120,12 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
 
     protected virtual void disconnectSockets() {
         foreach (Socket soc in _pegboard.getBackendSocketSet().sockets) {
-            // do we own this peg?
             if (soc.hasDrivingPeg() && soc.drivingPeg.owner != this) {
                 soc.disconnectDrivingPeg();
             }
         }
         foreach(Socket soc in _pegboard.getFrontendSocketSet().sockets) {
-            // remove any child constraints
-            if (soc.hasChildPeg()) {
-                soc.childPeg.removeIsChildConstraintAndItsParentConstraint(soc);
-            }
+            soc.removeConstraint();
         }
     }
 
@@ -145,11 +142,11 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     }
 
     protected virtual bool vConnectTo(Collider other) {
+        if (isConnectedTo(other.transform)) return false;
         // Connect to any peg or axel
         Socket aSocket;
         Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
-            //TODO: check socket/peg compatiblity?
             setSocketToPeg(aSocket, peg);
             return true;
         }
@@ -161,6 +158,23 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     }
     
     protected virtual bool vMakeConnectionWithAfterCursorOverride(Collider other) {
+        return false;
+    }
+
+    protected virtual bool isConnectedTo(Transform t) {
+        if (t == null) return false;
+        Drivable other = TransformUtil.FindComponentInThisOrParent<Drivable>(t);
+        if (other == null) return false;
+        foreach (Socket s in _pegboard.getBackendSocketSet().sockets) {
+            if (other == s.connectedDrivable()) {
+                return true;
+            }
+        }
+        foreach(Socket s in _pegboard.getFrontendSocketSet().sockets) {
+            if (other == s.connectedDrivable()) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -220,7 +234,16 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
         }
     }
 
+    protected virtual void removeConstraintsFromWidget(Handle handle) {
+        if (handle.widget == null) return;
+        Socket socket = handle.widget.GetComponent<Socket>();
+        if (socket != null) {
+            socket.removeConstraint();
+        }
+    }
+
     protected virtual void vStartDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+        removeConstraintsFromWidget(dragOverrideCollider.GetComponent<Handle>());
         _cursorRotationHandle = dragOverrideCollider.transform;
         _cursorRotationPivot = null;
         updateCursorRotationPivot (dragOverrideCollider);
@@ -273,7 +296,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
         Collider c = GetComponent<Collider>();
         if (c == null) {
             List<Transform> mainColliders = TagLookup.ChildrenWithTag(gameObject, TagLookup.MainCollider);
-            UnityEngine.Assertions.Assert.IsTrue(mainColliders.Count < 2);
+            Assert.IsTrue(mainColliders.Count < 2);
             if (mainColliders.Count == 1) {
                 c = mainColliders[0].GetComponent<Collider>();
             } else {

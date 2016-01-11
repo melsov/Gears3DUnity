@@ -14,6 +14,7 @@ public class Pole : Drivable
     }
 
     protected override bool vConnectTo(Collider other) {
+        if (isConnectedTo(other.transform)) { return false; }
         Socket aSocket;
         Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
@@ -31,6 +32,9 @@ public class Pole : Drivable
 
 //CONSIDER: make a drivable default version of vMakeConn...
     protected override bool vMakeConnectionWithAfterCursorOverride(Collider other) {
+        if (isConnectedTo(other.transform)) {
+            return false;
+        }
         // CASE 1: this is a socket that has a hinge connection such that 
         // we can connect to it and still keep any parent connection? 
         // CASE A:
@@ -39,7 +43,7 @@ public class Pole : Drivable
         }
 
         //CASE B:
-        print("vMake connection");
+        print("vMake connection after cursor override: other name: " + other.name);
         Collider dOC = GetComponent<CursorAgent>().dragOverrideCollider;
         Handle handle = dOC.GetComponent<Handle>();
         Socket frontSocket = handle.widget.GetComponent<Socket>();
@@ -69,12 +73,13 @@ public class Pole : Drivable
                 return true;
             }
         } else {
-            print("front soc no child peg");
             aSocket = frontSocket;
+            print("front socket no child peg");
             // get a peg on backend of other
             Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
             if (childSocket != null) {
                 if (childSocket.drivingPeg != null) {
+                    print("found driving peg on back of other: driving peg be child of");
                     childSocket.drivingPeg.beChildOf(aSocket);
                     return true;
                 }
@@ -84,6 +89,7 @@ public class Pole : Drivable
         return false;
     }
 
+    //CONSIDER: what kinds of parent constraints should go with what kinds of child constraints and where to enforce these decisions
     public override Constraint parentConstraintFor(Constraint childConstraint, Transform childTransform) {
         Socket socket = childConstraint.constraintTarget.target.GetComponent<Socket>();
 

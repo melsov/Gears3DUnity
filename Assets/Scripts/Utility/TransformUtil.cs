@@ -31,6 +31,15 @@ public class TransformUtil : MonoBehaviour
         }
         return result;
     }
+
+    public static T FindComponentInThisOrParent<T>(Transform t) {
+        T result = t.GetComponent<T>();
+        if (result == null) {
+            result = t.GetComponentInParent<T>();
+        }
+        return result;
+    }
+
     //haha: Get Component in Parent is recursive already
     //public static T FindTypeInParentRecursive<T>(Transform t, int levelLimit) {
     //    if (levelLimit <= 0 || t == null ) { return default(T); }

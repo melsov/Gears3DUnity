@@ -15,6 +15,7 @@ public class LineSegment : MonoBehaviour {
     // Use this for initialization
     void Awake () {
         lr = GetComponent<LineRenderer>();
+        debug();
 	}
 
     public VectorXZ distance {
@@ -56,6 +57,7 @@ public class LineSegment : MonoBehaviour {
     }
 
     private void debug() {
+        if (lr == null) return;
         lr.SetPosition(0, closestPoint(new VectorXZ(start.position + Vector3.right * .2f)).vector3(transform.position.y));
         lr.SetPosition(1, closestPoint(new VectorXZ(end.position)).vector3(transform.position.y));
     }

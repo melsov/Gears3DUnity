@@ -24,6 +24,7 @@ public class Gear : Drivable  {
         if (isDriven()) { //TODO: aren't we guaranteed not to be connected at this point?
             return false;
         }
+        if (isConnectedTo(other.transform)) { return false; }
         // If this is an axel, get driven by it
         Axel axel = getAxel(other);
         if (axel != null) {

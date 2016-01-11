@@ -33,7 +33,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
 
     //TODO: pegs on top of handles are hard to grab/remove from their parent sockets: give them priority over handles when selecting
     //TODO: let drivable handle moving itself! get move code out of CursorInteraction: will need to add / rearrange some ICursorAgentClient methods
-    // Impetus for this: LinearActuator needs to test whether it should disconnect from its constraint pair thing as it moves (or at least at the end of the move)
+    //Impetus for this: LinearActuator needs to test whether it should disconnect from its constraint pair thing as it moves (or at least at the end of the move)
     //TODO: BUG: disconnecting pole sometimes causes it to fly away violently or glide gently. Ensure that velocity is zero when disconnecting?
     public void startCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = true;

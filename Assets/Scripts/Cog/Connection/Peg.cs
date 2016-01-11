@@ -12,9 +12,23 @@ public class Peg : MonoBehaviour , ICursorAgentClient
 
     public Hinge hingePrefab;
 
-    protected Drivable _owner;
+    protected Drivable _owner; //owners permanently own pegs (pegboards with pegs on them are not owners)
     public Drivable owner {
         get { return _owner; }
+    }
+
+    protected WeakReference _parentSocket;
+    public Socket parent {
+        get {
+            return _parentSocket.Target as Socket;
+        }
+    }
+
+    protected WeakReference _childSocket;
+    public Socket child {
+        get {
+            return _childSocket.Target as Socket;
+        }
     }
 
     protected Hinge getHinge() {
@@ -50,12 +64,14 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         } else {
             TransformUtil.ParentToAndAlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
         }
+        _childSocket = new WeakReference(socket);
     } 
 
     public void releaseChild(Socket socket) {
         if (getHinge() != null) {
             getHinge().disconnectObject();
         }
+        _childSocket.Target = null;
     }
 
     private Renderer findRenderer() {
@@ -114,7 +130,9 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         if (socket != null) {
             socket.childPeg = null;
         }
-        transform.SetParent(null);
+        if (_owner == null) {
+            transform.SetParent(null);
+        }
         GetComponent<Highlighter>().unhighlight();
     }
 
@@ -149,6 +167,7 @@ public class Peg : MonoBehaviour , ICursorAgentClient
 
     public bool beChildOf(Socket socket) {
         socket.childPeg = this;
+        _parentSocket = new WeakReference(socket);
         if (isChildConstraint != null) {
             isChildConstraint.constraintTarget = socket.getConstraintTargetForChildPegConstraint();
             isChildConstraint.constraintTarget.parentConstraint = socket.parentContainer.getTransform().GetComponent<Drivable>().parentConstraintFor(isChildConstraint, transform);

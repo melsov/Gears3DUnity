@@ -20,4 +20,8 @@ public class Hinge : MonoBehaviour {
     public void disconnectObject() {
         getHingeJoint().connectedBody = null;
     }
+
+    public Transform getConnectedBody() {
+        return getHingeJoint().connectedBody.transform;
+    }
 }

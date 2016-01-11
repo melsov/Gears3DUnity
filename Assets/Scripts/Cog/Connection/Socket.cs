@@ -2,7 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 
-public class Socket : MonoBehaviour {
+public abstract class Socket : MonoBehaviour {
 
     public Peg autoconnectPeg;
     //public bool matePermanently; //TODO: implement permanency // consider whether you need a var for it here?
@@ -15,8 +15,8 @@ public class Socket : MonoBehaviour {
         get { return RotationMode.FREE_OR_FIXED; }
     }
 
-    protected RelationshipConstraint _relationshipConstraint = RelationshipConstraint.CAN_BE_CHILD_OR_PARENT;
-    public virtual RelationshipConstraint relationshipConstraint {
+    protected RigidRelationshipConstraint _relationshipConstraint = RigidRelationshipConstraint.CAN_ONLY_BE_CHILD;
+    public virtual RigidRelationshipConstraint relationshipConstraint {
         get { return _relationshipConstraint; }
     }
 
@@ -33,6 +33,9 @@ public class Socket : MonoBehaviour {
             }
             return _parentContainer;
         }
+    }
+    public Drivable getParentDrivable() {
+        return parentContainer.getTransform().GetComponent<Drivable>();
     }
 
     private Peg _drivingPeg;
@@ -106,6 +109,30 @@ public class Socket : MonoBehaviour {
         return new ConstraintTarget(transform, null);
     }
 
+    public void removeConstraint() {
+        if (hasChildPeg()) {
+            childPeg.removeIsChildConstraintAndItsParentConstraint(this);
+        }
+    }
+
+    public Drivable connectedDrivable() {
+        Peg peg = null;
+        Socket otherSocket = null;
+        if (hasChildPeg()) {
+            peg = childPeg;
+            otherSocket = peg.child;
+        } else if (hasDrivingPeg()) {
+            peg = drivingPeg;
+            otherSocket = peg.parent;
+        } else {
+            return null;
+        }
+        if (peg.owner != null) {
+            return peg.owner;
+        }
+        return otherSocket.getParentDrivable();
+    }
+
 }
 
 public enum RelationshipConstraint {
@@ -129,12 +156,24 @@ public static class RelationshipConstraintUtil
     public static bool Compatible(RelationshipConstraint a, RigidRelationshipConstraint b) {
         return Compatible(b, a);
     }
+    
+    public static bool Compatible(RigidRelationshipConstraint a, RigidRelationshipConstraint b) {
+        return (int)a == (int)b;
+    }
 
     public static bool CanBeAChild(RelationshipConstraint rc) {
         return rc != RelationshipConstraint.CAN_ONLY_BE_PARENT;
     }
 
+    public static bool CanBeAChild(RigidRelationshipConstraint rrc) {
+        return CanBeAChild((RelationshipConstraint)rrc);
+    }
+
     public static bool CanBeAParent(RelationshipConstraint rc) {
         return rc != RelationshipConstraint.CAN_ONLY_BE_CHILD;
+    }
+
+    public static bool CanBeAParent(RigidRelationshipConstraint rrc) {
+        return CanBeAParent((RelationshipConstraint)rrc);
     }
 }
