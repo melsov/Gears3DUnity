@@ -25,7 +25,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     protected ControllerAddOn controllerAddOn;
     protected List<ReceiverAddOn> receiverAddOns = new List<ReceiverAddOn>();
 
-    protected float radius {
+    protected virtual float radius {
         get { return  GetComponent<CapsuleCollider>().radius * transform.localScale.x; }
     }
 
@@ -413,6 +413,7 @@ public struct Drive
 {
     public Transform atPoint;
     public float amount;
+    public static Drive Zero = new Drive(null, 0f);
 
     public Drive(Transform _atPoint, float _amount) {
         atPoint = _atPoint; amount = _amount;
@@ -421,4 +422,6 @@ public struct Drive
     public Drive(float _amount) {
         atPoint = null; amount = _amount;
     }
+
+
 }

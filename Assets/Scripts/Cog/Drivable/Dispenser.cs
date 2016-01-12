@@ -10,7 +10,6 @@ public class Dispenser : Drivable {
     public float ejectForce = 4f;
     protected float timer;
 
-
     protected float _power = 1f;
     public float power {
         get { return _power; }
@@ -35,7 +34,7 @@ public class Dispenser : Drivable {
     }
 
     protected virtual Vector3 dispenseDirection {
-        get { return (spawnPlatform.transform.position - transform.position).normalized;  }
+        get { return new VectorXZ(spawnPlatform.transform.position - transform.position).vector3(0f).normalized;  }
     }
 
     // Use this for initialization

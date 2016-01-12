@@ -22,6 +22,10 @@ public struct VectorXZ  {
         set { v.y = value; }
     }
 
+    public Vector3 vector3() {
+        return vector3(0);
+    }
+
     public Vector3 vector3(float y) {
         return new Vector3(v.x, y, v.y);
     }

@@ -69,6 +69,7 @@
      <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
      <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
      <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\ConveyorBelt.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Dispenser.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Gear.cs" />
