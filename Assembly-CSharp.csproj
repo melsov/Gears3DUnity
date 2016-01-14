@@ -54,7 +54,6 @@
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\LightSwitchIndicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffIndicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Receiver\ReceiverAddOn.cs" />
-     <Compile Include="Assets\Scripts\Cog\Axel.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
@@ -69,6 +68,7 @@
      <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
      <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
      <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
+     <Compile Include="Assets\Scripts\Cog\Drivable\Axel.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\ConveyorBelt.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Dispenser.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
