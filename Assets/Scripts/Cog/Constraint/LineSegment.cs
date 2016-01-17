@@ -15,7 +15,7 @@ public class LineSegment : MonoBehaviour {
     // Use this for initialization
     void Awake () {
         lr = GetComponent<LineRenderer>();
-        debug();
+        //debug();
 	}
 
     public VectorXZ distance {

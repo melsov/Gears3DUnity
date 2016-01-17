@@ -53,11 +53,13 @@
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\Indicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\LightSwitchIndicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffIndicator.cs" />
+     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RotationIndicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Receiver\ReceiverAddOn.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Hinge.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\HingeJointSettings.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Peg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
@@ -67,7 +69,11 @@
      <Compile Include="Assets\Scripts\Cog\Constraint\LinearConstraint.cs" />
      <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
      <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
+     <Compile Include="Assets\Scripts\Cog\Dispensable\Funnel.cs" />
      <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
+     <Compile Include="Assets\Scripts\Cog\Dispensable\Tube.cs" />
+     <Compile Include="Assets\Scripts\Cog\Dispensable\TubeEntrance.cs" />
+     <Compile Include="Assets\Scripts\Cog\Dispensable\TubeExit.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Axel.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\ConveyorBelt.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Dispenser.cs" />

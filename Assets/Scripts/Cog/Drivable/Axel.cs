@@ -57,6 +57,7 @@ public struct AngleStep
     private float timestamp;
     private float lastAngle;
     private float angle;
+    public float getAngle() { return angle; }
 
     public AngleStep(float _angle) {
         lastAngle = 0f;

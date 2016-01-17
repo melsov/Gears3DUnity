@@ -4,7 +4,6 @@ using System.Collections;
 //CONSIDER: Crafting system
 public abstract class Dispensable : MonoBehaviour {
 
-	// Use this for initialization
 	void Awake () {
         awake();
 	}
@@ -12,7 +11,16 @@ public abstract class Dispensable : MonoBehaviour {
 
     }
 
+    void Update() {
+        update();
+    }
+    protected virtual void update() {
+        if (shouldDestroy()) {
+            Destroy(gameObject);
+        }
+    }
+
     protected virtual bool shouldDestroy() {
-        return false; 
+        return transform.position.magnitude > 3000f;
     }
 }

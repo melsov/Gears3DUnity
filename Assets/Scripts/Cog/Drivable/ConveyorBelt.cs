@@ -7,7 +7,11 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
     protected LineSegment lineSegment;
     protected float _radius;
     protected List<Collision> collisions;
-    protected float wheelRotation;
+    protected AngleStep wheelRotation;
+    public float speedMultiplier = 10f;
+    private float damper = 1000f;
+
+    protected RotationIndicator[] rotationIndicators;
 
     protected override float radius {
         get {
@@ -20,7 +24,7 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
 
     protected float beltSpeed {
         get {
-            return wheelRotation * radius;
+            return wheelRotation.deltaAngle * radius * speedMultiplier / damper;
         }
     }
 
@@ -28,6 +32,8 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
         base.awake();
         lineSegment = GetComponentInChildren<LineSegment>();
         collisions = new List<Collision>();
+        rotationIndicators = GetComponentsInChildren<RotationIndicator>();
+        if (rotationIndicators == null) { rotationIndicators = new RotationIndicator[0]; }
     }
 
     protected override void update() {
@@ -35,10 +41,45 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
     }
 
     void FixedUpdate() {
-        foreach (Collision coll in collisions) {
+        for (int i = 0; i < collisions.Count; ++i) {
+            Collision coll = collisions[i];
+            if (coll == null || coll.rigidbody == null) {
+                collisions.Remove(coll);
+                --i;
+                continue;
+            }
             coll.rigidbody.MovePosition(coll.transform.position + lineSegment.normalized.vector3() * beltSpeed);
         }
+    }
 
+    protected override bool vConnectTo(Collider other) {
+        if (isDriven()) { 
+            return false;
+        }
+        if (isConnectedTo(other.transform)) { return false; }
+
+        Gear gear = other.GetComponent<Gear>(); 
+        if (gear != null && gear is Drivable) {
+            _driver = gear;
+            gear.addDrivable(this);
+            positionRelativeTo(gear);
+            return true;
+        }
+        return false;
+    }
+
+    public override void positionRelativeTo(Drivable _driver) {
+        if (_driver is Gear) {
+            Collider track = null;
+            foreach (Collider co in GetComponentsInChildren<Collider>()) {
+                if (co.name.Equals("Track")) {
+                    track = co;
+                    break;
+                }
+            }
+            if (track == null) return;
+            //TODO: decide how to align conveyor belts
+        }
     }
 
     public override float driveScalar() {
@@ -46,24 +87,26 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
     }
 
     public override Drive receiveDrive(Drive drive) {
-        // TODO: update appearance of the belt?
-        // TODO: set up collider dropper and cursor agent. Test drivability of belt
-        wheelRotation = drive.amount * -1f / radius;
+        wheelRotation.update(wheelRotation.getAngle() + drive.amount * -1f / radius);
+        foreach (RotationIndicator ri in rotationIndicators) {
+            ri.rotation = wheelRotation.getAngle();
+        }
         return Drive.Zero;
     }
 
     public void proxyCollisionEnter(Collision collision) {
         collision.rigidbody.velocity = Vector3.zero;
+        collision.rigidbody.useGravity = false;
         collisions.Add(collision);
     }
 
     public void proxyCollisionStay(Collision collision) {
-        //collision.rigidbody.AddForce(lineSegment.normalized.vector3() * .5f);
-        //TODO: want simple move by instead
-        //collision.rigidbody.MovePosition(collision.transform.position + lineSegment.normalized.vector3() * .2f);
     }
 
     public void proxyCollisionExit(Collision collision) {
+        if (collision != null) {
+            collision.rigidbody.useGravity = true;
+        }
         collisions.Remove(collision);
     }
 }

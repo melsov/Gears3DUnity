@@ -11,6 +11,7 @@ public abstract class AddOn : MonoBehaviour , ICursorAgentClient {
 
     #region ICursorAgentClient
     public bool connectTo(Collider other) { return vConnectTo(other); }
+
     protected virtual bool vConnectTo(Collider other) {
         IAddOnClient aoc = other.GetComponent<IAddOnClient>();
         if (aoc != null) {
