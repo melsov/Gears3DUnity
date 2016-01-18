@@ -51,7 +51,7 @@ public struct VectorXZ  {
     public VectorXZ normal {
         get {
             VectorXZ ized = normalized;
-            return new VectorXZ(ized.z, ized.x);
+            return new VectorXZ(-ized.z, ized.x);
         }
     }
 

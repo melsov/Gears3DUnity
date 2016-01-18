@@ -16,21 +16,20 @@ public class TubeEntrance : MonoBehaviour {
         //pullToCenter(other);
     }
 
-    void OnTriggerStay(Collider other) {
-        //pullToCenter(other);
-    }
+    //void OnTriggerStay(Collider other) {
+    //    //pullToCenter(other);
+    //}
 
     //void OnTriggerExit(Collider other) {
-    //    other.GetComponent<Rigidbody>().useGravity = true;
+    //    //pullToCenter(other);
     //}
 
     private void pullToCenter(Collider other) {
         Vector3 towards = transform.position - other.transform.position;
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb == null) return;
-        if (towards.z < Mathf.Epsilon * -1f && rb.velocity.z < Mathf.Epsilon * -1f) {
-            rb.velocity = Vector3.Lerp(towards.normalized, rb.velocity.normalized, .2f) * rb.velocity.magnitude;
-            rb.AddForce(towards * strength, ForceMode.VelocityChange);
-        }
+        rb.velocity = Vector3.Lerp(towards.normalized, rb.velocity.normalized, .2f) * rb.velocity.magnitude;
+        //if (towards.z < Mathf.Epsilon * -1f && rb.velocity.z < Mathf.Epsilon * -1f) {
+        //}
     }
 }
