@@ -18,8 +18,11 @@ public class Funnel : MonoBehaviour {
         Vector3 towards = transform.position - other.transform.position;
         Rigidbody rb = other.GetComponent<Rigidbody>();
         if (rb == null) return;
-        if (Vector3.Dot(towards, transform.rotation * down) > 0f) { // headed into the funnel?
-            rb.velocity = Vector3.Lerp(towards.normalized, rb.velocity.normalized, .2f) * strength * towards.magnitude;
+        float dot = Vector3.Dot(towards, transform.rotation * down);
+        if (dot > 0f) { 
+            rb.velocity = Vector3.Lerp(towards.normalized, rb.velocity.normalized, .5f) * strength * towards.magnitude;
+        } else {
+            rb.velocity = Vector3.Lerp(transform.rotation * down, rb.velocity.normalized, .5f) * rb.velocity.magnitude * .95f;
         }
     }
 }

@@ -85,6 +85,7 @@
      <Compile Include="Assets\Scripts\Cog\Ducts\Tube.cs" />
      <Compile Include="Assets\Scripts\Cog\Ducts\TubeEntrance.cs" />
      <Compile Include="Assets\Scripts\Cog\Ducts\TubeExit.cs" />
+     <Compile Include="Assets\Scripts\Cog\Feedback\Chime.cs" />
      <Compile Include="Assets\Scripts\Cog\Proxy\CollisionProxy.cs" />
      <Compile Include="Assets\Scripts\Cog\Proxy\TriggerProxy.cs" />
      <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
@@ -92,6 +93,7 @@
      <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
      <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
      <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
+     <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
      <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
      <Compile Include="Assets\Scripts\UI\Pause.cs" />
@@ -105,6 +107,7 @@
      <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
+     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

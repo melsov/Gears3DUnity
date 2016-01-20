@@ -79,6 +79,9 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     private void connectToColliders(ColliderDropper dropper) {
+        if (dropper == null) {
+            return;
+        }
         while(dropper.colliders.Count > 0) {
             Collider c = dropper.colliders[0];
             dropper.colliders.RemoveAt(0);
