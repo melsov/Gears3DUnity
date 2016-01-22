@@ -107,6 +107,7 @@
      <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
+     <Compile Include="Assets\Scripts\View\Inventory\Inventory.cs" />
      <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
