@@ -96,7 +96,10 @@
      <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
      <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
-     <Compile Include="Assets\Scripts\UI\Pause.cs" />
+     <Compile Include="Assets\Scripts\UI\View\Inventory\Category.cs" />
+     <Compile Include="Assets\Scripts\UI\View\Inventory\InstantiateButton.cs" />
+     <Compile Include="Assets\Scripts\UI\View\Inventory\Inventory.cs" />
+     <Compile Include="Assets\Scripts\UI\View\Pause.cs" />
      <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
      <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
      <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
@@ -107,7 +110,6 @@
      <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
-     <Compile Include="Assets\Scripts\View\Inventory\Inventory.cs" />
      <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>

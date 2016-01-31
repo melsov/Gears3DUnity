@@ -119,13 +119,13 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     }
 
     protected virtual void disconnectSockets() {
+        foreach(Socket soc in _pegboard.getFrontendSocketSet().sockets) {
+            soc.removeConstraint();
+        }
         foreach (Socket soc in _pegboard.getBackendSocketSet().sockets) {
             if (soc.hasDrivingPeg() && soc.drivingPeg.owner != this) {
                 soc.disconnectDrivingPeg();
             }
-        }
-        foreach(Socket soc in _pegboard.getFrontendSocketSet().sockets) {
-            soc.removeConstraint();
         }
     }
 

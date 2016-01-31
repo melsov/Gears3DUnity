@@ -1,59 +1,113 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
-using System.Collections;
+using System;
 
 public class CursorInput : MonoBehaviour {
 
-    public GameObject testThing;
     private RaycastHit rayHit;
     public LineRenderer line;
 
     private CursorInteraction ci;
+    public Image itemProxyImage; // TODO: actually get from button
+    private bool triggeredDragEnterScene;
 
     private int layerMask;
     private int dragOverrideMask;
+    private InstantiateButton ib;
 
     // Use this for initialization
     void Awake () {
         line = GetComponent<LineRenderer>();
         layerMask = ~(LayerMask.GetMask("DragOverride") | LayerMask.GetMask("CogComponent"));
         dragOverrideMask = LayerMask.GetMask("DragOverride");
-	}
+        itemProxyImage.raycastTarget = false;
+        itemProxyImage.enabled = false;
+    }
 	
 	// Update is called once per frame
 	void Update () {
         if (Input.GetButtonDown("Fire1")) {
-            getInteractable();
+            ib = getInstantiateButton();
+            if (ib != null) {
+                ib.handleMouseDown();
+                setProxyImage();
+            }
+            else if (!EventSystem.current.IsPointerOverGameObject()) {
+                getInteractable();
+            }
         }
         if (Input.GetButton("Fire1")) {
+            if (ib != null) {
+                if (!triggeredDragEnterScene && !EventSystem.current.IsPointerOverGameObject()) { // pointer is over the scene
+                    ib.handleDragEnteredScene();
+                    hideProxyImage();
+                    triggeredDragEnterScene = true;
+                } else {
+                    positionProxyImage();
+                }
+            }
             if (ci != null) {
-                Vector3 v = Input.mousePosition;
-                v = Camera.main.ScreenToWorldPoint(new Vector3(v.x, v.y, Camera.main.nearClipPlane + 4));
-                ci.drag(new VectorXZ(v));
+                ci.drag(new VectorXZ(mousePositionOnRootPegboard));
             }
         }
         if (Input.GetButtonUp("Fire1")) {
             if (ci != null) {
-                Vector3 v = Input.mousePosition;
-                v = Camera.main.ScreenToWorldPoint(new Vector3(v.x, v.y, Camera.main.nearClipPlane + 4));
-                ci.mouseUp(new VectorXZ(v));
+                ci.mouseUp(new VectorXZ(mousePositionOnRootPegboard));
             }
-            releaseInteractable();
+            releaseItems();
         }
 	}
 
-    public void releaseInteractable() {
+    private void hideProxyImage() {
+        itemProxyImage.enabled = false;
+    }
+
+    private void positionProxyImage() {
+        if (!itemProxyImage.enabled) { return; }
+        itemProxyImage.GetComponent<RectTransform>().position = Input.mousePosition;
+    }
+
+    public Vector3 mousePositionOnRootPegboard {
+        get {
+            Vector3 v = Input.mousePosition;
+            return Camera.main.ScreenToWorldPoint(new Vector3(v.x, v.y, Camera.main.nearClipPlane + 4));
+        }
+    }
+
+    public void releaseItems() {
         ci = null;
+        if (ib != null) {
+            ib.handleMouseUp();
+        }
+        ib = null;
+        triggeredDragEnterScene = false;
+    }
+
+    public void takeInteractable(CursorInteraction _ci) {
+        ci = _ci;
+        ci.mouseDown(new VectorXZ(mousePositionOnRootPegboard));
+    }
+
+
+
+    private InstantiateButton getInstantiateButton() {
+        if (EventSystem.current.currentSelectedGameObject != null) {
+            return EventSystem.current.currentSelectedGameObject.GetComponent<InstantiateButton>();
+        }
+        return null;
     }
 
     private void getInteractable() {
-        releaseInteractable();
+        releaseItems();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         line.SetPosition(0, ray.origin);
         if (Physics.Raycast(ray, out rayHit, 100f, dragOverrideMask)) {
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
-                ci = rayHit.collider.GetComponentInParent<CursorInteraction>(); // TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
+                ci = rayHit.collider.GetComponentInParent<CursorInteraction>(); 
             }
         }
 
@@ -72,10 +126,10 @@ public class CursorInput : MonoBehaviour {
         line.SetPosition(1, ray.origin + ray.direction * 20f);
     }
 
-    // NOT IN USE
-    private void createObjectAtCursor(GameObject ob) {
-        Vector3 mouse = Input.mousePosition;
-        Vector3 v = Camera.main.ScreenToWorldPoint(new Vector3(mouse.x, mouse.y, Camera.main.nearClipPlane + 4));
-        Instantiate(ob, v, Quaternion.identity);
+    private void setProxyImage() {
+        if (ib == null) { return; }
+        itemProxyImage.enabled = true;
+        itemProxyImage.sprite = ib.proxySprite();
     }
+
 }
