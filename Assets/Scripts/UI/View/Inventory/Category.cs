@@ -8,6 +8,18 @@ public class Category : MonoBehaviour {
     protected Inventory inventory;
     public InventoryItem[] inventoryItems;
     public RectTransform templateButtonPanel;
+    public string title;
+    public Sprite icon;
+    //protected Button _showCategoryButton;
+    //public Button showCategoryButton {
+    //    get {
+    //        return _showCategoryButton;
+    //    }
+    //    set {
+    //        _showCategoryButton = value;
+            
+    //    }
+    //}
 
 	void Awake () {
         rectTransform = GetComponent<RectTransform>();

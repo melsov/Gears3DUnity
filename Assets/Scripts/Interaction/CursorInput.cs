@@ -129,6 +129,7 @@ public class CursorInput : MonoBehaviour {
     private void setProxyImage() {
         if (ib == null) { return; }
         itemProxyImage.enabled = true;
+        itemProxyImage.gameObject.SetActive(true);
         itemProxyImage.sprite = ib.proxySprite();
     }
 
