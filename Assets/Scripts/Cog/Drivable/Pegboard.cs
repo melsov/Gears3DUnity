@@ -31,7 +31,9 @@ public class Pegboard : MonoBehaviour , ISocketSetContainer
     public void unsetRigidbodyWithGravity() {
         Rigidbody r = GetComponent<Rigidbody>();
         if (r != null) {
+            print("unset rigidbody for: " + gameObject.name);
             r.useGravity = false;
+            r.isKinematic = true;
             r.velocity = Vector3.zero;
             r.angularVelocity = Vector3.zero;
         }

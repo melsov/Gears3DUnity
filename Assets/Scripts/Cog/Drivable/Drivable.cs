@@ -23,6 +23,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     protected List<Drivable> drivables = new List<Drivable>();
 
     protected ControllerAddOn controllerAddOn;
+
     protected List<ReceiverAddOn> receiverAddOns = new List<ReceiverAddOn>();
 
     protected virtual float radius {
@@ -120,7 +121,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
 
     protected virtual void disconnectSockets() {
         foreach(Socket soc in _pegboard.getFrontendSocketSet().sockets) {
-            soc.removeConstraint();
+            soc.breakChildConnections();
         }
         foreach (Socket soc in _pegboard.getBackendSocketSet().sockets) {
             if (soc.hasDrivingPeg() && soc.drivingPeg.owner != this) {
@@ -396,6 +397,11 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
             receiverAddOns.Remove((ReceiverAddOn)addOn_);
         }
     }
+
+    public void disconnectFromParentHinge() {
+        _pegboard.unsetRigidbodyWithGravity();
+    }
+
 }
 
 public interface ISocketSetContainer

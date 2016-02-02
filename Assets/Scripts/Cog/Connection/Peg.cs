@@ -136,7 +136,11 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         GetComponent<Highlighter>().unhighlight();
     }
 
-    public void removeIsChildConstraintAndItsParentConstraint(Socket parent) { 
+    public void detachChildren() {
+        removeIsChildConstraintAndItsParentConstraint();
+    }
+
+    protected void removeIsChildConstraintAndItsParentConstraint() { 
         if (isChildConstraint != null) {
             isChildConstraint.removeTarget();
             GameObject.Destroy(isChildConstraint.constraintTarget.parentConstraint);

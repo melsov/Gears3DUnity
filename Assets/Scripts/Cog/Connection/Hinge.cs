@@ -18,6 +18,14 @@ public class Hinge : MonoBehaviour {
     }
 
     public void disconnectObject() {
+        if (getHingeJoint().connectedBody == null) {
+            print("hinge: conn body null for: " + gameObject.name);
+            return;
+        }
+        Drivable d = getHingeJoint().connectedBody.GetComponent<Drivable>();
+        if (d != null) {
+            d.disconnectFromParentHinge();
+        }
         getHingeJoint().connectedBody = null;
     }
 

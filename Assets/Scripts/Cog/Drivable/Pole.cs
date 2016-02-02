@@ -26,6 +26,8 @@ public class Pole : Drivable
         return false;
     }
 
+//TODO: poles teleport up (in y) when they connect to gears: codify what y everything should be on
+
     // POLE CONNECT CASES:
     //  A: NEITHER BACKEND CONNECTED: try to set a backend socket
     //  B: ONE BACKEND CONNECTED: try to set a frontend socket

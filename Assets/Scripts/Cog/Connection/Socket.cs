@@ -53,6 +53,7 @@ public abstract class Socket : MonoBehaviour {
                     _drivingPeg = value;
                     parentContainer.getTransform().SetParent(null);
                     parentContainer.unsetRigidbodyWithGravity();
+                    print("unset driving peg called for socket in " + parentContainer.getTransform().gameObject.name);
                 }
             }
         }
@@ -109,9 +110,14 @@ public abstract class Socket : MonoBehaviour {
         return new ConstraintTarget(transform, null);
     }
 
+    public void breakChildConnections() {
+        removeConstraint();
+    }
+
     public void removeConstraint() {
         if (hasChildPeg()) {
-            childPeg.removeIsChildConstraintAndItsParentConstraint(this);
+            //childPeg.removeIsChildConstraintAndItsParentConstraint(this);
+            childPeg.detachChildren();
         }
     }
 
@@ -130,6 +136,7 @@ public abstract class Socket : MonoBehaviour {
         if (peg.owner != null) {
             return peg.owner;
         }
+        if (otherSocket == null) { return null; }
         return otherSocket.getParentDrivable();
     }
 
