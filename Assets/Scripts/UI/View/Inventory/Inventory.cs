@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
-using System.Collections;
+using System.Collections.Generic;
 using System;
+
+//TODO: random concept: drill into ground to get resources: 'oil derrick'
 
 public class Inventory : Singleton<Inventory> {
 
@@ -12,6 +14,9 @@ public class Inventory : Singleton<Inventory> {
     public RectTransform categorySelectPanel;
     public Button categorySelectButtonPrefab;
     protected CursorInput cursorInput;
+    public Transform root;
+
+    private List<Transform> sceneObjects = new List<Transform>();
 
     protected Inventory() { }
 
@@ -24,6 +29,10 @@ public class Inventory : Singleton<Inventory> {
             showCategory(categories[0]);
         }
 	}
+
+    public void putBackInInventory(Transform trans) {
+        Destroy(trans.gameObject);
+    }
 
     private void setupCategorySelect() {
         Vector3 anchor = new Vector3(4,-4,4);
@@ -72,12 +81,30 @@ public class Inventory : Singleton<Inventory> {
     }	
 
     private void instantiatePrefab(Transform prefab) {
-        print("inst pressed");
         Transform tr = Instantiate<Transform>(prefab);
-        tr.position = cursorInput.mousePositionOnRootPegboard;
+        setPosition(tr);
         CursorInteraction ci = tr.GetComponent<CursorInteraction>();
         Assert.IsTrue(ci != null);
         cursorInput.takeInteractable(ci);
+    }
+
+    private void setPosition(Transform t) {
+        t.position = cursorInput.mousePositionOnRootPegboard;
+        TransformUtil.PositionOnYLayer(t);
+    }
+
+    public Transform prefabWithId(int id_) {
+        foreach(Category cat in categories) {
+            foreach(InventoryItem ii in cat.inventoryItems) {
+                ItemID itemID = ii.prefab.GetComponent<ItemID>();
+                if (itemID != null && id_ == itemID.id) {
+                    print("found prefab with id: " + ii.prefab.name);
+                    return ii.prefab;
+                }
+            }
+        }
+        print("prefab not found");
+        return null;
     }
 }
 

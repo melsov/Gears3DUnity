@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System;
 
-public abstract class AddOn : MonoBehaviour , ICursorAgentClient {
-
+public abstract class AddOn : Cog , ICursorAgentClient
+{
     protected IAddOnClient client;
-
     protected Collider currentOverrideCollider;
     protected RotationHandle rotationHandle;
 

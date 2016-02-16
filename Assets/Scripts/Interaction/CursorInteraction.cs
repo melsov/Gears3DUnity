@@ -42,6 +42,13 @@ public class CursorInteraction : MonoBehaviour {
             ci.endCursorInteraction(worldPoint);
         }
     }
+
+    public bool isOverridingDrag(VectorXZ worldPoint) {
+        foreach (ICursorInteractable ci in interactables) {
+            if (ci.shouldOverrideDrag(worldPoint)) { return true; }
+        }
+        return false;
+    }
 }
 
 public interface ICursorInteractable

@@ -3,7 +3,8 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using System;
 
-public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClient // ISocketSetContainer,
+[System.Serializable]
+public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGameSerializable, IRestoreConnection
 {
     protected AngleStep _angleStep;
     protected AngleStep angleStep {
@@ -16,15 +17,12 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     }
     protected Socket connectedSocket;
     protected Pegboard _pegboard;
-    //protected SocketSet backendSocketSet;
-    //protected SocketSet frontendSocketSet;
-
     protected Drivable _driver;
     protected List<Drivable> drivables = new List<Drivable>();
-
     protected ControllerAddOn controllerAddOn;
-
     protected List<ReceiverAddOn> receiverAddOns = new List<ReceiverAddOn>();
+    protected Transform _cursorRotationPivot = null;
+    protected Transform _cursorRotationHandle = null;
 
     protected virtual float radius {
         get { return  GetComponent<CapsuleCollider>().radius * transform.localScale.x; }
@@ -41,6 +39,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
                 _pegboard = gameObject.AddComponent<Pegboard>();
             }
         }
+        TransformUtil.PositionOnYLayer(transform);
         gameObject.AddComponent<Highlighter>();
     }
 
@@ -70,9 +69,21 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
         update();
 	}
 
+    protected void debugY() {
+        print("this " + GetType() + " has Y: " + transform.position.y);
+    }
+
     protected virtual void update() {
         updateAngleStep();
-        foreach (Drivable dr in drivables) {
+        //foreach (Drivable dr in drivables) {
+        //    dr.receiveDrive(new Drive(driveScalar()));
+        //}
+        for (int i=0; i < drivables.Count; ++i) {
+            Drivable dr = drivables[i];
+            if (dr == null) {
+                drivables.RemoveAt(i--);
+                continue;
+            }
             dr.receiveDrive(new Drive(driveScalar()));
         }
     }
@@ -84,11 +95,11 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
 
     protected virtual void setSocketToPeg(Socket socket, Peg peg) {
         socket.drivingPeg = peg;
-        //TransformUtil.ParentToAndAlignXZ(transform, peg.transform, socket.transform);
     }
 
     public virtual void addDrivable(Drivable _drivable) {
-        if (!drivables.Contains(_drivable))
+        if (drivables.Contains(_drivable)) { print("already contains drivable: " + _drivable.name); }
+        if (!drivables.Contains(_drivable) && _drivable != this)
             drivables.Add(_drivable);
     }
 
@@ -216,8 +227,7 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
     public void endDragOverride(VectorXZ cursorGlobal) {
         vEndDragOverride(cursorGlobal);
     }
-    protected Transform _cursorRotationPivot = null;
-    protected Transform _cursorRotationHandle = null;
+
 
     protected virtual void updateCursorRotationPivot(Collider dragOverrideCollider) {
         if (_cursorRotationPivot == null) {
@@ -400,6 +410,49 @@ public abstract class Drivable : MonoBehaviour , ICursorAgentClient , IAddOnClie
 
     public void disconnectFromParentHinge() {
         _pegboard.unsetRigidbodyWithGravity();
+    }
+
+    [System.Serializable]
+    class SerializeStorage
+    {
+
+    }
+    public virtual void Serialize(ref List<byte[]> data) {
+        SerializeStorage stor = new SerializeStorage();
+
+        SaveManager.Instance.SerializeIntoArray(stor, ref data);
+    }
+
+    public virtual void Deserialize(ref List<byte[]> data) {
+        SerializeStorage stor;
+        if ((stor = SaveManager.Instance.DeserializeFromArray<SerializeStorage>(ref data)) != null) {
+
+        }
+    }
+
+    [System.Serializable]
+    class ConnectionData
+    {
+        public List<string> drivableGuids = new List<string>();
+    }
+    public void storeConnectionData(ref List<byte[]> connectionData) {
+        ConnectionData cd = new ConnectionData();
+        foreach(Drivable d in drivables) {
+            cd.drivableGuids.Add(d.GetComponent<Guid>().guid.ToString());
+        }
+        SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
+    }
+
+    public void restoreConnectionData(ref List<byte[]> connectionData) {
+        print("restore connection data in drivable");
+        ConnectionData cd;
+        if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
+            foreach(String drivableGuid in cd.drivableGuids) {
+                GameObject drivenGO = SaveManager.Instance.FindGameObjectByGuid(drivableGuid);
+                Drivable d = drivenGO.GetComponent<Drivable>();
+                addDrivable(d);
+            }
+        }
     }
 
 }

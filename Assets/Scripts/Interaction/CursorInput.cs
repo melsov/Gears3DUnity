@@ -12,7 +12,9 @@ public class CursorInput : MonoBehaviour {
 
     private CursorInteraction ci;
     public Image itemProxyImage; // TODO: actually get from button
+    public Sprite putBackInInventoryIcon;
     private bool triggeredDragEnterScene;
+    private bool ciDragEnterInventory;
 
     private int layerMask;
     private int dragOverrideMask;
@@ -50,14 +52,30 @@ public class CursorInput : MonoBehaviour {
                 }
             }
             if (ci != null) {
+                if (pointerOverInventory() && !ci.isOverridingDrag(new VectorXZ(mousePositionOnRootPegboard))) {
+                    if (!ciDragEnterInventory) { //TODO: and not drag override
+                        ciDragEnterInventory = true;
+                        //TODO: hide the ci
+                        setRemoveFromSceneProxyImage();
+                    }
+                    positionProxyImage();
+                } else {
+                    ciDragEnterInventory = false;
+                    hideProxyImage();
+                }
                 ci.drag(new VectorXZ(mousePositionOnRootPegboard));
             }
         }
         if (Input.GetButtonUp("Fire1")) {
             if (ci != null) {
-                ci.mouseUp(new VectorXZ(mousePositionOnRootPegboard));
+                if (pointerOverInventory()) {
+                    Inventory.Instance.putBackInInventory(ci.transform);
+                } else {
+                    ci.mouseUp(new VectorXZ(mousePositionOnRootPegboard));
+                }
             }
             releaseItems();
+            hideProxyImage();
         }
 	}
 
@@ -84,6 +102,7 @@ public class CursorInput : MonoBehaviour {
         }
         ib = null;
         triggeredDragEnterScene = false;
+        ciDragEnterInventory = false;
     }
 
     public void takeInteractable(CursorInteraction _ci) {
@@ -91,13 +110,18 @@ public class CursorInput : MonoBehaviour {
         ci.mouseDown(new VectorXZ(mousePositionOnRootPegboard));
     }
 
-
-
     private InstantiateButton getInstantiateButton() {
         if (EventSystem.current.currentSelectedGameObject != null) {
             return EventSystem.current.currentSelectedGameObject.GetComponent<InstantiateButton>();
         }
         return null;
+    }
+
+    private bool pointerOverInventory() {
+        if (EventSystem.current.IsPointerOverGameObject()) {
+            return true;
+        }
+        return false;
     }
 
     private void getInteractable() {
@@ -131,6 +155,12 @@ public class CursorInput : MonoBehaviour {
         itemProxyImage.enabled = true;
         itemProxyImage.gameObject.SetActive(true);
         itemProxyImage.sprite = ib.proxySprite();
+    }
+
+    private void setRemoveFromSceneProxyImage() {
+        itemProxyImage.enabled = true;
+        itemProxyImage.gameObject.SetActive(true);
+        itemProxyImage.sprite = putBackInInventoryIcon;
     }
 
 }

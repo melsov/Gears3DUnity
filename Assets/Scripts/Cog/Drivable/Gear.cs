@@ -12,14 +12,6 @@ public class Gear : Drivable  {
         return _angleStep.deltaAngle * radius;
     }
 
-    //private void turnWithAxel() {
-    //    transform.RotateAround(connectedAxelSocket.transform.position, orientation, connectedAxelSocket.axel.axisRotation);
-    //}
-
-    //public void turnByDegrees(float d) { 
-    //    transform.Rotate(Vector3.up * d * Time.deltaTime);
-    //}
-
     protected override bool vConnectTo(Collider other) {
         if (isDriven()) { //TODO: aren't we guaranteed not to be connected at this point?
             return false;

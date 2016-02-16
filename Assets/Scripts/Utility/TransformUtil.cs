@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Assertions;
 using System.Collections;
 
 public class TransformUtil : MonoBehaviour
@@ -8,7 +9,6 @@ public class TransformUtil : MonoBehaviour
         child.transform.SetParent(parent, true);
     }
 
-// CONSIDER: this seems to fail sometimes? maybe do some tests... use local scale as well?
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
         Vector3 localOffset = Vector3.zero;
         if (localOffsetObject != null) {
@@ -24,6 +24,16 @@ public class TransformUtil : MonoBehaviour
             -localOffset.z +
             parent.position.z);
     }
+
+    public static void PositionOnYLayer(Transform trans) {
+        System.Type type = typeof(Drivable);
+        Drivable drivable = trans.GetComponent<Drivable>();
+        if (drivable != null) {
+            type = drivable.GetType();
+        }
+        trans.position = new Vector3(trans.position.x, YLayer.Layer(type), trans.position.z);
+    }
+
     public static T FindComponentInThisOrChildren<T>(Transform t) {
         T result = t.GetComponent<T>();
         if (result == null) {

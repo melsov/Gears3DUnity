@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class Chime : MonoBehaviour , ICollisionProxyClient {
+public class Chime : Cog , ICollisionProxyClient {
 
     protected AudioSource _audioSource;
 

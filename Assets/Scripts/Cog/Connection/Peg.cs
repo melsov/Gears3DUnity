@@ -2,8 +2,9 @@
 using UnityEngine.Assertions;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
-public class Peg : MonoBehaviour , ICursorAgentClient
+public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnection
 {
     public Material freeRotationMaterial;
     public Material fixedRotationMaterial;
@@ -20,15 +21,24 @@ public class Peg : MonoBehaviour , ICursorAgentClient
     protected WeakReference _parentSocket;
     public Socket parent {
         get {
-            return _parentSocket.Target as Socket;
+            if (_parentSocket != null) {
+                return _parentSocket.Target as Socket;
+            }
+            return null;
         }
     }
 
     protected WeakReference _childSocket;
     public Socket child {
         get {
-            return _childSocket.Target as Socket;
+            if (_childSocket != null) {
+                return _childSocket.Target as Socket;
+            }
+            return null;
         }
+    }
+    public bool hasChild {
+        get { return child != null; }
     }
 
     protected Hinge getHinge() {
@@ -117,6 +127,27 @@ public class Peg : MonoBehaviour , ICursorAgentClient
         awake();
     }
 
+    #region serialize
+    [System.Serializable]
+    class SerializeStorage
+    {
+        public int __pegIsParentRotationMode;
+    }
+
+    public void Serialize(ref List<byte[]> data) {
+        SerializeStorage stor = new SerializeStorage();
+        stor.__pegIsParentRotationMode = (int)__pegIsParentRotationMode;
+        SaveManager.Instance.SerializeIntoArray(stor, ref data);
+    }
+
+    public void Deserialize(ref List<byte[]> data) {
+        SerializeStorage stor;
+        if((stor = SaveManager.Instance.DeserializeFromArray<SerializeStorage>(ref data)) != null) {
+            __pegIsParentRotationMode = (RotationMode)stor.__pegIsParentRotationMode;
+        }
+    }
+    #endregion
+
     protected virtual void awake() {
         setMaterial();
         _isChildConstraint = GetComponent<Constraint>();
@@ -203,6 +234,39 @@ public class Peg : MonoBehaviour , ICursorAgentClient
     public Collider mainCollider() { return GetComponent<Collider>(); }
 
     public void triggerExitDuringDrag(Collider other) {
+    }
+
+    [System.Serializable]
+    class ConnectionData
+    {
+        public bool hasChild;
+        public string connectedGuid; //sure this exists?
+        public int connectedSocketID;
+    }
+    public void storeConnectionData(ref List<byte[]> connectionData) {
+        ConnectionData cd = new ConnectionData();
+        if (hasChild) {
+            cd.hasChild = hasChild;
+            Transform connectedT = child.parentContainer.getTransform();
+            cd.connectedGuid = connectedT.GetComponent<Guid>().guid.ToString();
+        }
+        SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
+    }
+
+    public void restoreConnectionData(ref List<byte[]> connectionData) {
+        print("restore connection data in peg");
+        ConnectionData cd;
+        if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
+            if (cd.hasChild) {
+                GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
+                Pegboard pb = connectedGO.GetComponentInChildren<Pegboard>();
+                if (pb != null) {
+                    print("found pegboard");
+                    Socket s = pb.getBackendSocketSet().socketWithId(cd.connectedSocketID);
+                    receiveChild(s);
+                }
+            }
+        }
     }
 }
 

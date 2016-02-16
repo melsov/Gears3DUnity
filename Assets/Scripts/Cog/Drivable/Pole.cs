@@ -5,10 +5,12 @@ using UnityEngine.Assertions;
 
 //TODO: connectTo method will apply for any free-rotatable drivable
 // make class FreeRotatableDrivabe
+[System.Serializable]
 public class Pole : Drivable
 {
     protected override void awake() {
         base.awake();
+        print("pole awake: y is: " + transform.position.y);
         Assert.IsTrue(_pegboard.getBackendSocketSet().sockets.Length == 2);
         Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 2);
     }
@@ -19,10 +21,13 @@ public class Pole : Drivable
         Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
             if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
+                debugY();
                 setSocketToPeg(aSocket, peg);
+                debugY(); //
                 return true;
             }
         }
+        
         return false;
     }
 

@@ -5,7 +5,7 @@ using System.Collections;
 public abstract class Socket : MonoBehaviour {
 
     public Peg autoconnectPeg;
-    //public bool matePermanently; //TODO: implement permanency // consider whether you need a var for it here?
+    public int id;
 
     public virtual RotationMode socketIsChildRotationMode {
         get { return RotationMode.FREE_OR_FIXED; }

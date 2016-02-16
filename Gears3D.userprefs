@@ -1,0 +1,18 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\SaveLoad\KnightPasta\SaveManager.cs">
+    <Files>
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\Guid.cs" Line="27" Column="3" />
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\GenerateGuids.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\SaveEntry.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\SerializableVecQuat.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\SaveData.cs" Line="1" Column="34" />
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\SaveManager.cs" Line="114" Column="40" />
+      <File FileName="Assets\Scripts\SaveLoad\KnightPasta\MultiMap.cs" Line="30" Column="34" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

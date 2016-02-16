@@ -45,6 +45,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Browser.cs" />
      <Compile Include="Assets\Scripts\Camera\ViewControls.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\AddOn.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />
@@ -55,6 +56,7 @@
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffIndicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RotationIndicator.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Receiver\ReceiverAddOn.cs" />
+     <Compile Include="Assets\Scripts\Cog\Cog.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
@@ -63,6 +65,7 @@
      <Compile Include="Assets\Scripts\Cog\Connection\Peg.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
      <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
+     <Compile Include="Assets\Scripts\Cog\Connection\YLayer.cs" />
      <Compile Include="Assets\Scripts\Cog\Constraint\Constraint.cs" />
      <Compile Include="Assets\Scripts\Cog\Constraint\ConstratintTargetSet.cs" />
      <Compile Include="Assets\Scripts\Cog\Constraint\LineSegment.cs" />
@@ -80,6 +83,7 @@
      <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
      <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />
+     <Compile Include="Assets\Scripts\Cog\Ducts\Duct.cs" />
      <Compile Include="Assets\Scripts\Cog\Ducts\ElbowTube.cs" />
      <Compile Include="Assets\Scripts\Cog\Ducts\Funnel.cs" />
      <Compile Include="Assets\Scripts\Cog\Ducts\Tube.cs" />
@@ -96,9 +100,21 @@
      <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
      <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateGuids.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateItemIDs.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\Guid.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\MultiMap.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\SaveData.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\SaveEntry.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\SaveManager.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\SerializableVecQuat.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\SaveLoad.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\TestSerialize.cs" />
+     <Compile Include="Assets\Scripts\UI\SaveLoadController.cs" />
      <Compile Include="Assets\Scripts\UI\View\Inventory\Category.cs" />
      <Compile Include="Assets\Scripts\UI\View\Inventory\InstantiateButton.cs" />
      <Compile Include="Assets\Scripts\UI\View\Inventory\Inventory.cs" />
+     <Compile Include="Assets\Scripts\UI\View\Inventory\ItemID.cs" />
      <Compile Include="Assets\Scripts\UI\View\Pause.cs" />
      <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
      <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
@@ -110,7 +126,11 @@
      <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
+     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
      <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
+ <Reference Include="Assembly-UnityScript-firstpass">
+ <HintPath>D:/unity/Gears3D/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+ </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
@@ -123,6 +143,10 @@
  <Reference Include="UnityEditor.iOS.Extensions.Xcode">
  <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport/UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
  </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{D2E29437-8D58-8A50-1C20-1C513392F46E}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

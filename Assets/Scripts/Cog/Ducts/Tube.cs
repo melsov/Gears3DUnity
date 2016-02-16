@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Tube : MonoBehaviour {
+public class Tube : Duct {
 
     public float strength = 300f;
     protected Transform entrance;

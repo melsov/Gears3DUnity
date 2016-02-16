@@ -10,16 +10,6 @@ public class Category : MonoBehaviour {
     public RectTransform templateButtonPanel;
     public string title;
     public Sprite icon;
-    //protected Button _showCategoryButton;
-    //public Button showCategoryButton {
-    //    get {
-    //        return _showCategoryButton;
-    //    }
-    //    set {
-    //        _showCategoryButton = value;
-            
-    //    }
-    //}
 
 	void Awake () {
         rectTransform = GetComponent<RectTransform>();
@@ -36,7 +26,6 @@ public class Category : MonoBehaviour {
             Inventory.createButton(templateButtonPanel, ii.sprite, ii.title, transform, ii.prefab, pos);
             pos.y -= getTemplateButtonHeight();
         }
-
         return rectTransform;
     }
 

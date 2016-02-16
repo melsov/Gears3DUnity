@@ -12,6 +12,17 @@ public class SocketSet
         } else {
             sockets = new Socket[] { };
         }
+
+        for(int i = 0; i < sockets.Length; ++i) {
+            sockets[i].id = i;
+        }
+    }
+
+    public Socket socketWithId(int id) {
+        foreach(Socket s in sockets) {
+            if (id == s.id) { return s; }
+        }
+        return null;
     }
 
     public bool contains(Socket s) {
