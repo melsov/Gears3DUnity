@@ -11,6 +11,7 @@ public class Pole : Drivable
     protected override void awake() {
         base.awake();
         print("pole awake: y is: " + transform.position.y);
+        print("pegboard null ? " + (_pegboard == null) + "\n back sock set null: " + (_pegboard.getBackendSocketSet() == null));
         Assert.IsTrue(_pegboard.getBackendSocketSet().sockets.Length == 2);
         Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 2);
     }

@@ -12,8 +12,7 @@ public class SaveLoadController : MonoBehaviour {
     }
 
     private void load() {
-        string temp_file = SaveLoad.Instance.filename;
-        SaveLoad.Instance.load(temp_file);
+        SaveLoad.Instance.load();
     }
 
     public void newPressed() {

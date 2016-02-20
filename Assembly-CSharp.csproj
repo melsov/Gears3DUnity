@@ -45,7 +45,6 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Browser.cs" />
      <Compile Include="Assets\Scripts\Camera\ViewControls.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\AddOn.cs" />
      <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />
@@ -100,6 +99,7 @@
      <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
      <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
      <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
+     <Compile Include="Assets\Scripts\SaveLoad\Browser\Browser.cs" />
      <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateGuids.cs" />
      <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateItemIDs.cs" />
      <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\Guid.cs" />
@@ -127,6 +127,7 @@
      <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
      <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
      <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
+     <None Include="Assets\Temp\hi.txt" />
      <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
  <Reference Include="Assembly-UnityScript-firstpass">
  <HintPath>D:/unity/Gears3D/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>

@@ -38,8 +38,8 @@ public class SaveManager : Singleton<SaveManager> {
 		}
 		
 		FillObjectsToSave ();
-		
-		string saveFileName = GetSaveFileName(saveName);
+
+        string saveFileName = saveName; // GetSaveFileName(saveName);
 		
 		Debug.Log ("Saving game to: " + saveFileName);
 		
@@ -51,7 +51,7 @@ public class SaveManager : Singleton<SaveManager> {
 	
 	public bool LoadGame(string saveName)
 	{
-		string loadFileName = GetSaveFileName(saveName);
+        string loadFileName = saveName; // GetSaveFileName(saveName);
 		
 		if(File.Exists(loadFileName))
 		{
@@ -97,12 +97,21 @@ public class SaveManager : Singleton<SaveManager> {
 		GameObject[] objectsInScene = GameObject.FindObjectsOfType (typeof(GameObject)) as GameObject[];
         //SetDisabledGameObjectsActive (false);
 
+        // MMP: prefabs instances may have the same guids. So always update them before saving.
+        // Having new guids per each save isn't a problem since the kind of prefab is recovered using its itemID.
 		foreach (GameObject go in objectsInScene)
 		{
             if ( (go.GetComponent("Guid") as Guid) != null && go.GetComponent<ItemID>() != null )
 			{
-               go.GetComponent<Guid>().Generate(); //MMP: prefabs instances may have the same guids. So always update them. 
-				mSaveData.entries.Add(new SaveEntry(go));
+                go.GetComponent<Guid>().Generate(); 
+			}
+		}
+
+		foreach (GameObject go in objectsInScene)
+		{
+            if ( (go.GetComponent("Guid") as Guid) != null && go.GetComponent<ItemID>() != null )
+			{
+                mSaveData.entries.Add(new SaveEntry(go));
 			}
 		}
 	}
@@ -199,6 +208,7 @@ public class SaveManager : Singleton<SaveManager> {
 	
 	public GameObject FindGameObjectByGuid(string guid)
 	{
+        if (guid == null) return null;
 		foreach (GameObject go in GameObject.FindObjectsOfType(typeof (GameObject)))
 		{
 			Guid g = go.GetComponent("Guid") as Guid;

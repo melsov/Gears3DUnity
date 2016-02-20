@@ -29,27 +29,27 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void save() {
-        //BinaryFormatter bf = new BinaryFormatter();
-        //FileStream fs = File.Create(folder + filename);
-        //bf.Serialize(fs, sceneObjects());
-        //fs.Close();
         SaveManager.Instance.SaveGame("test1");
+
+        //WANT
+        //string doesntmatter = Application.dataPath + "/TempSaveFile";
+        //print(Application.persistentDataPath);
+        //Browser.Instance.SaveFile(doesntmatter, Application.persistentDataPath, handleSaveFile);
     }
 
-    public void load(string filename_) {
-        //string path = folder + filename_;
-        //if (File.Exists(path)) {
-        //    BinaryFormatter bf = new BinaryFormatter();
-        //    FileStream fs = File.Open(path, FileMode.Open);
-        //    List<GameObject> gas = (List<GameObject>)bf.Deserialize(fs);
-        //    foreach(GameObject ga in gas) {
-        //        print(ga.name);
-        //    }
-        //    print("deserialized");
-        //    fs.Close();
-        //}
-        SaveManager.Instance.LoadGame("test1");
+    private void handleSaveFile(string filename) {
+        SaveManager.Instance.SaveGame(filename);
     }
+
+    public void load() {
+        SaveManager.Instance.LoadGame("test1");
+        //Browser.Instance.OpenFile(Application.persistentDataPath, handleLoadFile); //WANT
+    }
+
+    private void handleLoadFile(string filename) {
+        SaveManager.Instance.LoadGame(filename);
+    }
+    
 
     public void newScene() {
         foreach(Cog cog in sceneObjects()) {

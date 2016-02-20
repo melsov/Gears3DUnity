@@ -19,7 +19,22 @@ public class GenerateItemIDs : ScriptableWizard {
             }
             ids.Add(itemID.id);
             GUI.changed = true;
-            EditorUtility.SetDirty( itemID.gameObject );
+            EditorUtility.SetDirty( itemID.gameObject);
+        }
+    }
+
+    [MenuItem("Custom/Add Guids ItemIDs to Prefabs")]
+    static void AddGuidAndItemId() {
+        MonoBehaviour[] prefabs = Resources.LoadAll<MonoBehaviour>("Prefabs/Cog");
+        foreach(MonoBehaviour mb in prefabs) {
+            if (mb.GetComponent<ItemID>() == null) {
+                mb.gameObject.AddComponent<ItemID>();
+            }
+            if (mb.GetComponent<Guid>() == null) {
+                mb.gameObject.AddComponent<Guid>();
+            }
+            GUI.changed = true;
+            EditorUtility.SetDirty(mb.gameObject);
         }
     }
 

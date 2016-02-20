@@ -7,7 +7,7 @@ using System.Collections;
 using System;
 using System.IO;
 
-public class Browser : MonoBehaviour
+public class Browser : Singleton<Browser>
 {
     public int defaultWidth = 100;
     public int minWidth = 50;
@@ -32,8 +32,13 @@ public class Browser : MonoBehaviour
     
     static Rect BrowserRect = new Rect(20, 20, 500, 400);
 
-    public void OpenFile(String mainFolder) 
+    public delegate void HandleOpenFile(string filename);
+    private HandleOpenFile handleOpenFile;
+    private HandleOpenFile handleSaveFile;
+
+    public void OpenFile(String mainFolder, HandleOpenFile _handleOpenFile) 
     {
+        handleOpenFile = _handleOpenFile;
         if(Directory.Exists(mainFolder))
         {
             WindowOpen = true;
@@ -54,12 +59,15 @@ public class Browser : MonoBehaviour
         }
     }
 
-    public void SaveFile(String FilePath, String mainFolder) 
+    public void SaveFile(String FilePath, String mainFolder, HandleOpenFile _handleOpenFile) 
     {
+        handleSaveFile = _handleOpenFile;
         if(Directory.Exists(mainFolder))
         {
             if(File.Exists(FilePath) || Directory.Exists(FilePath))
             {
+            }
+            else Debug.LogError("I need a path for a temporary save file that actually exists! This one doesn't: \n" + FilePath);
                 WindowOpen = true;
                 WinType = WindowType.Save;
                 DragStat.Dragging = false;    // Ensure nothing is being draged.
@@ -72,8 +80,6 @@ public class Browser : MonoBehaviour
                 AddWidth();
                 AddScrollPosition(0);
                 AddPath(MainFolder, 0);
-            }
-            else Debug.LogError("I need a path for a temporary save file that actually exists!");
         }
         else
         {
@@ -169,6 +175,8 @@ public class Browser : MonoBehaviour
                 //                                    and pass to it: FileToOpen.                                       //
                 //                                                                                                      //
                 //////////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (handleOpenFile != null)
+                    handleOpenFile(FileToOpen);
                 Debug.Log("Opening File: " + FileToOpen);
             }
             else Debug.LogError("The File you are trying to open must have gotten moved, or deleated.");
@@ -179,21 +187,21 @@ public class Browser : MonoBehaviour
         {
             if(File.Exists(FileToSave) || Directory.Exists(FileToSave))
             {
-                //NameOfFileToSave
-                String SaveLocation = OpenPaths[OpenPaths.Length-1];
-                if(Directory.Exists( SaveLocation ))
-                    OverwriteDuplicates(FileToSave, SaveLocation+"/"+NameOfFileToSave);
-                else
-                {
-                    if(File.Exists(SaveLocation)) // If the user chooses a file instead of a folder the parent folder will be used.
-                    {
-                        SaveLocation = (new FileInfo(SaveLocation)).DirectoryName;
-                        OverwriteDuplicates(FileToSave, SaveLocation+"/"+NameOfFileToSave);
-                    }
-                    else Debug.LogError("The directory you're trying to save in no longer exists");
-                }
             }
             else Debug.LogError("The file/folder your trying to save no longer exists.");
+                //NameOfFileToSave
+                String SaveLocation = OpenPaths[OpenPaths.Length-1];
+                if (Directory.Exists(SaveLocation)) {
+                    //OverwriteDuplicates(FileToSave, SaveLocation + "/" + NameOfFileToSave);
+                    handleSaveFile(SaveLocation + "/" + NameOfFileToSave);
+                } else {
+                    if (File.Exists(SaveLocation)) // If the user chooses a file instead of a folder the parent folder will be used.
+                    {
+                        SaveLocation = (new FileInfo(SaveLocation)).DirectoryName;
+                        //OverwriteDuplicates(FileToSave, SaveLocation + "/" + NameOfFileToSave);
+                        handleSaveFile(SaveLocation + "/" + NameOfFileToSave);
+                    } else Debug.LogError("The directory you're trying to save in no longer exists");
+                }
             WindowOpen = false;
         }
         bottom.width = 52;
@@ -206,7 +214,7 @@ public class Browser : MonoBehaviour
 					File.Delete(FileToSave); // Deleate FileToSave if the user chooses cancel.
 				if(Directory.Exists(FileToSave))
 					Directory.Delete(FileToSave, true); // Deleate FileToSave if the user chooses cancel.
-				Debug.Log("Deleate: " + FileToSave);
+				Debug.Log("Delete: " + FileToSave);
 			}
 				//Directory.Delete(FileToSave, true); // Deleate the file to save if the user chooses cancel.
             WindowOpen = false;
@@ -415,13 +423,14 @@ public class Browser : MonoBehaviour
             WalkTheTree( di );
     }
     
-    
-    
     void OverwriteDuplicates(String FTS, String FL)
     {
-        if(Directory.Exists(FL)) Directory.Delete(FL, true);
-        else if (File.Exists(FL)) File.Delete(FL);
-        Directory.Move(FTS, FL);
+        print("File to Save: " + FTS);
+        print("FL: " + FL);
+        handleSaveFile(FL);
+        //if(Directory.Exists(FL)) Directory.Delete(FL, true);
+        //else if (File.Exists(FL)) File.Delete(FL);
+        //Directory.Move(FTS, FL);
     }
     
     void AddPath(String add, int indexOfAdd)

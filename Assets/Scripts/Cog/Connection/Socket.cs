@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
-using System.Collections;
+using System.Collections.Generic;
 
-public abstract class Socket : MonoBehaviour {
+public abstract class Socket : MonoBehaviour, IRestoreConnection {
 
     public Peg autoconnectPeg;
     public int id;
@@ -138,6 +138,47 @@ public abstract class Socket : MonoBehaviour {
         }
         if (otherSocket == null) { return null; }
         return otherSocket.getParentDrivable();
+    }
+
+    [System.Serializable]
+    class ConnectionData
+    {
+        public bool hasChildPeg;
+        public string connectedGuid; //sure this exists?
+    }
+    public void storeConnectionData(ref List<byte[]> connectionData) {
+        ConnectionData cd = new ConnectionData();
+        if (hasChildPeg()) {
+            cd.hasChildPeg = hasChildPeg();
+            Guid connectedGuid = childPeg.GetComponent<Guid>();
+            if (connectedGuid != null) {
+                cd.connectedGuid = connectedGuid.guid.ToString();
+            } else Debug.LogError("No connected guid for child peg: " + childPeg.name + " of socket: " + name);
+        }
+        SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
+    }
+
+    public void restoreConnectionData(ref List<byte[]> connectionData) {
+        print("restore connection data in socket: " + name);
+        //if (hasChildPeg()) {
+        //    print("we already have a child peg (from prefab presubably). don't restore anything");
+        //    return;
+        //} else {
+        //    print("no child peg on socket: " + name);
+        //}
+        ConnectionData cd;
+        if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
+            if (cd.hasChildPeg) {
+                GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
+                if (connectedGO == null) {
+                    return;
+                }
+                Peg peg = connectedGO.GetComponent<Peg>();
+                if (peg != null) {
+                    peg.beChildOf(this);
+                }
+            }
+        }
     }
 
 }

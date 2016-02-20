@@ -61,7 +61,6 @@ public class SaveEntry
             ser.Serialize(ref scriptData);
         }
 
-
         //Save connection data
         foreach (IRestoreConnection rc in obj.GetComponentsInChildren<IRestoreConnection>()) {
             rc.storeConnectionData(ref connectionData);

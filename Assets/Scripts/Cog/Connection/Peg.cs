@@ -248,7 +248,12 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         if (hasChild) {
             cd.hasChild = hasChild;
             Transform connectedT = child.parentContainer.getTransform();
-            cd.connectedGuid = connectedT.GetComponent<Guid>().guid.ToString();
+            Guid connectedGuid = connectedT.GetComponent<Guid>();
+            if (connectedGuid != null) {
+                print("*peg connected guid name: " + connectedGuid.name + " guid: \n" + connectedGuid.guid.ToString());
+                cd.connectedGuid = connectedGuid.guid.ToString();
+                cd.connectedSocketID = child.id;
+            } else Debug.LogError("No connected guid for: " + connectedT.name + "(child of peg: " + name + ")");
         }
         SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
     }
@@ -259,6 +264,10 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
             if (cd.hasChild) {
                 GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
+                if (connectedGO != null)
+                    print("found game object for guid: " + connectedGO.name);
+                else
+                    print("connectedGo null ");
                 Pegboard pb = connectedGO.GetComponentInChildren<Pegboard>();
                 if (pb != null) {
                     print("found pegboard");

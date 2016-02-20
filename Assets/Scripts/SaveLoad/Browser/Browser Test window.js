@@ -16,7 +16,7 @@ function OnGUI() // Runs once at Runtime when object is loaded.
 	// Unity, without compiling, then the file browser will be a duplicate of your "Project" tab.
 	if(GUI.Button(Rect(5,5,230,30), "Test Browser's Open File function"))
 	{
-		Browser.OpenFile( Application.dataPath);
+		Browser.OpenFile( Application.dataPath, null);
 	}
 	
 	// Since opening a file is reliant on the user making multiple actions before the file they wish to open is actually
@@ -64,7 +64,8 @@ function OnGUI() // Runs once at Runtime when object is loaded.
 			Sw.WriteLine("");
 			Sw.WriteLine("YAY!!!!");
 			Sw.Close();
+			print(Application.dataPath);
 		// This is the actual save file comand that you need to know about, the first:
-		Browser.SaveFile( FileName, Application.dataPath+"/Demo Directory Tree");
+		Browser.SaveFile( FileName, Application.dataPath+"/Temp", null);
 	}
 }

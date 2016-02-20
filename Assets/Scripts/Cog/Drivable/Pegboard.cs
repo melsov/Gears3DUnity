@@ -4,15 +4,13 @@ using System;
 
 public class Pegboard : MonoBehaviour , ISocketSetContainer
 {
-    SocketSet backendSocketSet;
-    SocketSet frontendSocketSet;
+    protected SocketSet backendSocketSet;
+    protected SocketSet frontendSocketSet;
 
     void Awake() {
         awake();
     }
     protected virtual void awake() {
-        backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
-        frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());        
     }
 
     public Transform getTransform() {
@@ -40,10 +38,16 @@ public class Pegboard : MonoBehaviour , ISocketSetContainer
     }
 
     public SocketSet getBackendSocketSet() {
+        if (backendSocketSet == null) {
+            backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
+        }
         return backendSocketSet;
     }
 
     public SocketSet getFrontendSocketSet() {
+        if (frontendSocketSet == null) {
+            frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
+        }
         return frontendSocketSet;
     }
 }
