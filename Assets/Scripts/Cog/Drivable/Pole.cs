@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using UnityEngine.Assertions;
+using System.Collections.Generic;
 
 //TODO: connectTo method will apply for any free-rotatable drivable
 // make class FreeRotatableDrivabe
@@ -138,5 +139,10 @@ public class Pole : Drivable
 
     public override Drive receiveDrive(Drive drive) {
         return drive;
+    }
+
+    public override void restoreConnectionData(ref List<byte[]> connectionData) {
+        print("%%%welcome to pole: restore connection data");
+        base.restoreConnectionData(ref connectionData);
     }
 }

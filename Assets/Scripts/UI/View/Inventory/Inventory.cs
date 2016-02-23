@@ -35,7 +35,7 @@ public class Inventory : Singleton<Inventory> {
     }
 
     private void setupCategorySelect() {
-        Vector3 anchor = new Vector3(4,-4,4);
+        Vector3 anchor = new Vector3(4,-4,1);
         foreach(Category cat in categories) {
             createCategorySelectButton(cat, anchor);
             anchor.y -= categorySelectButtonPrefab.GetComponent<RectTransform>().rect.height + 2;
@@ -43,12 +43,12 @@ public class Inventory : Singleton<Inventory> {
     }
 
     private void createCategorySelectButton(Category cat, Vector3 anchoredPosition) {
-        Button cb = Instantiate<Button>(categorySelectButtonPrefab);
+        Button cb = cat.selectButton; // Instantiate<Button>(categorySelectButtonPrefab);
         cb.GetComponentInChildren<Text>().text = cat.title;
         cb.GetComponent<Image>().color = cat.GetComponent<Image>().color;
         cb.onClick.AddListener(delegate { showCategory(cat); });
-        cb.transform.SetParent(categorySelectPanel);
-        cb.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
+        ////cb.transform.SetParent(categorySelectPanel);
+        //cb.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
     }
 
     public void showCategory(Category category) {
@@ -84,7 +84,7 @@ public class Inventory : Singleton<Inventory> {
         Transform tr = Instantiate<Transform>(prefab);
         setPosition(tr);
         CursorInteraction ci = tr.GetComponent<CursorInteraction>();
-        Assert.IsTrue(ci != null);
+        Assert.IsTrue(ci != null, "no cursor interaction on prefab: " + prefab.name);
         cursorInput.takeInteractable(ci);
     }
 

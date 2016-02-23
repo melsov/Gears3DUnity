@@ -111,6 +111,7 @@ public class SaveManager : Singleton<SaveManager> {
 		{
             if ( (go.GetComponent("Guid") as Guid) != null && go.GetComponent<ItemID>() != null )
 			{
+                print("new save entry: " + go.name);
                 mSaveData.entries.Add(new SaveEntry(go));
 			}
 		}

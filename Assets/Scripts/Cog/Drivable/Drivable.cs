@@ -435,7 +435,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     {
         public List<string> drivableGuids = new List<string>();
     }
-    public void storeConnectionData(ref List<byte[]> connectionData) {
+    public virtual void storeConnectionData(ref List<byte[]> connectionData) {
         ConnectionData cd = new ConnectionData();
         foreach(Drivable d in drivables) {
             cd.drivableGuids.Add(d.GetComponent<Guid>().guid.ToString());
@@ -443,8 +443,8 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
     }
 
-    public void restoreConnectionData(ref List<byte[]> connectionData) {
-        print("restore connection data in drivable");
+    public virtual void restoreConnectionData(ref List<byte[]> connectionData) {
+        print("--restore connection data in drivable: " + name);
         ConnectionData cd;
         if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
             foreach(String drivableGuid in cd.drivableGuids) {

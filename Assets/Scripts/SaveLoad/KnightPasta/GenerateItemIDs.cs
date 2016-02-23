@@ -38,6 +38,19 @@ public class GenerateItemIDs : ScriptableWizard {
         }
     }
 
+
+    [MenuItem("Custom/Add Manifests to Prefabs")]
+    static void AddManifestToPrefabs() {
+        MonoBehaviour[] prefabs = Resources.LoadAll<MonoBehaviour>("Prefabs/Cog");
+        foreach(MonoBehaviour mb in prefabs) {
+            if (mb.GetComponent<Manifest>() == null) {
+                mb.gameObject.AddComponent<Manifest>();
+            }
+            GUI.changed = true;
+            EditorUtility.SetDirty(mb.gameObject);
+        }
+    }
+
     [MenuItem("Custom/Test Guid")]
     static void TestGuid() {
         System.Guid gu = System.Guid.NewGuid();

@@ -6,6 +6,7 @@ public class Category : MonoBehaviour {
 
     protected RectTransform rectTransform;
     protected Inventory inventory;
+    public Button selectButton;
     public InventoryItem[] inventoryItems;
     public RectTransform templateButtonPanel;
     public string title;

@@ -263,11 +263,12 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         ConnectionData cd;
         if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
             if (cd.hasChild) {
+                if (cd.connectedGuid == null || string.IsNullOrEmpty(cd.connectedGuid)) { return; }
                 GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
                 if (connectedGO != null)
                     print("found game object for guid: " + connectedGO.name);
                 else
-                    print("connectedGo null ");
+                    print("connectedGo null: '" + cd.connectedGuid + "' (end)");
                 Pegboard pb = connectedGO.GetComponentInChildren<Pegboard>();
                 if (pb != null) {
                     print("found pegboard");

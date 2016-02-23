@@ -213,7 +213,7 @@ public class Browser : Singleton<Browser>
 				if(File.Exists(FileToSave))
 					File.Delete(FileToSave); // Deleate FileToSave if the user chooses cancel.
 				if(Directory.Exists(FileToSave))
-					Directory.Delete(FileToSave, true); // Deleate FileToSave if the user chooses cancel.
+					Directory.Delete(FileToSave, true); // Deleate FileToSave if the user chooses cancel. //WANT (?)
 				Debug.Log("Delete: " + FileToSave);
 			}
 				//Directory.Delete(FileToSave, true); // Deleate the file to save if the user chooses cancel.
@@ -397,8 +397,8 @@ public class Browser : Singleton<Browser>
     void WalkTheTree(DirectoryInfo DI)
     {
         String PARENT = DI.FullName;
-        DirectoryInfo[] diArr = DI.GetDirectories();
-        FileInfo[] fiArr = DI.GetFiles();
+        DirectoryInfo[] diArr = DI.GetDirectories(); // WANT
+        FileInfo[] fiArr = DI.GetFiles(); //WANT
         
         //Debug
         Path[] PathTreeTemp = new Path[ diArr.Length + fiArr.Length ];

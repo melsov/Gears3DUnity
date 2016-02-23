@@ -61,11 +61,36 @@ public class SaveEntry
             ser.Serialize(ref scriptData);
         }
 
-        //Save connection data
-        foreach (IRestoreConnection rc in obj.GetComponentsInChildren<IRestoreConnection>()) {
-            rc.storeConnectionData(ref connectionData);
+        testChildrenAgainstManifest(obj);
+        Manifest manifest = obj.GetComponent<Manifest>();
+        if (manifest == null) {
+            Debug.LogError("this object needs a manifest: " + obj.name);
+            return;
         }
+        foreach(MonoBehaviour mb in manifest.prefabComponents) {
+            if (mb is IRestoreConnection) {
+                ((IRestoreConnection)mb).storeConnectionData(ref connectionData);
+            }
+        }
+        //Save connection data
+        //CONSIDER: object may have children that are not part of the prefab that it's based on (added later)
+        //foreach (IRestoreConnection rc in obj.GetComponentsInChildren<IRestoreConnection>()) {
+        //    rc.storeConnectionData(ref connectionData);
+        //} // <--replaced with manifest iteration
 	}
+
+    private void testChildrenAgainstManifest(GameObject obj) {
+        Manifest manifest = obj.GetComponent<Manifest>();
+        if (manifest == null) { Debug.Log("no manifest"); return; }
+
+        List<MonoBehaviour> manifestMBs = new List<MonoBehaviour>(manifest.prefabComponents);
+        foreach (IRestoreConnection rc in obj.GetComponentsInChildren<IRestoreConnection>()) {
+            MonoBehaviour mb = (MonoBehaviour)rc;
+            if (!(manifestMBs.Contains(mb))) {
+                Debug.Log("obj not in prefab manifest: " + mb.name);
+            }
+        }
+    }
 	
 	public void RestoreGameObject()
 	{
@@ -73,7 +98,7 @@ public class SaveEntry
             reinstantiateGameObject();
         }
 		reinstantiatedGameObject.transform.position = position;
-		reinstantiatedGameObject.transform.localScale = localScale;
+		//reinstantiatedGameObject.transform.localScale = localScale;//Don't restore scale
 		reinstantiatedGameObject.transform.rotation = rotation;
 		reinstantiatedGameObject.SetActive (active);
         reinstantiatedGameObject.GetComponent<Guid>().guid = new System.Guid(guid);
@@ -97,6 +122,8 @@ public class SaveEntry
 
     public void RestoreConnections() {
         if (reinstantiatedGameObject == null) { throw new Exception("game object not reinstantiated yet"); }
+        //CONSIDER: unpredictable order of this enumeration causes errors (possibly?) 
+        // Is it possible to make connectionData be a dictionary? 
         foreach (IRestoreConnection rc in reinstantiatedGameObject.GetComponentsInChildren<IRestoreConnection>()) {
             rc.restoreConnectionData(ref connectionData);
         }

@@ -167,17 +167,21 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         //    print("no child peg on socket: " + name);
         //}
         ConnectionData cd;
-        if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
-            if (cd.hasChildPeg) {
-                GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
-                if (connectedGO == null) {
-                    return;
-                }
-                Peg peg = connectedGO.GetComponent<Peg>();
-                if (peg != null) {
-                    peg.beChildOf(this);
+        try {
+            if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
+                if (cd.hasChildPeg) {
+                    GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
+                    if (connectedGO == null) {
+                        return;
+                    }
+                    Peg peg = connectedGO.GetComponent<Peg>();
+                    if (peg != null) {
+                        peg.beChildOf(this);
+                    }
                 }
             }
+        } catch (System.InvalidCastException ice) {
+            print("caught invalid cast exception for");
         }
     }
 
