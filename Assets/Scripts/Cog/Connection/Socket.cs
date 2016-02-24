@@ -151,11 +151,26 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         if (hasChildPeg()) {
             cd.hasChildPeg = hasChildPeg();
             Guid connectedGuid = childPeg.GetComponent<Guid>();
+            if (connectedGuid == null) {
+                connectedGuid = getSpecialCaseGuid(childPeg.transform);
+            }
             if (connectedGuid != null) {
                 cd.connectedGuid = connectedGuid.guid.ToString();
             } else Debug.LogError("No connected guid for child peg: " + childPeg.name + " of socket: " + name);
         }
         SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
+    }
+
+    private Guid getSpecialCaseGuid(Transform tr) {
+        IPegProxy ipp = tr.GetComponent<IPegProxy>();
+        if (ipp == null) {
+            ipp = tr.parent.GetComponent<IPegProxy>();
+        }
+        if (ipp != null) {
+            print("****%%%%got IPegProxy");
+            return ipp.getGuid();
+        }
+        return null;
     }
 
     public void restoreConnectionData(ref List<byte[]> connectionData) {
@@ -175,13 +190,20 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                         return;
                     }
                     Peg peg = connectedGO.GetComponent<Peg>();
+                    if (peg == null) {
+                        print("^^^^^^i peg proxy??");
+                        if (connectedGO.GetComponent<IPegProxy>() != null) {
+                            peg = connectedGO.GetComponent<IPegProxy>().getPeg();
+                            print("getting Ipegproxy: peg null? " + (peg == null));
+                        }
+                    }
                     if (peg != null) {
                         peg.beChildOf(this);
                     }
                 }
             }
         } catch (System.InvalidCastException ice) {
-            print("caught invalid cast exception for");
+            Debug.LogError("caught invalid cast exception for");
         }
     }
 

@@ -60,7 +60,7 @@ public class Pole : Drivable
 
         Peg aPeg = null;
         Socket aSocket = null;
-        ISocketSetContainer ssc = TransformUtil.FindComponentInThisOrChildren<ISocketSetContainer>(other.transform); // other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = other.GetComponentInChildren<ISocketSetContainer>(); // TransformUtil.FindComponentInThisOrChildren<ISocketSetContainer>(other.transform); 
         if (ssc == null) {
             print("no socket set on");
             Bug.printComponents(other.gameObject);
@@ -82,19 +82,36 @@ public class Pole : Drivable
                 return true;
             }
         } else {
-            aSocket = frontSocket;
-            print("front socket no child peg");
-            // get a peg on backend of other
-            Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
-            if (childSocket != null) {
-                if (childSocket.drivingPeg != null) {
-                    print("found driving peg on back of other: driving peg be child of");
-                    childSocket.drivingPeg.beChildOf(aSocket);
-                    return true;
-                }
+            if (connectToBackendOf(otherBackendSet, frontSocket)) {
+                return true;
             }
         }
         // is a constraint applied where available?
+        return false;
+    }
+
+    private bool connectToBackendOf(SocketSet otherBackendSet, Socket frontSocket) {
+        Socket aSocket = frontSocket;
+        print("front socket no child peg");
+        // get a peg on backend of other
+        Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
+        if (childSocket != null) {
+            if (childSocket.drivingPeg != null) {
+                print("found driving peg on back of other: driving peg be child of");
+                childSocket.drivingPeg.beChildOf(aSocket);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool acceptBackendPegOnDrivable(Drivable d) {
+        Socket frontSocket = _pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(d.transform.position, RotationMode.FREE_OR_FIXED);
+        if (frontSocket == null) { return false; }
+        ISocketSetContainer ssc = d.GetComponentInChildren<ISocketSetContainer>();
+        if (ssc != null) {
+            return connectToBackendOf(ssc.getBackendSocketSet(), frontSocket);
+        }
         return false;
     }
 

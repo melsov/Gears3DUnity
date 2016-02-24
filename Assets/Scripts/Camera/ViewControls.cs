@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class ViewControls : MonoBehaviour {
@@ -22,23 +23,25 @@ public class ViewControls : MonoBehaviour {
         if (pause.paused) {
             return;
         }
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll < -float.Epsilon || scroll > float.Epsilon) {
-            if (mouseIsOverScreen())
-                cam.orthographicSize += scroll * zoomSpeed *-1f;
-        }
+        if (!EventSystem.current.IsPointerOverGameObject()) {
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            if (scroll < -float.Epsilon || scroll > float.Epsilon) {
+                if (mouseIsOverScreen())
+                    cam.orthographicSize += scroll * zoomSpeed *-1f;
+            }
 
-        //MMB
-        if (Input.GetMouseButtonDown(2)) {
-            targetPosition = cam.transform.position;
-            lastMouseGlobal = cam.ScreenToWorldPoint(Input.mousePosition);
-        }
-        if (Input.GetMouseButton(2)) {
-            Vector3 mouseGlobal = cam.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 nudge = (mouseGlobal - lastMouseGlobal);
-            nudge.Scale(_vpanScale);
-            targetPosition -= nudge;
-            lastMouseGlobal = mouseGlobal;
+            //MMB
+            if (Input.GetMouseButtonDown(2)) {
+                targetPosition = cam.transform.position;
+                lastMouseGlobal = cam.ScreenToWorldPoint(Input.mousePosition);
+            }
+            if (Input.GetMouseButton(2)) {
+                Vector3 mouseGlobal = cam.ScreenToWorldPoint(Input.mousePosition);
+                Vector3 nudge = (mouseGlobal - lastMouseGlobal);
+                nudge.Scale(_vpanScale);
+                targetPosition -= nudge;
+                lastMouseGlobal = mouseGlobal;
+            }
         }
         cam.transform.position = Vector3.Lerp(cam.transform.position, targetPosition, panSpeed * Time.deltaTime);
 	}

@@ -61,7 +61,7 @@ public class SaveEntry
             ser.Serialize(ref scriptData);
         }
 
-        testChildrenAgainstManifest(obj);
+        //Save connection data
         Manifest manifest = obj.GetComponent<Manifest>();
         if (manifest == null) {
             Debug.LogError("this object needs a manifest: " + obj.name);
@@ -72,25 +72,9 @@ public class SaveEntry
                 ((IRestoreConnection)mb).storeConnectionData(ref connectionData);
             }
         }
-        //Save connection data
-        //CONSIDER: object may have children that are not part of the prefab that it's based on (added later)
-        //foreach (IRestoreConnection rc in obj.GetComponentsInChildren<IRestoreConnection>()) {
-        //    rc.storeConnectionData(ref connectionData);
-        //} // <--replaced with manifest iteration
+
 	}
 
-    private void testChildrenAgainstManifest(GameObject obj) {
-        Manifest manifest = obj.GetComponent<Manifest>();
-        if (manifest == null) { Debug.Log("no manifest"); return; }
-
-        List<MonoBehaviour> manifestMBs = new List<MonoBehaviour>(manifest.prefabComponents);
-        foreach (IRestoreConnection rc in obj.GetComponentsInChildren<IRestoreConnection>()) {
-            MonoBehaviour mb = (MonoBehaviour)rc;
-            if (!(manifestMBs.Contains(mb))) {
-                Debug.Log("obj not in prefab manifest: " + mb.name);
-            }
-        }
-    }
 	
 	public void RestoreGameObject()
 	{
