@@ -124,19 +124,24 @@ public class Pole : Drivable
         }
         Socket freeRotatingBackendSocket = null;
         foreach(Socket s in _pegboard.getBackendSocketSet().sockets) {
-            print("s has parent: " + s.hasDrivingPeg());
             if (s.isFreeRotatingOnPeg()) {
                 freeRotatingBackendSocket = s;
                 break;
             }
         }
         if (freeRotatingBackendSocket == null) {
-            print("opposite soc is null");
             return null;
         }
         // set up 'look at constraint'
-        print("set up look at constraint");
-        LookAtConstraint lookAtConstraint = gameObject.AddComponent<LookAtConstraint>();
+        LookAtConstraint lookAtConstraint = GetComponent<LookAtConstraint>();
+        if (lookAtConstraint == null) {
+            lookAtConstraint = gameObject.AddComponent<LookAtConstraint>();
+        }
+        LineSegment ls = null;
+        if (childTransform.GetComponentInParent<LinearActuator>() != null) {
+            ls = childTransform.GetComponentInParent<LinearActuator>().GetComponentInChildren<LineSegment>();
+            lookAtConstraint.constraintTarget.lineSegmentReference = ls;
+        }
         lookAtConstraint.constraintTarget.target = childTransform;
         lookAtConstraint.constraintTarget.reference = freeRotatingBackendSocket.transform;
         lookAtConstraint.constraintTarget.altReference = socket.transform;

@@ -44,13 +44,14 @@ public struct ConstraintTarget
     public Transform target;
     public Transform reference;
     public Transform altReference;
+    public LineSegment lineSegmentReference;
     public Constraint parentConstraint;
 
     public ConstraintTarget(Transform _target, Transform _reference) {
-        target = _target; reference = _reference; parentConstraint = null; altReference = null;
+        target = _target; reference = _reference; parentConstraint = null; altReference = null; lineSegmentReference = null;
     }
     public ConstraintTarget (Transform _target) {
-        target = _target; reference = null; parentConstraint = null; altReference = null;
+        target = _target; reference = null; parentConstraint = null; altReference = null; lineSegmentReference = null;
     }
 
     public bool isPsuedoNull() {
