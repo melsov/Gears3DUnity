@@ -3,6 +3,8 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using System;
 
+//TODO: new drivable: 'rack' (pole with gear teeth)
+
 [System.Serializable]
 public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGameSerializable, IRestoreConnection
 {

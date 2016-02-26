@@ -133,6 +133,7 @@
     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
     <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\Browser\Browser.cs" />
+    <Compile Include="Assets\Scripts\SaveLoad\Browser\BrowserBKUP.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateGuids.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateItemIDs.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\Guid.cs" />
@@ -150,6 +151,7 @@
     <Compile Include="Assets\Scripts\UI\View\Inventory\Inventory.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\ItemID.cs" />
     <Compile Include="Assets\Scripts\UI\View\Pause.cs" />
+    <Compile Include="Assets\Scripts\UI\View\ProjectName.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
     <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />

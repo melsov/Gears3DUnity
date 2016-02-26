@@ -29,12 +29,12 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void save() {
-        SaveManager.Instance.SaveGame("test1");
+        //SaveManager.Instance.SaveGame("test1");
 
         //WANT
-        //string doesntmatter = Application.dataPath + "/TempSaveFile";
-        //print(Application.persistentDataPath);
-        //Browser.Instance.SaveFile(doesntmatter, Application.persistentDataPath, handleSaveFile);
+        string doesntmatter = Application.dataPath + "/TempSaveFile";
+        print(Application.persistentDataPath);
+        Browser.Instance.SaveFile(doesntmatter, Application.persistentDataPath, handleSaveFile);
     }
 
     private void handleSaveFile(string filename) {
@@ -42,8 +42,8 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void load() {
-        SaveManager.Instance.LoadGame("test1");
-        //Browser.Instance.OpenFile(Application.persistentDataPath, handleLoadFile); //WANT
+        //SaveManager.Instance.LoadGame("test1");
+        Browser.Instance.OpenFile(Application.persistentDataPath, handleLoadFile); //WANT
     }
 
     private void handleLoadFile(string filename) {

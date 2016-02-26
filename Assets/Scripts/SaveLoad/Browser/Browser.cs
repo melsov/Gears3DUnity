@@ -6,6 +6,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 using System.IO;
+using UnityEngine.UI;
 
 public class Browser : Singleton<Browser>
 {
@@ -35,6 +36,24 @@ public class Browser : Singleton<Browser>
     public delegate void HandleOpenFile(string filename);
     private HandleOpenFile handleOpenFile;
     private HandleOpenFile handleSaveFile;
+
+    //private InputField projectNameInput;
+
+    public string projectName {
+        set {
+            NameOfFileToSave = value;
+        }
+    }
+
+    void Awake() {
+        //projectNameInput = GameObject.Find("ProjectNameInput").GetComponent<InputField>();
+        //UnityEngine.Assertions.Assert.IsTrue(projectNameInput != null, "no project input field?? (Browser.cs)");
+        //NameOfFileToSave = projectNameInput.text;
+        //if (NameOfFileToSave == "") {
+        //    NameOfFileToSave = projectNameInput.placeholder.GetComponentInChildren<Text>().text;
+        //}
+        
+    }
 
     public void OpenFile(String mainFolder, HandleOpenFile _handleOpenFile) 
     {
@@ -179,7 +198,7 @@ public class Browser : Singleton<Browser>
                     handleOpenFile(FileToOpen);
                 Debug.Log("Opening File: " + FileToOpen);
             }
-            else Debug.LogError("The File you are trying to open must have gotten moved, or deleated.");
+            else Debug.LogError("The File you are trying to open must have gotten moved, or deleted.");
             
             WindowOpen = false;
         }
