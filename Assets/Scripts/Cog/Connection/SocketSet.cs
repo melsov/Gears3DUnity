@@ -70,7 +70,7 @@ public class SocketSet
         RigidRelationshipConstraint socketRelationshipConstraint) {
         
         Socket closest = null;
-        Vector3 dist = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        Vector3 dist = new Vector3(999999f,999999f,999999f);
         foreach(Socket socket in sockets) {
             if (needOpenPegSlot && (socket.hasChildPeg())) { continue; }
             if (needPegInPegSlot && !socket.hasDrivingPeg()) { debugGetSocket("no child"); continue; }
@@ -79,9 +79,22 @@ public class SocketSet
                 socket.socketIsParentRotationMode : socket.socketIsChildRotationMode;
             if (!RotationModeHelper.CompatibleModes(requiredSocketRotationMode, relevantSocketRotationMode)) { continue; } 
             Vector3 nextdDist = socket.transform.position - global;
-            if (nextdDist.magnitude < dist.magnitude) {
+            if (nextdDist.sqrMagnitude < dist.sqrMagnitude) {
                 dist = nextdDist;
                 closest = socket;
+            }
+        }
+        return closest;
+    }
+
+    public Socket getSocketClosestTo(Vector3 global) {
+        Vector3 dist = new Vector3(9999999f, 9999999f, 9999999f);
+        Socket closest = null;
+        foreach(Socket s in sockets) {
+            Vector3 nextdDist = s.transform.position - global;
+            if (nextdDist.sqrMagnitude < dist.sqrMagnitude) {
+                dist = nextdDist;
+                closest = s;
             }
         }
         return closest;
@@ -258,6 +271,14 @@ public class SocketSet
                     return s.childPeg;
                 }
             }
+        }
+        return null;
+    }
+
+    public Socket getAnother(Socket socket) {
+        if (!contains(socket)) { return null; }
+        foreach(Socket s in sockets) {
+            if (socket != s) return s;
         }
         return null;
     }

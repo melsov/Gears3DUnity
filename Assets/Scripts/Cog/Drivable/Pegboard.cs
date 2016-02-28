@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class Pegboard : MonoBehaviour , ISocketSetContainer
+public class Pegboard : MonoBehaviour, ISocketSetContainer
 {
     protected SocketSet backendSocketSet;
     protected SocketSet frontendSocketSet;
@@ -49,5 +49,13 @@ public class Pegboard : MonoBehaviour , ISocketSetContainer
             frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
         }
         return frontendSocketSet;
+    }
+
+    public Socket closestOppositeEndSocket(Socket socket) {
+        if (getFrontendSocketSet().contains(socket)) {
+            return getBackendSocketSet().getSocketClosestTo(socket.transform.position);
+        } else {
+            return getFrontendSocketSet().getSocketClosestTo(socket.transform.position);
+        }
     }
 }

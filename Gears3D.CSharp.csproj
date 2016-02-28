@@ -101,6 +101,7 @@
     <Compile Include="Assets\Scripts\Cog\Constraint\Constraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\ConstratintTargetSet.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LineSegment.cs" />
+    <Compile Include="Assets\Scripts\Cog\Constraint\LinearActuatorConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />

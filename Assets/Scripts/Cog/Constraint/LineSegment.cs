@@ -56,9 +56,29 @@ public class LineSegment : MonoBehaviour {
         return result;
     }
 
-    private void debug() {
-        if (lr == null) return;
-        lr.SetPosition(0, closestPoint(new VectorXZ(start.position + Vector3.right * .2f)).vector3(transform.position.y));
-        lr.SetPosition(1, closestPoint(new VectorXZ(end.position)).vector3(transform.position.y));
+    public bool isOnSegment(VectorXZ global) {
+        VectorXZ dif = closestPointOnLine(global) - startXZ;
+        return dif.dot(distance) > 0f && dif.dot(distance) < distance.magnitudeSquared;
+    }
+
+    public float slopeXZ {
+        get {
+            return (end.position.z - start.position.z) / (end.position.x - start.position.x);
+        }
+    }
+
+    public float interceptXZ {
+        get {
+            return end.position.z - slopeXZ * end.position.x;
+        } 
+    }
+
+    public void debug() {
+        if (lr == null) { print("line rend null"); return; }
+        lr.SetPosition(0, new Vector3(0, end.position.y, interceptXZ));
+        float z = 100f * slopeXZ + interceptXZ;
+        lr.SetPosition(1, new Vector3(100f, end.position.y, z));
+        //lr.SetPosition(0, closestPoint(new VectorXZ(start.position + Vector3.right * .2f)).vector3(transform.position.y));
+        //lr.SetPosition(1, closestPoint(new VectorXZ(end.position)).vector3(transform.position.y));
     }
 }

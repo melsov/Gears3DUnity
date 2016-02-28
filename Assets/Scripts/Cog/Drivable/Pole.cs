@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using UnityEngine.Assertions;
 using System.Collections.Generic;
+using UnityEditor;
 
 //TODO: connectTo method will apply for any free-rotatable drivable
 // make class FreeRotatableDrivabe
@@ -107,6 +108,20 @@ public class Pole : Drivable
 
     public bool acceptBackendPegOnDrivable(Drivable d) {
         Socket frontSocket = _pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(d.transform.position, RotationMode.FREE_OR_FIXED);
+
+        // if this front socket is 'on top of' a driven back end socket use the opposite frontend socket instead
+        Socket backSocket = _pegboard.closestOppositeEndSocket(frontSocket);
+        if (backSocket != null && backSocket.hasDrivingPeg()) {
+            Socket another = _pegboard.getFrontendSocketSet().getAnother(frontSocket);
+            if (another != null) {
+                print("***^^^%%%%%another not null");
+                frontSocket = another;
+            }
+        }
+
+        BugLine.Instance.markPoint(new VectorXZ(frontSocket.transform.position), 1); //DBUG
+        EditorApplication.isPaused = true;
+
         if (frontSocket == null) { return false; }
         ISocketSetContainer ssc = d.GetComponentInChildren<ISocketSetContainer>();
         if (ssc != null) {
@@ -133,20 +148,20 @@ public class Pole : Drivable
             return null;
         }
         // set up 'look at constraint'
-        LookAtConstraint lookAtConstraint = GetComponent<LookAtConstraint>();
-        if (lookAtConstraint == null) {
-            lookAtConstraint = gameObject.AddComponent<LookAtConstraint>();
+        LinearActuatorConstraint laConstraint = GetComponent<LinearActuatorConstraint>();
+        if (laConstraint == null) {
+            laConstraint = gameObject.AddComponent<LinearActuatorConstraint>();
         }
         LineSegment ls = null;
         if (childTransform.GetComponentInParent<LinearActuator>() != null) {
             ls = childTransform.GetComponentInParent<LinearActuator>().GetComponentInChildren<LineSegment>();
-            lookAtConstraint.constraintTarget.lineSegmentReference = ls;
+            laConstraint.constraintTarget.lineSegmentReference = ls;
         }
-        lookAtConstraint.constraintTarget.target = childTransform;
-        lookAtConstraint.constraintTarget.reference = freeRotatingBackendSocket.transform;
-        lookAtConstraint.constraintTarget.altReference = socket.transform;
-        lookAtConstraint.isParentConstraint = true;
-        return lookAtConstraint;
+        laConstraint.constraintTarget.target = childTransform;
+        laConstraint.constraintTarget.reference = freeRotatingBackendSocket.transform;
+        laConstraint.constraintTarget.altReference = socket.transform;
+        laConstraint.isParentConstraint = true;
+        return laConstraint;
     }
 
     protected override void vDisconnect() {
