@@ -36,6 +36,9 @@ public abstract class Constraint : MonoBehaviour {
 
     protected abstract void constrain();
 
+    public virtual void configure(Drivable referenceDrivable, Drivable targetDrivable) {
+    }
+
 }
 
 [System.Serializable]

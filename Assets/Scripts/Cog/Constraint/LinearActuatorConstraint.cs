@@ -7,10 +7,68 @@ public class LinearActuatorConstraint : Constraint
     public float testFactor = 1.2f;
     //public LineSegment lineSegment;
     protected Vector3 prevTargetPosition = Vector3.zero;
+    protected int intersectionIndex = -1;
 
     protected override void awake() {
         base.awake();
         prevTargetPosition = constraintTarget.reference.position;
+    }
+
+    public override void configure(Drivable referenceDrivable, Drivable targetDrivable) {
+        base.configure(referenceDrivable, targetDrivable);
+        if (targetDrivable == null || !(targetDrivable is LinearActuator)) {
+            print("wrong kind of drivable: " + targetDrivable.name); return;
+        }
+
+        chooseIntersectionIndex(referenceDrivable);
+    }
+
+    private void chooseIntersectionIndex(Drivable referenceDrivable) {
+        Gear gear = referenceDrivable.GetComponent<Gear>();
+        if (gear == null) {
+            print("bad reference drivable: " + referenceDrivable.name); return;
+        }
+
+        //survey line segment
+        int sections = 36;
+        Vector3 gearCenter = gear.transform.position;
+        float radius = (gearCenter - constraintTarget.reference.position).magnitude;
+        int zeroHit = 0, oneHit = 0;
+        for (int i=0; i<sections; ++i) {
+            float ang = Mathf.PI * 2 * i / ((float)sections);
+            Vector3 testDirection = new Vector3(radius * Mathf.Cos(ang), 0f, radius * Mathf.Sin(ang));
+            int result = connectedIndicesFromCenter(gearCenter + testDirection);
+            if (result == 2) {
+                zeroHit++;
+                oneHit++;
+            } else if (result == 0) {
+                zeroHit++;
+            } else if (result == 1) {
+                oneHit++;
+            }
+        }
+
+        if (zeroHit > oneHit) {
+            intersectionIndex = 0;
+        } else {
+            intersectionIndex = 1;
+        }
+    }
+
+    private int connectedIndicesFromCenter(Vector3 center) {
+        VectorXZ[] points = new VectorXZ[2];
+        bool intersected = intersectionPoints(ref points, constraintTarget.reference.position, constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
+        int result = -1;
+        bool zedOnSeg = constraintTarget.lineSegmentReference.isOnSegment(points[0]);
+        bool oneOneSeg = constraintTarget.lineSegmentReference.isOnSegment(points[1]);
+        if (zedOnSeg && oneOneSeg) {
+            result = 2;
+        } else if (zedOnSeg) {
+            result = 0;
+        } else if (oneOneSeg) {
+            result = 1;
+        }
+        return result;
     }
 
     //CONSIDER: THIS SHOULD REALLY BE CALLED 'LINESEGMENT CONSTRAINT'
@@ -27,12 +85,12 @@ public class LinearActuatorConstraint : Constraint
             VectorXZ[] points = new VectorXZ[2];
             VectorXZ n = new VectorXZ(nudge);
 
-//TODO: diagnose bugs in this
-            bool intersected = intersectionPoints(ref points);
+            bool intersected = intersectionPoints(ref points, constraintTarget.reference.position, constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
             BugLine.Instance.markPoint(points[0], 0);
             BugLine.Instance.markPoint(points[1], 1);
+            target = points[intersectionIndex].vector3(target.y);
 
-            if (intersected) {
+            if (false && intersected) { //UNREACHABLE
                 //if p0 == p1??
                 //TODO: this algo is no good! find the definitive way
                 bool zedOnSeg = constraintTarget.lineSegmentReference.isOnSegment(points[0]);
@@ -76,22 +134,22 @@ public class LinearActuatorConstraint : Constraint
     }
     // Called from fixed update
 
-    private int tick = 0;
+    private static int tick = 0;
 
-    private bool intersectionPoints(ref VectorXZ[] points) {
+    private static bool intersectionPoints(ref VectorXZ[] points, Vector3 center, Vector3 pointOnCircle, LineSegment lineSegment) {
 
         // p and q are x and y offsets for circle defined by r = pole length, center = pinned down end of pole (reference.position)
-        float p = constraintTarget.reference.position.x;
-        float q = constraintTarget.reference.position.z;
-        VectorXZ pole = new VectorXZ(constraintTarget.altReference.position - constraintTarget.reference.position);
-        float slope = constraintTarget.lineSegmentReference.slopeXZ;
-        float intercept = constraintTarget.lineSegmentReference.interceptXZ;
+        float p = center.x; // constraintTarget.reference.position.x;
+        float q = center.z; // constraintTarget.reference.position.z;
+        VectorXZ pole = new VectorXZ(pointOnCircle - center); // constraintTarget.altReference.position - constraintTarget.reference.position);
+        float slope = lineSegment.slopeXZ; // constraintTarget.lineSegmentReference.slopeXZ;
+        float intercept = lineSegment.interceptXZ; // constraintTarget.lineSegmentReference.interceptXZ;
 
         if (tick++ > 30) {
             tick = 0;
             //BugLine.Instance.markPoint(new VectorXZ(constraintTarget.altReference.position), 2);
             //BugLine.Instance.markPoint(new VectorXZ(constraintTarget.reference.position), 3);
-            BugLine.Instance.circle(constraintTarget.reference.position, pole.magnitude);
+            BugLine.Instance.circle(center, pole.magnitude); // constraintTarget.reference.position, pole.magnitude);
         }
 
         //coefficients

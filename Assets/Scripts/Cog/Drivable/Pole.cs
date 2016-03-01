@@ -93,12 +93,11 @@ public class Pole : Drivable
 
     private bool connectToBackendOf(SocketSet otherBackendSet, Socket frontSocket) {
         Socket aSocket = frontSocket;
-        print("front socket no child peg");
+
         // get a peg on backend of other
         Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
         if (childSocket != null) {
             if (childSocket.drivingPeg != null) {
-                print("found driving peg on back of other: driving peg be child of");
                 childSocket.drivingPeg.beChildOf(aSocket);
                 return true;
             }
@@ -114,11 +113,10 @@ public class Pole : Drivable
         if (backSocket != null && backSocket.hasDrivingPeg()) {
             Socket another = _pegboard.getFrontendSocketSet().getAnother(frontSocket);
             if (another != null) {
-                print("***^^^%%%%%another not null");
                 frontSocket = another;
             }
         }
-
+        //DBUG
         BugLine.Instance.markPoint(new VectorXZ(frontSocket.transform.position), 1); //DBUG
         EditorApplication.isPaused = true;
 
@@ -147,7 +145,7 @@ public class Pole : Drivable
         if (freeRotatingBackendSocket == null) {
             return null;
         }
-        // set up 'look at constraint'
+        // set up 'linear actuator constraint'
         LinearActuatorConstraint laConstraint = GetComponent<LinearActuatorConstraint>();
         if (laConstraint == null) {
             laConstraint = gameObject.AddComponent<LinearActuatorConstraint>();
@@ -161,8 +159,19 @@ public class Pole : Drivable
         laConstraint.constraintTarget.reference = freeRotatingBackendSocket.transform;
         laConstraint.constraintTarget.altReference = socket.transform;
         laConstraint.isParentConstraint = true;
+
+        Peg peg = childTransform.GetComponent<Peg>();
+        if (peg != null) {
+            Drivable drChild = peg.GetComponentInParent<Drivable>();
+            Drivable gear = freeRotatingBackendSocket.drivingPeg.parent.GetComponentInParent<Drivable>();
+            
+            laConstraint.configure(gear, drChild);
+        }
         return laConstraint;
     }
+
+    //TODO: pole and in general drivable needs to lose parent constraint on disconnect
+    //TODO: give constraint a chance to adjust on move of either drivable
 
     protected override void vDisconnect() {
         base.vDisconnect();

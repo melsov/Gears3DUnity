@@ -73,6 +73,10 @@ public class LineSegment : MonoBehaviour {
         } 
     }
 
+    public void setDistance(float distance) {
+        end.position = start.position + (normalized * distance).vector3();
+    }
+
     public void debug() {
         if (lr == null) { print("line rend null"); return; }
         lr.SetPosition(0, new Vector3(0, end.position.y, interceptXZ));

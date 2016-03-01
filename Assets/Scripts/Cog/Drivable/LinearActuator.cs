@@ -3,9 +3,16 @@ using System.Collections;
 using System;
 
 public class LinearActuator : Drivable , IPegProxy {
-    
-// TODO: resolve LA's origin weirdness
-// TOOD: make LA's slider length settable
+
+    // TODO: resolve LA's origin weirdness
+    // TOOD: make LA's slider length settable
+
+    protected LineSegment lineSegment;
+
+    protected override void awake() {
+        base.awake();
+        lineSegment = GetComponentInChildren<LineSegment>();
+    }
 
     public override float driveScalar() {
         return 0f;
