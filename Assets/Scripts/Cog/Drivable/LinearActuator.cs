@@ -22,16 +22,59 @@ public class LinearActuator : Drivable , IPegProxy {
         return drive;
     }
 
-    // Linear Actuator never does the connecting itself?
+    public virtual Pole drivingPole {
+        get {
+            if (drivingPeg.parent == null) return null;
+            return drivingPeg.parent.parentContainer.getTransform().GetComponentInParent<Pole>();
+        }
+    }
+
+    public bool hasDrivingPole {
+        get { return drivingPole != null; }
+    }
+
+    protected LinearActuatorConstraint linearActuatorConstraint {
+        get {
+            if (drivingPeg == null) return null;
+            if (drivingPeg.isChildConstraint == null) return null;
+            if (drivingPeg.isChildConstraint.constraintTarget.parentConstraint == null) return null;
+            return drivingPeg.isChildConstraint.constraintTarget.parentConstraint.GetComponent<LinearActuatorConstraint>();
+        }
+    }
+
     protected override bool vConnectTo(Collider other) {
-        if (drivingPeg.hasParentSocket) { return false; }
         Pole pole = other.GetComponent<Pole>();
+        if (pole != null && drivingPole != null && pole != drivingPole) {
+            return false;
+        }
+       
+        // if other is a pole. 
+        // that has a free socket 
         if (pole != null) {
             return pole.acceptBackendPegOnDrivable(this);
         }
-        // if other is a pole. 
-        // that has a free 
         return false;
+    }
+
+    protected override void vDisconnect() {
+        LinearActuatorConstraint lac = linearActuatorConstraint;
+        if(lac != null) {
+            if (lac.isTargetInRange()) {
+                lac.configure();
+            } else {
+                base.vDisconnect();
+                // disconnect constraint
+            }
+        }
+    }
+
+    protected override void vEndDragOverride(VectorXZ cursorGlobal) {
+        LinearActuatorConstraint lac = linearActuatorConstraint;
+        if (lac != null) {
+            if (lac.isTargetInRange()) {
+                lac.configure();
+            }
+        }
     }
 
     public Guid getGuid() {

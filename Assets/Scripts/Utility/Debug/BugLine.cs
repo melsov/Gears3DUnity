@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class BugLine : Singleton<BugLine> {
 
     LineRenderer lineRenderer;
+    private int vertices = 7;
     protected BugLine() { }
     Transform pointMarker;
     List<Transform> markers;
@@ -22,7 +23,7 @@ public class BugLine : Singleton<BugLine> {
         lines = new Dictionary<VecPair, GameObject>();
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.SetWidth(.1f, .2f);
-        lineRenderer.SetVertexCount(6);
+        lineRenderer.SetVertexCount(vertices);
         Material m = Resources.Load<Material>("Materials/BugLineMat.mat");
         lineRenderer.material = m;
 
@@ -86,10 +87,10 @@ public class BugLine : Singleton<BugLine> {
     }
 
     public void circle(Vector3 origin, float radius) {
-        float sections = 6;
+        float sections = vertices - 1;
         float wedge = Mathf.PI * 2 / sections;
         Vector3 next;
-        for(int i = 0; i < sections; ++i) {
+        for(int i = 0; i <= sections; ++i) {
             float angle = i * wedge;
             next = origin + new Vector3(radius * Mathf.Cos(i), 0f, radius * Mathf.Sin(i));
             lineRenderer.SetPosition(i, next);

@@ -14,19 +14,30 @@ public class LinearActuatorConstraint : Constraint
         prevTargetPosition = constraintTarget.reference.position;
     }
 
-    public override void configure(Drivable referenceDrivable, Drivable targetDrivable) {
-        base.configure(referenceDrivable, targetDrivable);
-        if (targetDrivable == null || !(targetDrivable is LinearActuator)) {
-            print("wrong kind of drivable: " + targetDrivable.name); return;
-        }
-
-        chooseIntersectionIndex(referenceDrivable);
+    public virtual bool isTargetInRange() {
+        if (constraintTarget.lineSegmentReference == null) return false;
+        return 
+            (constraintTarget.lineSegmentReference.start.position - constraintTarget.reference.position).sqrMagnitude < poleDirection.sqrMagnitude ||
+            (constraintTarget.lineSegmentReference.end.position - constraintTarget.reference.position).sqrMagnitude < poleDirection.sqrMagnitude;
     }
 
-    private void chooseIntersectionIndex(Drivable referenceDrivable) {
-        Gear gear = referenceDrivable.GetComponent<Gear>();
+    protected Vector3 poleDirection {
+        get { return constraintTarget.altReference.position - constraintTarget.reference.position; }
+    }
+
+    public override void configure() {
+        base.configure();
+        if (constraintTarget.drivenReference == null || !(constraintTarget.drivenReference is LinearActuator)) {
+            print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
+        }
+
+        chooseIntersectionIndex();
+    }
+
+    private void chooseIntersectionIndex() {
+        Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
         if (gear == null) {
-            print("bad reference drivable: " + referenceDrivable.name); return;
+            print("bad reference drivable: " + constraintTarget.driverReference.name); return;
         }
 
         //survey line segment
@@ -77,7 +88,7 @@ public class LinearActuatorConstraint : Constraint
             return;
         }
 
-        Vector3 curDirection = constraintTarget.altReference.position - constraintTarget.reference.position;
+        Vector3 curDirection = poleDirection; // constraintTarget.altReference.position - constraintTarget.reference.position;
         Vector3 target = constraintTarget.target.position;
         Vector3 nudge = constraintTarget.reference.position - prevTargetPosition; // constraintTarget.target.rotation.eulerAngles * testFactor; // Dot(constraintTarget.target.rotation.eulerAngles, curDirection.normalized) * .3f * constraintTarget.target.rotation.eulerAngles;
 

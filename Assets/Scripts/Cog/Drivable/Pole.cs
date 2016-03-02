@@ -160,12 +160,12 @@ public class Pole : Drivable
         laConstraint.constraintTarget.altReference = socket.transform;
         laConstraint.isParentConstraint = true;
 
+
         Peg peg = childTransform.GetComponent<Peg>();
         if (peg != null) {
-            Drivable drChild = peg.GetComponentInParent<Drivable>();
-            Drivable gear = freeRotatingBackendSocket.drivingPeg.parent.GetComponentInParent<Drivable>();
-            
-            laConstraint.configure(gear, drChild);
+            laConstraint.constraintTarget.driverReference = freeRotatingBackendSocket.drivingPeg.parent.GetComponentInParent<Drivable>();
+            laConstraint.constraintTarget.drivenReference = peg.GetComponentInParent<Drivable>();
+            laConstraint.configure();
         }
         return laConstraint;
     }

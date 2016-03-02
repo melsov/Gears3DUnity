@@ -36,7 +36,7 @@ public abstract class Constraint : MonoBehaviour {
 
     protected abstract void constrain();
 
-    public virtual void configure(Drivable referenceDrivable, Drivable targetDrivable) {
+    public virtual void configure() {
     }
 
 }
@@ -50,11 +50,16 @@ public struct ConstraintTarget
     public LineSegment lineSegmentReference;
     public Constraint parentConstraint;
 
+    public Drivable driverReference;
+    public Drivable drivenReference;
+
     public ConstraintTarget(Transform _target, Transform _reference) {
         target = _target; reference = _reference; parentConstraint = null; altReference = null; lineSegmentReference = null;
+        driverReference = null; drivenReference = null;
     }
     public ConstraintTarget (Transform _target) {
         target = _target; reference = null; parentConstraint = null; altReference = null; lineSegmentReference = null;
+        driverReference = null; drivenReference = null;
     }
 
     public bool isPsuedoNull() {
