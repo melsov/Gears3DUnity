@@ -107,6 +107,7 @@
     <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Axel.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Bopper.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ConveyorBelt.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Dispenser.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
@@ -166,6 +167,8 @@
     <Compile Include="Assets\Scripts\Utility\VectorXZ.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Audio\ClassicGuitarScale\_readme_and_license.txt" />
+    <None Include="Assets\Audio\GuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
     <None Include="Assets\Temp\hi.txt" />
