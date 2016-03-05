@@ -171,6 +171,11 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         removeIsChildConstraintAndItsParentConstraint();
     }
 
+    public void disconnectFromParent() {
+        print("peg disconnect froom parent");
+        //removeIsChildConstraintAndItsParentConstraint();
+    }
+
     protected void removeIsChildConstraintAndItsParentConstraint() { 
         if (isChildConstraint != null) {
             isChildConstraint.removeTarget();
@@ -277,6 +282,9 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
                 }
             }
         }
+    }
+
+    public void onDragEnd() {
     }
 }
 

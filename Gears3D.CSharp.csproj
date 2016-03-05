@@ -119,6 +119,7 @@
     <Compile Include="Assets\Scripts\Cog\Ducts\Duct.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\ElbowTube.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Funnel.cs" />
+    <Compile Include="Assets\Scripts\Cog\Ducts\OneWayTube.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Tube.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\TubeEntrance.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\TubeExit.cs" />

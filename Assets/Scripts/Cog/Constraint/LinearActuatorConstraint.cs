@@ -11,14 +11,19 @@ public class LinearActuatorConstraint : Constraint
 
     protected override void awake() {
         base.awake();
-        prevTargetPosition = constraintTarget.reference.position;
+        //prevTargetPosition = constraintTarget.reference.position;
     }
 
     public virtual bool isTargetInRange() {
+        return isTargetInRange(false);
+    }
+
+    public virtual bool isTargetInRange(bool extendedRange) {
         if (constraintTarget.lineSegmentReference == null) return false;
+        Vector3 rangeV = extendedRange ? (poleDirection * 1.5f) : poleDirection;
         return 
-            (constraintTarget.lineSegmentReference.start.position - constraintTarget.reference.position).sqrMagnitude < poleDirection.sqrMagnitude ||
-            (constraintTarget.lineSegmentReference.end.position - constraintTarget.reference.position).sqrMagnitude < poleDirection.sqrMagnitude;
+            (constraintTarget.lineSegmentReference.start.position - constraintTarget.reference.position).sqrMagnitude < rangeV.sqrMagnitude ||
+            (constraintTarget.lineSegmentReference.end.position - constraintTarget.reference.position).sqrMagnitude < rangeV.sqrMagnitude;
     }
 
     protected Vector3 poleDirection {
@@ -30,7 +35,7 @@ public class LinearActuatorConstraint : Constraint
         if (constraintTarget.drivenReference == null || !(constraintTarget.drivenReference is LinearActuator)) {
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
-
+        print("laC configure");
         chooseIntersectionIndex();
     }
 
@@ -59,10 +64,18 @@ public class LinearActuatorConstraint : Constraint
             }
         }
 
+        int prevIntersectionIndexTest = intersectionIndex;
         if (zeroHit > oneHit) {
             intersectionIndex = 0;
         } else {
             intersectionIndex = 1;
+        }
+
+        //DBUG
+        if (prevIntersectionIndexTest != -1 && intersectionIndex != prevIntersectionIndexTest) {
+            print("new intersection index: was: " + prevIntersectionIndexTest + " now: " + intersectionIndex);
+        } else {
+            print("same intersection index: " + intersectionIndex + " (prev: " + prevIntersectionIndexTest + ")");
         }
     }
 

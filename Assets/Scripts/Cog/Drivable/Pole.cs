@@ -170,6 +170,13 @@ public class Pole : Drivable
         return laConstraint;
     }
 
+    public void removeLinearActuatorConstraint() {
+        LinearActuatorConstraint lac = GetComponent<LinearActuatorConstraint>();
+        if (lac != null) {
+            Destroy(lac);
+        } 
+    }
+
     //TODO: pole and in general drivable needs to lose parent constraint on disconnect
     //TODO: give constraint a chance to adjust on move of either drivable
 

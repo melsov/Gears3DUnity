@@ -34,6 +34,15 @@ public class TransformUtil : MonoBehaviour
         trans.position = new Vector3(trans.position.x, YLayer.Layer(type), trans.position.z);
     }
 
+    public static Transform FindChildWithName(Transform parent, string _name) {
+        foreach(Transform child in parent.GetComponentsInChildren<Transform>()) {
+            if (child.name.Equals(_name)) {
+                return child;
+            }
+        }
+        return null;
+    }
+
     public static T FindComponentInThisOrChildren<T>(Transform t) {
         T result = t.GetComponent<T>();
         if (result == null) {

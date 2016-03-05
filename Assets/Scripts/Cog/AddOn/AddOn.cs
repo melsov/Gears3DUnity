@@ -97,6 +97,9 @@ public abstract class AddOn : Cog , ICursorAgentClient
     protected virtual void update() {
         
     }
+
+    public void onDragEnd() {
+    }
 }
 
 public interface IAddOnClient

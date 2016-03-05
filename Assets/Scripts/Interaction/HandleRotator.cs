@@ -97,4 +97,7 @@ public class HandleRotator : MonoBehaviour , ICursorAgentClient {
 	void Update () {
 	
 	}
+
+    public void onDragEnd() {
+    }
 }

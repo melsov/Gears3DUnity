@@ -137,8 +137,12 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             soc.breakChildConnections();
         }
         foreach (Socket soc in _pegboard.getBackendSocketSet().sockets) {
-            if (soc.hasDrivingPeg() && soc.drivingPeg.owner != this) {
-                soc.disconnectDrivingPeg();
+            if (soc.hasDrivingPeg()) {
+                if (soc.drivingPeg.owner != this) { 
+                    soc.disconnectDrivingPeg();
+                } else {
+                    soc.drivingPeg.disconnectFromParent();
+                }
             }
         }
     }
@@ -165,6 +169,13 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             return true;
         }
         return false;
+    }
+
+    public void onDragEnd() {
+        vOnDragEnd();
+    }
+    protected virtual void vOnDragEnd() {
+
     }
 
     public bool makeConnectionWithAfterCursorOverride(Collider other) {

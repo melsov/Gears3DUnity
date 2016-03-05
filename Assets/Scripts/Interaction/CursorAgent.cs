@@ -72,6 +72,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             client.endDragOverride(cursorGlobal);
         } 
         connectToColliders(colliderDropper);
+        client.onDragEnd();
     }
 
     public bool isCursorInteracting() {
@@ -110,6 +111,7 @@ public interface ICursorAgentClient
     Collider shouldPreserveConnection();
     void disconnect();
     bool connectTo(Collider other);
+    void onDragEnd();
     bool makeConnectionWithAfterCursorOverride(Collider other);
     void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider);
     void dragOverride(VectorXZ cursorGlobal);

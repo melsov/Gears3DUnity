@@ -56,25 +56,39 @@ public class LinearActuator : Drivable , IPegProxy {
         return false;
     }
 
+    protected override void vOnDragEnd() {
+        checkConstraint();
+    }
+
     protected override void vDisconnect() {
         LinearActuatorConstraint lac = linearActuatorConstraint;
         if(lac != null) {
-            if (lac.isTargetInRange()) {
-                lac.configure();
-            } else {
-                base.vDisconnect();
-                // disconnect constraint
+            if (!lac.isTargetInRange()) {
+                base.vDisconnect(); //CONSIDER: has no meaning for linear actuators?
             }
         }
     }
 
     protected override void vEndDragOverride(VectorXZ cursorGlobal) {
+        checkConstraint();
+    }
+
+    protected void checkConstraint() {
         LinearActuatorConstraint lac = linearActuatorConstraint;
         if (lac != null) {
-            if (lac.isTargetInRange()) {
+            if (lac.isTargetInRange(true)) {
                 lac.configure();
+            } else {
+                removeParentConstraintAndConstraintTargets();
+                base.vDisconnect();
             }
         }
+    }
+
+    private void removeParentConstraintAndConstraintTargets() {
+        drivingPole.removeLinearActuatorConstraint();
+        drivingPeg.isChildConstraint.constraintTarget.parentConstraint = null;
+        drivingPeg.isChildConstraint.removeTarget();
     }
 
     public Guid getGuid() {

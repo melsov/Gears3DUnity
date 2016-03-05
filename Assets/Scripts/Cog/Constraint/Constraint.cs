@@ -30,7 +30,6 @@ public abstract class Constraint : MonoBehaviour {
     }
 
     public virtual void removeTarget() {
-        
         constraintTarget.target = null;
     }
 
