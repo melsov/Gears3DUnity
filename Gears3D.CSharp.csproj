@@ -117,6 +117,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\SteadyDispenser.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Duct.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\ElbowTube.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Funnel.cs" />

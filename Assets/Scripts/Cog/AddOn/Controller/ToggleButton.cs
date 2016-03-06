@@ -14,12 +14,28 @@ public class ToggleButton : Switch , ICollisionProxyClient {
 
     public float bounce = 3f;
 
-    protected Rigidbody rb;
+    public bool isPulseButton = false;
+    private float pulseTimer;
+
+    protected Rigidbody buttonRB;
     protected float restDistance;
     protected bool shouldTrackPress = true;
     protected bool trackingPress;
 
     protected LineSegment lineSegment;
+
+    protected override void toggleOn() {
+        if (isPulseButton) {
+            on.setState(SwitchState.ON);
+            if (onOffIndicator != null) {
+                pulseTimer = Time.fixedTime;
+                onOffIndicator.state = on.getState();
+            }
+            updateClient();
+        } else {
+            base.toggleOn();
+        }
+    }
 
     protected Vector3 buttonTravel {
         get { return anchor.position - button.position; }
@@ -28,16 +44,18 @@ public class ToggleButton : Switch , ICollisionProxyClient {
     protected override void awake() {
         base.awake();
         Assert.IsTrue(button.GetComponent<CollisionProxy>() != null);
-        rb = button.GetComponent<Rigidbody>();
-        Assert.IsTrue(rb.constraints == (RigidbodyConstraints.FreezeAll ^ RigidbodyConstraints.FreezePositionX ^ RigidbodyConstraints.FreezePositionZ)); // only x, z pos is not constrained
+        buttonRB = button.GetComponent<Rigidbody>();
+        Assert.IsTrue(buttonRB.constraints == (RigidbodyConstraints.FreezeAll ^ RigidbodyConstraints.FreezePositionX ^ RigidbodyConstraints.FreezePositionZ)); // only x, z pos is not constrained
         restDistance = buttonTravel.magnitude;
         lineSegment = GetComponentInChildren<LineSegment>();
         button.GetComponent<LinearConstraint>().lineSegment = lineSegment;
 	}
-    
+
     public void proxyCollisionEnter(Collision collision) {
         if (shouldTrackPress) {
             float travelScale =  Vector3.Dot(collision.impulse.normalized, buttonTravel.normalized);
+            travelScale = Mathf.Abs(travelScale); // travelScale insists on being negative in duplicates of toggle button (the game object) but not the original
+            // this is pretty mysterious. luckily this duct tape does the trick with no downside.
             if (travelScale > sensitivity) {
                 shouldTrackPress = false;
                 toggleOn();
@@ -59,11 +77,17 @@ public class ToggleButton : Switch , ICollisionProxyClient {
                 shouldTrackPress = true;
             }
         }
-	}
+
+        if (isPulseButton) {
+            if (Time.fixedTime - pulseTimer > .4f) {
+                onOffIndicator.state = SwitchState.OFF;
+            }
+        }
+    }
 
     void FixedUpdate() {
-        rb.angularVelocity = Vector3.zero;
-        rb.AddForce(lineSegment.normalized.vector3(0f) * rb.mass * 120f); // TODO: indicator light // TODO: scale the pushback to distance (or is this not needed)?
+        buttonRB.angularVelocity = Vector3.zero;
+        buttonRB.AddForce(lineSegment.normalized.vector3(0f) * buttonRB.mass * 120f); // TODO: indicator light // TODO: scale the pushback to distance (or is this not needed)?
     }
 
 }

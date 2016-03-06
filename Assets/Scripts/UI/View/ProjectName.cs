@@ -14,6 +14,8 @@ public class ProjectName : MonoBehaviour {
         }
         Browser.Instance.projectName = projectNameInput.text;
         projectNameInput.onEndEdit.AddListener(handleEndEdit);
+
+        Browser.Instance.handleNewProjectName = browserGotNewProjectName;
 	}
 
     private string randomLetters() {
@@ -25,6 +27,10 @@ public class ProjectName : MonoBehaviour {
         }
 
         return result;
+    }
+
+    public void browserGotNewProjectName(string _newName) {
+        projectNameInput.text = _newName;
     }
 
     public void handleEndEdit(string _name) {

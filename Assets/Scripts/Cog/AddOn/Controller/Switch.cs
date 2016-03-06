@@ -19,6 +19,7 @@ public class Switch : ControllerAddOn  {
         } else {
             on = new OnOffSwitchState(SwitchState.ON);
         }
+        UnityEngine.Assertions.Assert.IsTrue(on != null, "wait on (switch state toggle) is null?");
         onOffIndicator = GetComponentInChildren<OnOffIndicator>();
         if (onOffIndicator != null) onOffIndicator.gameObject.layer = LayerLookup.DragOverride;
     }
@@ -53,9 +54,9 @@ public class Switch : ControllerAddOn  {
     }
 
     protected virtual void updateClient() {
-        if (client != null) {
+        if (client != null && setScalar != null && on != null) {
             setScalar((int)on.getState());
-        }
+        } 
     }
 
     #region proxy trigger disabled
@@ -104,6 +105,7 @@ public interface ISwitchStateToggle
 {
     void nextState();
     SwitchState getState();
+    void setState(SwitchState state);
 }
 
 public struct OnOffSwitchState : ISwitchStateToggle
@@ -125,6 +127,10 @@ public struct OnOffSwitchState : ISwitchStateToggle
             state = SwitchState.OFF;
         }
     }
+
+    public void setState(SwitchState _state) {
+        state = _state;
+    }
 }
 
 public struct ForwardReverseSwitchState : ISwitchStateToggle
@@ -144,6 +150,10 @@ public struct ForwardReverseSwitchState : ISwitchStateToggle
         } else {
             state = SwitchState.REVERSE;
         }
+    }
+
+    public void setState(SwitchState _state) {
+        state = _state;
     }
 
 }

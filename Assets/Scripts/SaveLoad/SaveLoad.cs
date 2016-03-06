@@ -18,7 +18,7 @@ public class SaveLoad : Singleton<SaveLoad> {
         set { _filename = value; }
     }
 
-    private List<Cog> sceneObjects() {
+    private List<Cog> allCogsInScene() {
         List<Cog> result = new List<Cog>();
         foreach (GameObject ga in GameObject.FindObjectsOfType<GameObject>()) {
             if (ga.activeInHierarchy && ga.GetComponent<Cog>() != null) {
@@ -29,9 +29,6 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void save() {
-        //SaveManager.Instance.SaveGame("test1");
-
-        //WANT
         string doesntmatter = Application.dataPath + "/TempSaveFile";
         print(Application.persistentDataPath);
         Browser.Instance.SaveFile(doesntmatter, Application.persistentDataPath, handleSaveFile);
@@ -42,17 +39,17 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void load() {
-        //SaveManager.Instance.LoadGame("test1");
         Browser.Instance.OpenFile(Application.persistentDataPath, handleLoadFile); //WANT
     }
 
     private void handleLoadFile(string filename) {
+        newScene();
         SaveManager.Instance.LoadGame(filename);
     }
     
 
     public void newScene() {
-        foreach(Cog cog in sceneObjects()) {
+        foreach(Cog cog in allCogsInScene()) {
             Destroy(cog.gameObject);
         }
     }
