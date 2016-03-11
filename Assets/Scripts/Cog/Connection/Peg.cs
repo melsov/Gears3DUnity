@@ -4,7 +4,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnection
+public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnection, IConstrainable
 {
     public Material freeRotationMaterial;
     public Material fixedRotationMaterial;
@@ -206,17 +206,27 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     public bool beChildOf(Socket socket) {
+        return beChildOf(socket, false);
+    }
+
+    public bool beChildOf(Socket socket, bool skipConstraint) {
         socket.childPeg = this;
         _parentSocket = new WeakReference(socket);
-        if (isChildConstraint != null) {
-            isChildConstraint.constraintTarget = socket.getConstraintTargetForChildPegConstraint();
-            isChildConstraint.constraintTarget.parentConstraint = socket.parentContainer.getTransform().GetComponent<Drivable>().parentConstraintFor(isChildConstraint, transform);
-            // TODO: let parent constraint align the child?
+        if (!skipConstraint && isChildConstraint != null) {
+            setupConstraint();
             GetComponent<Highlighter>().highlight(Color.cyan);
-        } else {
+        } else if (isChildConstraint == null) {
             TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
         }
         return true;
+    }
+
+    public void setupConstraint() {
+        if (_parentSocket != null && _parentSocket.Target != null && isChildConstraint != null) {
+            Socket socket = (Socket)_parentSocket.Target;
+            isChildConstraint.constraintTarget = socket.getConstraintTargetForChildPegConstraint();
+            isChildConstraint.constraintTarget.parentConstraint = socket.parentContainer.getTransform().GetComponent<Drivable>().parentConstraintFor(isChildConstraint, transform);
+        }
     }
 
     public void suspendConnection() {
@@ -278,7 +288,8 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
                 if (pb != null) {
                     print("found pegboard");
                     Socket s = pb.getBackendSocketSet().socketWithId(cd.connectedSocketID);
-                    receiveChild(s);
+                    s.drivingPeg = this;
+                    //receiveChild(s);
                 }
             }
         }

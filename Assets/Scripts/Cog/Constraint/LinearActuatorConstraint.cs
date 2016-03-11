@@ -9,6 +9,8 @@ public class LinearActuatorConstraint : Constraint
     protected Vector3 prevTargetPosition = Vector3.zero;
     protected int intersectionIndex = -1;
 
+    private bool needToConfigure = true;
+
     protected override void awake() {
         base.awake();
         //prevTargetPosition = constraintTarget.reference.position;
@@ -32,11 +34,15 @@ public class LinearActuatorConstraint : Constraint
 
     public override void configure() {
         base.configure();
-        if (constraintTarget.drivenReference == null || !(constraintTarget.drivenReference is LinearActuator)) {
+        if (constraintTarget.driverReference == null) {
+            print("null driver ref in linear actuator constraint"); return;
+        }
+        if (constraintTarget.drivenReference == null ||  !(constraintTarget.drivenReference is LinearActuator)) {
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
         print("laC configure");
         chooseIntersectionIndex();
+        needToConfigure = false;
     }
 
     private void chooseIntersectionIndex() {
@@ -95,9 +101,17 @@ public class LinearActuatorConstraint : Constraint
         return result;
     }
 
+    int testConfig = 0;
+
     //CONSIDER: THIS SHOULD REALLY BE CALLED 'LINESEGMENT CONSTRAINT'
     protected override void constrain() {
         if (constraintTarget.target == null) {
+            return;
+        }
+
+        //if (needToConfigure) {
+        if (testConfig++ < 5) { //TEST
+            configure();
             return;
         }
 

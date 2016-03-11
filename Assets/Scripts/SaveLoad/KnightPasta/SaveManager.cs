@@ -127,6 +127,15 @@ public class SaveManager : Singleton<SaveManager> {
         foreach (SaveEntry en in mSaveData.entries) {
             en.RestoreConnections();
         }
+
+        foreach(GameObject go in GameObject.FindObjectsOfType<GameObject>()) {
+            if (go.GetComponent<Guid>() != null) {
+                foreach (IConstrainable constrainable in go.GetComponentsInChildren<IConstrainable>()) {
+                    print("found I contstrainable");
+                    constrainable.setupConstraint();
+                }
+            }
+        }
 	}
 
 //	protected void LoadObjectsFromSaveOLD()
@@ -230,4 +239,9 @@ public interface IRestoreConnection
 {
     void storeConnectionData(ref List<byte[]> connectionData);
     void restoreConnectionData(ref List<byte[]> connectionData);
+}
+
+public interface IConstrainable
+{
+    void setupConstraint();
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEditor;
 using System.Collections.Generic;
 
 public abstract class Socket : MonoBehaviour, IRestoreConnection {
@@ -45,6 +46,8 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         }
         set {
             if (value != null) {
+                //print("driving peg got a value");
+                //EditorApplication.isPaused = true;
                 _drivingPeg = value;
                 _drivingPeg.receiveChild(this);
             } else {
@@ -198,7 +201,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                         }
                     }
                     if (peg != null) {
-                        peg.beChildOf(this);
+                        peg.beChildOf(this, true);
                     }
                 }
             }

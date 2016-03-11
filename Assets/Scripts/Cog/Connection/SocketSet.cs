@@ -99,6 +99,20 @@ public class SocketSet
         }
         return closest;
     }
+
+    public Socket getSocketFurthestFrom(Vector3 global) {
+        Vector3 dist = Vector3.zero;
+        Socket closest = null;
+        foreach(Socket s in sockets) {
+            Vector3 nextdDist = s.transform.position - global;
+            if (nextdDist.sqrMagnitude > dist.sqrMagnitude) {
+                dist = nextdDist;
+                closest = s;
+            }
+        }
+        return closest;
+    }
+
     private void debugGetSocket(string s) {
         if (true) MonoBehaviour.print("get soc closest to: " +s);
     }
