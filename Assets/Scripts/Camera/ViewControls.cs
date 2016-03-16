@@ -10,19 +10,19 @@ public class ViewControls : MonoBehaviour {
     private Vector3 lastMouseGlobal;
     private Vector3 _vpanScale;
     private Vector3 targetPosition;
-    private Pause pause;
+    //private Pause pause;
 
     void Awake () {
         cam = GetComponent<Camera>();
         _vpanScale = new Vector3(1f, 0f, 1f); 
         targetPosition = cam.transform.position;
-        pause = GameObject.FindObjectOfType<Pause>();
+        //pause = GameObject.FindObjectOfType<Pause>();
 	}
 	
 	void Update () {
-        if (pause.paused) {
-            return;
-        }
+        //if (pause.paused) {
+        //    return;
+        //}
         if (!EventSystem.current.IsPointerOverGameObject()) {
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             if (scroll < -float.Epsilon || scroll > float.Epsilon) {

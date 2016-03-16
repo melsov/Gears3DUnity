@@ -8,10 +8,14 @@ public class Motor : Drivable // , IGameSerializable
     public float maxAngularVelocity = 10f;
     protected float _power = 1f;
     public virtual float power {
-        get { return _power; }
+        get { return _power * _isPaused; }
         set { _power = Mathf.Clamp(value, -1f, 1f); }
     }
-    //public bool isPowered { get { return _power > 0f; } }
+    protected float _isPaused = 1f;
+    protected override void pause(bool isPaused) {
+        base.pause(isPaused);
+        _isPaused = isPaused ? 0f : 1f;
+    }
 
     protected Axel _axel;
     public Axel axel {
@@ -51,10 +55,7 @@ public class Motor : Drivable // , IGameSerializable
 	}
 
 	protected override void update () {
-        //if (!isPowered) {
-        //    return;
-        //}
-        angle += maxAngularVelocity * Time.deltaTime * power; // driveScalar();
+        angle += maxAngularVelocity * Time.deltaTime * power;
         axel.turnTo(angle);
 	}
 

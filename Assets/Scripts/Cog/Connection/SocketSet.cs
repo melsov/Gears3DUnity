@@ -157,7 +157,7 @@ public class SocketSet
     public virtual Socket openBackendSocketOnOtherClosestToOpenPegOnThis(Transform other, out Peg closestPeg) {
         Socket aSocket = null;
         closestPeg = null;
-        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = findSocketSetContainer(other); // other.GetComponent<ISocketSetContainer>();
         if (ssc == null) return null;
         Vector3 distance = VectorXZ.maxVector3;
         List<Socket> openBackendSockets = ssc.getBackendSocketSet().openChildableSockets();
@@ -178,11 +178,11 @@ public class SocketSet
     public virtual Peg drivingPegOnBackendOfOtherClosestToOpenSocketOnThis(Transform other, out Socket closestOpenSocket) {
         Peg aPeg = null;
         closestOpenSocket = null;
-        if (other.GetComponent<ISocketSetContainer>() == null) {
+        if (findSocketSetContainer(other) == null) { //  other.GetComponent<ISocketSetContainer>() == null) {
             MonoBehaviour.print("no i socket set container with collider: " + other.name);
             return null;
         }
-        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = findSocketSetContainer(other); // other.GetComponent<ISocketSetContainer>();
         if (ssc == null) return null; 
         Vector3 distance = VectorXZ.maxVector3;
         List<Socket> occupiedBackendSockets = ssc.getBackendSocketSet().childSocketsWithParents();
@@ -211,7 +211,7 @@ public class SocketSet
     public virtual Peg closestOpenPegOnFrontendOf(Collider other, out Socket closestSocket) {
         Peg aPeg = null;
         closestSocket = null;
-        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = findSocketSetContainer(other); // other.GetComponent<ISocketSetContainer>();
         if (ssc == null) return null;
         Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         SocketSet otherSocketSet = ssc.getFrontendSocketSet(); //  wantFrontEndSocketSetOfOther ? ssc.getFrontendSocketSet() : ssc.getBackendSocketSet();
@@ -236,7 +236,7 @@ public class SocketSet
     public virtual Peg closestOpenPegOnBackendOf(Collider other, out Socket closestSocket) {
         Peg aPeg = null;
         closestSocket = null;
-        ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = findSocketSetContainer(other);
         if (ssc == null) return null;
         Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         SocketSet otherSocketSet = ssc.getBackendSocketSet();
@@ -295,5 +295,13 @@ public class SocketSet
             if (socket != s) return s;
         }
         return null;
+    }
+
+    protected ISocketSetContainer findSocketSetContainer(Transform other) {
+        return other.GetComponent<ISocketSetContainer>();
+    }
+
+    protected ISocketSetContainer findSocketSetContainer(Collider other) {
+        return findSocketSetContainer(other.transform);
     }
 }

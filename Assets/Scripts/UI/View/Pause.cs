@@ -2,11 +2,14 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class Pause : MonoBehaviour {
+public class Pause : Singleton<Pause> {
 
     public Button pauseButton;
     public Sprite pausedSprite;
     public Sprite unpausedSprite;
+    public delegate void OnPause(bool isPaused);
+    public OnPause onPause;
+
 
     public bool paused {
         get { return _paused; }
@@ -20,7 +23,9 @@ public class Pause : MonoBehaviour {
     public void pausePressed() {
         _paused = !_paused;
         setImage();
-        Time.timeScale = _paused ? 0f : 1f;
+        print("pause: " + _paused);
+        onPause(_paused);
+        //Time.timeScale = _paused ? 0f : 1f;
     }
 
     private void setImage() {

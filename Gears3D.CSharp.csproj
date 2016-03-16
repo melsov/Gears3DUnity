@@ -104,6 +104,7 @@
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearActuatorConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
+    <Compile Include="Assets\Scripts\Cog\Dispensable\Combinable.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Axel.cs" />
@@ -120,6 +121,9 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Rope.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\SteadyDispenser.cs" />
+    <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\Combiner.cs" />
+    <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\CombinerSlot.cs" />
+    <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\RecipeLookup.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Duct.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\ElbowTube.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Funnel.cs" />
@@ -137,6 +141,7 @@
     <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
+    <Compile Include="Assets\Scripts\Interaction\PhysicsCursorInteraction.cs" />
     <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\Browser\Browser.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\Browser\BrowserBKUP.cs" />
@@ -160,6 +165,7 @@
     <Compile Include="Assets\Scripts\UI\View\ProjectName.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
+    <Compile Include="Assets\Scripts\Utility\Debug\BugLineComponent.cs" />
     <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
     <Compile Include="Assets\Scripts\Utility\Highlighter.cs" />
     <Compile Include="Assets\Scripts\Utility\LayerLookup.cs" />

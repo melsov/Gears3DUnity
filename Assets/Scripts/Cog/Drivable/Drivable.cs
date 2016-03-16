@@ -43,6 +43,11 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         }
         TransformUtil.PositionOnYLayer(transform);
         gameObject.AddComponent<Highlighter>();
+        Pause.Instance.onPause += pause;
+    }
+
+    protected virtual void pause(bool isPaused) {
+
     }
 
     public virtual bool isOnAxel() {

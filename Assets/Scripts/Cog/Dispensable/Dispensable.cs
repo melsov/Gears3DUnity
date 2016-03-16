@@ -2,7 +2,7 @@
 using System.Collections;
 
 //CONSIDER: Crafting system
-public abstract class Dispensable : MonoBehaviour {
+public abstract class Dispensable : Combinable {
 
 	void Awake () {
         awake();

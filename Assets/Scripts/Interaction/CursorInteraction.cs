@@ -4,11 +4,15 @@ using System.Collections.Generic;
 
 public class CursorInteraction : MonoBehaviour {
 
-    private VectorXZ mouseLocal;
-    private ICursorInteractable[] interactables;
-    private bool _shouldOverrideDrag;
+    protected VectorXZ mouseLocal;
+    protected ICursorInteractable[] interactables;
+    protected bool _shouldOverrideDrag;
 
-	void Awake () {
+    void Awake() {
+        awake();
+    }
+
+	protected virtual void awake () {
         List<ICursorInteractable> cis = new List<ICursorInteractable>();
         MonoBehaviour[] mbs = GetComponents<MonoBehaviour>();
         foreach(MonoBehaviour mb in mbs) {
@@ -19,7 +23,7 @@ public class CursorInteraction : MonoBehaviour {
         interactables = cis.ToArray();
 	}	
 
-    public void mouseDown(VectorXZ worldPoint) {
+    public virtual void mouseDown(VectorXZ worldPoint) {
         _shouldOverrideDrag = false;
         foreach (ICursorInteractable ci  in interactables) {
             ci.startCursorInteraction(worldPoint);
@@ -37,7 +41,7 @@ public class CursorInteraction : MonoBehaviour {
         }
     }
 
-    public void mouseUp(VectorXZ worldPoint) {
+    public virtual void mouseUp(VectorXZ worldPoint) {
         foreach (ICursorInteractable ci in interactables) {
             ci.endCursorInteraction(worldPoint);
         }
