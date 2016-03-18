@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 using System;
 
 public class Combiner : MonoBehaviour {
@@ -14,12 +15,25 @@ public class Combiner : MonoBehaviour {
 	}
 
     protected void eject() {
-        
+        foreach(Combinable c in combinables()) {
+            //TODO: c.transform.position = eject area position
+            c.enable();
+        }
+        //resetSlots();
+    }
+
+    public IEnumerable<Combinable> combinables() {
+        foreach(CombinerSlot cs in slots) {
+            foreach (Combinable c in cs.combinables()) {
+                yield return c;
+            }
+        }
     }
 
     protected void combine(Transform combined) {
-        foreach(CombinerSlot slot in slots) {
-            slot.release();
+        print("combine");
+        foreach (Combinable com in combinables()) {
+            print(com.name);
         }
         Transform result = Instantiate<Transform>(combined);
         // TODO: result position = in the output tube
@@ -27,9 +41,22 @@ public class Combiner : MonoBehaviour {
         Debug.LogError("combined: " + result.name);
     }
 
+    protected void destroyIngredients() {
+        foreach(Combinable c in combinables()) {
+            Destroy(c.gameObject);
+        }
+        resetSlots();
+    }
+    protected void resetSlots() {
+        foreach (CombinerSlot slot in slots) {
+            slot.release();
+        }
+    }
+
     public void evaluate() {
         Recipe recipe = new Recipe();
         foreach(CombinerSlot slot in slots) {
+            if (slot.empty) { return; }
             recipe.add(slot.typeAmount);
         }
         Transform result = null;
@@ -37,12 +64,14 @@ public class Combiner : MonoBehaviour {
         switch (state) {
             case RecipeState.POTENTIALLY_vALID:
             default:
+                print("po valid");
                 break;
             case RecipeState.VALID:
                 combine(result);
-                eject();
+                destroyIngredients();
                 break;
             case RecipeState.INVALID:
+                print("invalid");
                 eject();
                 break;
         }

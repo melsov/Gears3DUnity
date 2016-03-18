@@ -4,7 +4,12 @@ using System.Collections.Generic;
 
 public class CombinerSlot : MonoBehaviour {
 
-    protected List<Combinable> combinables = new List<Combinable>();
+    protected List<Combinable> _combinables = new List<Combinable>();
+    public IEnumerable<Combinable> combinables() {
+        foreach (Combinable com in _combinables) {
+            yield return com;
+        }
+    }
 
     protected Type _type;
     protected int _count;
@@ -30,10 +35,16 @@ public class CombinerSlot : MonoBehaviour {
             _type = combinable.GetType();
         }
         if (_type.Equals(combinable.GetType())) {
-            combinables.Add(combinable);
+            combinable.transform.position = transform.position;
+            combinable.disable();
+            _combinables.Add(combinable);
             _count++;
         }
         combiner.evaluate();
+    }
+
+    public bool empty {
+        get { return _count == 0; }
     }
 
     public TypeAmount typeAmount {
@@ -41,7 +52,7 @@ public class CombinerSlot : MonoBehaviour {
     }
 
     public void release() {
-        combinables.RemoveRange(0, combinables.Count);
+        _combinables.RemoveRange(0, _combinables.Count);
         _type = null;
         _count = 0;
     }

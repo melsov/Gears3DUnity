@@ -25,11 +25,15 @@ public abstract class Combinable : MonoBehaviour {
 
     public void disable() {
         rb.velocity = Vector3.zero;
+        GetComponent<Collider>().enabled = false;
+        rb.useGravity = false;
         rb.isKinematic = true;
         renderr.enabled = false;
     }
     
     public void enable() {
+        rb.useGravity = true;
+        GetComponent<Collider>().enabled = true;
         rb.isKinematic = false;
         renderr.enabled = true;
     }
