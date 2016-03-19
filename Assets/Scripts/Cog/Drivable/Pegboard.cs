@@ -40,6 +40,9 @@ public class Pegboard : MonoBehaviour, ISocketSetContainer
     public SocketSet getBackendSocketSet() {
         if (backendSocketSet == null) {
             backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
+            if (backendSocketSet == null) {
+                backendSocketSet = new SocketSet(null);
+            }
         }
         return backendSocketSet;
     }
@@ -47,6 +50,9 @@ public class Pegboard : MonoBehaviour, ISocketSetContainer
     public SocketSet getFrontendSocketSet() {
         if (frontendSocketSet == null) {
             frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
+            if (frontendSocketSet == null) {
+                frontendSocketSet = new SocketSet(null);
+            }
         }
         return frontendSocketSet;
     }

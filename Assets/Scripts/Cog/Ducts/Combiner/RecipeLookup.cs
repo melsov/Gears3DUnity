@@ -46,6 +46,8 @@ public class RecipeLookup : Singleton<RecipeLookup> {
 public class Recipe
 {
     protected List<TypeAmount> ingredients = new List<TypeAmount>();
+    public float bakeTimeSeconds = 1f;
+    public Combinable[] byproducts;
 
     public void add(TypeAmount typeAmount) {
         ingredients.Add(typeAmount);
@@ -118,7 +120,7 @@ public struct TypeAmount
     }
 
     public RecipeState compare(TypeAmount other) {
-        if (other.type == null) { return RecipeState.INVALID; }
+        if (other.type == null) { return RecipeState.POTENTIALLY_vALID; }
         if (!other.type.Equals(type) || other.amount > amount) {
             return RecipeState.INVALID;
         }

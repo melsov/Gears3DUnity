@@ -11,16 +11,8 @@ public class TubeExit : MonoBehaviour {
         UnityEngine.Assertions.Assert.IsTrue(tube != null);
     }
 
-    //void OnTriggerEnter(Collider other) {
-    //    other.GetComponent<Rigidbody>().useGravity = false;
-    //    //pullToCenter(other);
-    //}
-
-    //void OnTriggerStay(Collider other) {
-    //    //pullToCenter(other);
-    //}
-
     void OnTriggerExit(Collider other) {
+        if (other.GetComponent<Rigidbody>() == null) { return; }
         other.GetComponent<Rigidbody>().useGravity = true;
     }
 

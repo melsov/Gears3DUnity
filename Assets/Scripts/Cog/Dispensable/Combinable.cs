@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public abstract class Combinable : MonoBehaviour {
 
-    public Sprite icon;
+    public Sprite sprite;
     protected Rigidbody rb {
         get { return GetComponent<Rigidbody>(); }
     }

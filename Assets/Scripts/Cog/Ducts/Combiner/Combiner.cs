@@ -3,23 +3,29 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 
-public class Combiner : MonoBehaviour {
+public class Combiner : Drivable {
 
-    //List<Combinable> combinables = new List<Combinable>();
     public Transform outTube;
+    public Transform ejectArea;
+    public Collider _mainCollider;
 
     protected CombinerSlot[] slots;
 
-	void Awake () {
+    protected override void awake() {
+        base.awake();
         slots = GetComponentsInChildren<CombinerSlot>();
 	}
 
+    protected override Collider vMainCollider() {
+        return _mainCollider;
+    }
+
     protected void eject() {
         foreach(Combinable c in combinables()) {
-            //TODO: c.transform.position = eject area position
+            c.transform.position = ejectArea.position;
             c.enable();
         }
-        //resetSlots();
+        resetSlots();
     }
 
     public IEnumerable<Combinable> combinables() {
@@ -31,14 +37,11 @@ public class Combiner : MonoBehaviour {
     }
 
     protected void combine(Transform combined) {
-        print("combine");
         foreach (Combinable com in combinables()) {
             print(com.name);
         }
         Transform result = Instantiate<Transform>(combined);
-        // TODO: result position = in the output tube
         result.position = outTube.position;
-        Debug.LogError("combined: " + result.name);
     }
 
     protected void destroyIngredients() {
@@ -54,9 +57,9 @@ public class Combiner : MonoBehaviour {
     }
 
     public void evaluate() {
+        if (isBaking) { print("already baking"); return; }
         Recipe recipe = new Recipe();
         foreach(CombinerSlot slot in slots) {
-            if (slot.empty) { return; }
             recipe.add(slot.typeAmount);
         }
         Transform result = null;
@@ -64,16 +67,35 @@ public class Combiner : MonoBehaviour {
         switch (state) {
             case RecipeState.POTENTIALLY_vALID:
             default:
-                print("po valid");
                 break;
             case RecipeState.VALID:
-                combine(result);
-                destroyIngredients();
+                //combine(result);
+                //destroyIngredients();
+                StartCoroutine(bake(recipe, result));
                 break;
             case RecipeState.INVALID:
-                print("invalid");
                 eject();
                 break;
         }
+    }
+    protected bool isBaking;
+    protected IEnumerator bake(Recipe recipe, Transform result) {
+        if (!isBaking) {
+            isBaking = true;
+            yield return new WaitForSeconds(recipe.bakeTimeSeconds);
+            combine(result);
+            destroyIngredients();
+            isBaking = false;
+        } else {
+            yield return null;
+        }
+    }
+
+    public override float driveScalar() {
+        return 0f;
+    }
+
+    public override Drive receiveDrive(Drive drive) {
+        return drive;
     }
 }

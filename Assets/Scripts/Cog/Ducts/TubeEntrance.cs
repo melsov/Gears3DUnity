@@ -12,24 +12,14 @@ public class TubeEntrance : MonoBehaviour {
     }
 
     void OnTriggerEnter(Collider other) {
+        if (other.GetComponent<Rigidbody>() == null) { return; }
         other.GetComponent<Rigidbody>().useGravity = false;
-        //pullToCenter(other);
     }
-
-    //void OnTriggerStay(Collider other) {
-    //    //pullToCenter(other);
-    //}
-
-    //void OnTriggerExit(Collider other) {
-    //    //pullToCenter(other);
-    //}
-
+   
     private void pullToCenter(Collider other) {
         Vector3 towards = transform.position - other.transform.position;
         Rigidbody rb = other.GetComponent<Rigidbody>();
-        if (rb == null) return;
+        if (rb == null) { return; }
         rb.velocity = Vector3.Lerp(towards.normalized, rb.velocity.normalized, .2f) * rb.velocity.magnitude;
-        //if (towards.z < Mathf.Epsilon * -1f && rb.velocity.z < Mathf.Epsilon * -1f) {
-        //}
     }
 }
