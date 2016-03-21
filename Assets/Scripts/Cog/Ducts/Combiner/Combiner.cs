@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Collections;
 using System;
-
+//TODO: save / restore combiner
 public class Combiner : Drivable {
 
     public Transform outTube;

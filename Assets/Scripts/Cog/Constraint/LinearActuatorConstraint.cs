@@ -40,9 +40,25 @@ public class LinearActuatorConstraint : Constraint
         if (constraintTarget.drivenReference == null ||  !(constraintTarget.drivenReference is LinearActuator)) {
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
+        adjustPosition();
         print("laC configure");
         chooseIntersectionIndex();
         needToConfigure = false;
+    }
+
+    private void adjustPosition() {
+        Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
+        VectorXZ center = new VectorXZ(gear.transform.position);
+        VectorXZ closest = constraintTarget.lineSegmentReference.closestPointOnLine(center);
+        float radius = gear.radiusInDirection(closest.vector3() - gear.transform.position);
+        float minDistanceFromCenter =  poleDirection.magnitude - radius;
+        float closestDistFromCenter = (closest - center).magnitude;
+        if (minDistanceFromCenter > closestDistFromCenter && constraintTarget.lineSegmentReference.isOnSegment(closest)) {
+            LinearActuator la = constraintTarget.target.GetComponentInParent<LinearActuator>();
+            VectorXZ dif = closest - center;
+            VectorXZ nudge = center + dif.normalized * minDistanceFromCenter - closest;
+            la.transform.position += nudge.vector3();
+        }
     }
 
     private void chooseIntersectionIndex() {
@@ -110,10 +126,10 @@ public class LinearActuatorConstraint : Constraint
         }
 
         //if (needToConfigure) {
-        if (testConfig++ < 5) { //TEST
-            configure();
-            return;
-        }
+        //if (testConfig++ < 5) { //TEST : TODO erase this
+        //    configure();
+        //    return;
+        //}
 
         Vector3 curDirection = poleDirection; // constraintTarget.altReference.position - constraintTarget.reference.position;
         Vector3 target = constraintTarget.target.position;

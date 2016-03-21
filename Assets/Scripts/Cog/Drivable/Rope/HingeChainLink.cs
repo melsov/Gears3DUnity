@@ -2,7 +2,7 @@
 using System;
 using System.Collections;
 
-public class ChainLink : MonoBehaviour {
+public class HingeChainLink : MonoBehaviour {
 
     HingeJoint hj;
     protected WeakReference _rope = new WeakReference(null);
@@ -29,10 +29,10 @@ public class ChainLink : MonoBehaviour {
     //    set { _downNeighbor = new WeakReference(value); }
     //}
     //private WeakReference _upNeighbor = new WeakReference(null);
-    public ChainLink upNeighbor {
+    public HingeChainLink upNeighbor {
         get {
             if (connectedRigidbody == null) return null;
-            return connectedRigidbody.GetComponent<ChainLink>();
+            return connectedRigidbody.GetComponent<HingeChainLink>();
             //if (_upNeighbor.Target == null) return null;
             //return (ChainLink)_upNeighbor.Target;
         }

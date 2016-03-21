@@ -109,7 +109,6 @@
     <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Axel.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Bopper.cs" />
-    <Compile Include="Assets\Scripts\Cog\Drivable\ChainLink.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ConveyorBelt.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Dispenser.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
@@ -119,7 +118,10 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />
-    <Compile Include="Assets\Scripts\Cog\Drivable\Rope.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Rope\ChainLink.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Rope\Chainn.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Rope\HingeChainLink.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Rope\Rope.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\SteadyDispenser.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\Combiner.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\CombinerSlot.cs" />

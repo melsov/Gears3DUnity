@@ -96,6 +96,7 @@ public class Inventory : Singleton<Inventory> {
     public Transform prefabWithId(int id_) {
         foreach(Category cat in categories) {
             foreach(InventoryItem ii in cat.inventoryItems) {
+                print(ii.title);
                 ItemID itemID = ii.prefab.GetComponent<ItemID>();
                 if (itemID != null && id_ == itemID.id) {
                     print("found prefab with id: " + ii.prefab.name);
