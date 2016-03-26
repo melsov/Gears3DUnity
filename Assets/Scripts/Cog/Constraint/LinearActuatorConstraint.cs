@@ -41,9 +41,31 @@ public class LinearActuatorConstraint : Constraint
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
         adjustPosition();
+        reignInLineSegment();
         print("laC configure");
         chooseIntersectionIndex();
         needToConfigure = false;
+    }
+
+    private void reignInLineSegment()
+    {
+        Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
+        Vector3 gearCenter = gear.transform.position;
+        float radius = (gearCenter - constraintTarget.reference.position).magnitude;
+        float poleDistance = new VectorXZ(poleDirection).magnitude;
+        LinearActuator la = constraintTarget.lineSegmentReference.GetComponentInParent<LinearActuator>();
+        foreach (Vector3 direction in directions(36))
+        {
+            VectorXZ gearRim = new VectorXZ(gearCenter + direction * radius);
+            VectorXZ closest = constraintTarget.lineSegmentReference.closestPoint(gearRim);
+            VectorXZ dif = closest - gearRim;
+            if (dif.magnitudeSquared > poleDistance * poleDistance)
+            {
+                VectorXZ nudge = dif.normalized * -1f * (dif.magnitude - poleDistance);
+                la.transform.position += nudge.vector3();
+            }
+            
+        }
     }
 
     private void adjustPosition() {
@@ -61,20 +83,34 @@ public class LinearActuatorConstraint : Constraint
         }
     }
 
+    private IEnumerable radianAngles(int sections)
+    {
+        for(int i = 0; i < sections; ++i)
+        {
+            yield return Mathf.PI * 2f * i / ((float)sections);
+        }
+    }
+
+    private IEnumerable directions(int sections)
+    {
+        foreach(float ang in radianAngles(sections))
+        {
+            yield return new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang));
+        }
+    }
+    
     private void chooseIntersectionIndex() {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
-        if (gear == null) {
-            print("bad reference drivable: " + constraintTarget.driverReference.name); return;
-        }
+        if (gear == null) { return; }
 
         //survey line segment
-        int sections = 36;
         Vector3 gearCenter = gear.transform.position;
         float radius = (gearCenter - constraintTarget.reference.position).magnitude;
         int zeroHit = 0, oneHit = 0;
-        for (int i=0; i<sections; ++i) {
-            float ang = Mathf.PI * 2 * i / ((float)sections);
-            Vector3 testDirection = new Vector3(radius * Mathf.Cos(ang), 0f, radius * Mathf.Sin(ang));
+
+        foreach (Vector3 direction in directions(36))
+        {
+            Vector3 testDirection = direction * radius;
             int result = connectedIndicesFromCenter(gearCenter + testDirection);
             if (result == 2) {
                 zeroHit++;
@@ -85,19 +121,10 @@ public class LinearActuatorConstraint : Constraint
                 oneHit++;
             }
         }
-
-        int prevIntersectionIndexTest = intersectionIndex;
         if (zeroHit > oneHit) {
             intersectionIndex = 0;
         } else {
             intersectionIndex = 1;
-        }
-
-        //DBUG
-        if (prevIntersectionIndexTest != -1 && intersectionIndex != prevIntersectionIndexTest) {
-            print("new intersection index: was: " + prevIntersectionIndexTest + " now: " + intersectionIndex);
-        } else {
-            print("same intersection index: " + intersectionIndex + " (prev: " + prevIntersectionIndexTest + ")");
         }
     }
 
@@ -135,18 +162,19 @@ public class LinearActuatorConstraint : Constraint
         Vector3 target = constraintTarget.target.position;
         Vector3 nudge = constraintTarget.reference.position - prevTargetPosition; // constraintTarget.target.rotation.eulerAngles * testFactor; // Dot(constraintTarget.target.rotation.eulerAngles, curDirection.normalized) * .3f * constraintTarget.target.rotation.eulerAngles;
 
-        if (nudge.sqrMagnitude != 0f) {
+        if (nudge.sqrMagnitude > 0f) {
             VectorXZ[] points = new VectorXZ[2];
             VectorXZ n = new VectorXZ(nudge);
 
             bool intersected = intersectionPoints(ref points, constraintTarget.reference.position, constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
-            BugLine.Instance.markPoint(points[0], 0);
-            BugLine.Instance.markPoint(points[1], 1);
-            target = points[intersectionIndex].vector3(target.y);
+            BugLine.Instance.markPoint(points[intersectionIndex], 0);
+            if (intersected)
+            {
+                VectorXZ intersection = points[intersectionIndex];
+                target = constraintTarget.lineSegmentReference.closestPoint(intersection).vector3(target.y);
+            }
 
-            if (false && intersected) { //UNREACHABLE
-                //if p0 == p1??
-                //TODO: this algo is no good! find the definitive way
+            if (false && intersected) { 
                 bool zedOnSeg = constraintTarget.lineSegmentReference.isOnSegment(points[0]);
                 bool oneOneSeg = constraintTarget.lineSegmentReference.isOnSegment(points[1]);
                 if (zedOnSeg && oneOneSeg) { // uh-oh? TODO: figure definitive way of knowing
@@ -183,21 +211,19 @@ public class LinearActuatorConstraint : Constraint
         }
         Vector3 nextDirection = target - constraintTarget.reference.position;
         transform.RotateAround(constraintTarget.reference.position, EnvironmentSettings.towardsCameraDirection, Quaternion.FromToRotation(curDirection, nextDirection).eulerAngles.y);
-
         prevTargetPosition = constraintTarget.reference.position;
     }
-    // Called from fixed update
 
     private static int tick = 0;
 
     private static bool intersectionPoints(ref VectorXZ[] points, Vector3 center, Vector3 pointOnCircle, LineSegment lineSegment) {
 
-        // p and q are x and y offsets for circle defined by r = pole length, center = pinned down end of pole (reference.position)
-        float p = center.x; // constraintTarget.reference.position.x;
-        float q = center.z; // constraintTarget.reference.position.z;
-        VectorXZ pole = new VectorXZ(pointOnCircle - center); // constraintTarget.altReference.position - constraintTarget.reference.position);
-        float slope = lineSegment.slopeXZ; // constraintTarget.lineSegmentReference.slopeXZ;
-        float intercept = lineSegment.interceptXZ; // constraintTarget.lineSegmentReference.interceptXZ;
+        // p and q are x and y offsets for circle defined by r = pole-length, center = pinned down end of pole (reference.position)
+        float p = center.x; 
+        float q = center.z; 
+        VectorXZ pole = new VectorXZ(pointOnCircle - center);
+        float slope = lineSegment.slopeXZ;
+        float intercept = lineSegment.interceptXZ;
 
         if (tick++ > 30) {
             tick = 0;
@@ -210,7 +236,6 @@ public class LinearActuatorConstraint : Constraint
         float a = slope*slope + 1;
         float b = 2 * (slope * intercept - slope * q - p);
         float c = (q * q - pole.magnitudeSquared + p * p - 2 * intercept * q + intercept * intercept);
-
         float discriminant = b * b - 4 * a * c;
 
         if (discriminant > 0f) {
@@ -230,7 +255,7 @@ public class LinearActuatorConstraint : Constraint
             points[1] = tangent;
             return true;
         }
-
+        print("miss");
         return false;
     }
 

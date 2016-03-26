@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class BugLine : Singleton<BugLine> {
 
     LineRenderer lineRenderer;
-    private int vertices = 7;
+    private int vertices = 25;
     protected BugLine() { }
     Transform pointMarker;
     List<Transform> markers;
@@ -92,7 +92,7 @@ public class BugLine : Singleton<BugLine> {
         Vector3 next;
         for(int i = 0; i <= sections; ++i) {
             float angle = i * wedge;
-            next = origin + new Vector3(radius * Mathf.Cos(i), 0f, radius * Mathf.Sin(i));
+            next = origin + new Vector3(radius * Mathf.Cos(angle), 0f, radius * Mathf.Sin(angle));
             lineRenderer.SetPosition(i, next);
         }
     }
