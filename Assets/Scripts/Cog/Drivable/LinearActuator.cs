@@ -8,6 +8,7 @@ public class LinearActuator : Drivable , IPegProxy {
     // TOOD: make LA's slider length settable
 
     protected LineSegment lineSegment;
+    protected HandleSet handleSet;
 
     protected override void awake() {
         base.awake();
@@ -41,15 +42,20 @@ public class LinearActuator : Drivable , IPegProxy {
             return drivingPeg.isChildConstraint.constraintTarget.parentConstraint.GetComponent<LinearActuatorConstraint>();
         }
     }
+    
 
     protected override bool vConnectTo(Collider other) {
+        print("LA connect");
         Pole pole = other.GetComponent<Pole>();
         if (pole != null && drivingPole != null && pole != drivingPole) {
+            print("have a pole already");
             return false;
         }
-       
+
+        print("got something: " + other.name);
         // if other is a pole. 
         // that has a free socket 
+
         if (pole != null) {
             return pole.acceptBackendPegOnDrivable(this);
         }
@@ -103,6 +109,10 @@ public class LinearActuator : Drivable , IPegProxy {
         get {
             return _pegboard.getBackendSocketSet().sockets[0].drivingPeg;
         }
+    }
+
+    public void extendToAccommodate(VectorXZ p) {
+        lineSegment.extendToAccommodate(p);
     }
 
 }

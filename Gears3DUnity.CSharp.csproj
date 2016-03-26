@@ -137,6 +137,7 @@
     <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
+    <Compile Include="Assets\Scripts\Interaction\LinearHandleSet.cs" />
     <Compile Include="Assets\Scripts\Interaction\PhysicsCursorInteraction.cs" />
     <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\Browser\Browser.cs" />

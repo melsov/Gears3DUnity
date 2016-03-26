@@ -1,21 +1,32 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
-using System.Collections;
+using System.Collections.Generic;
 
 public class LineSegment : MonoBehaviour {
 
     public Transform start;
     public Transform end;
+    protected List<Transform> sides = new List<Transform>(2);
 
     public float fudgeStart = .01f;
     public float fudgeEnd = .05f;
 
     private LineRenderer lr;
+    private Vector3 originalDistance;
+
+    public delegate void AdjustedExtents();
+    public AdjustedExtents adjustedExtents;
 
     // Use this for initialization
     void Awake () {
         lr = GetComponent<LineRenderer>();
-        //debug();
+        originalDistance = end.position - start.position;
+
+        foreach(BoxCollider bc in GetComponentsInChildren<BoxCollider>()) {
+            Transform t = bc.transform;
+            if (t == transform || t == start || t == end) { continue; }
+            sides.Add(t);
+        }
 	}
 
     public VectorXZ distance {
@@ -75,6 +86,29 @@ public class LineSegment : MonoBehaviour {
 
     public void setDistance(float distance) {
         end.position = start.position + (normalized * distance).vector3();
+    }
+
+    public void extendToAccommodate(VectorXZ p)
+    {
+        p = closestPointOnLine(p);
+        if (isOnSegment(p)) { return; }
+        VectorXZ dif = p - startXZ;
+        if (dif.dot(distance) > 0f)
+        {
+            end.position = p.vector3(end.position.y);
+        } else
+        {
+            start.position = p.vector3(start.position.y);
+        }
+        float sideScale = distance.magnitude;
+        foreach(Transform side in sides) {
+            side.localScale = new Vector3(sideScale, side.localScale.y, side.localScale.z);
+
+            Vector3 localPos = side.localPosition;
+            localPos.x = start.localPosition.x + sideScale / 2f;
+            side.localPosition = localPos;
+        }
+        adjustedExtents();
     }
 
     public void debug() {

@@ -11,7 +11,7 @@ public class ColliderDropper : MonoBehaviour {
         client = GetComponent<IColliderDropperClient>();
         if (client == null) {
             client = GetComponentInParent<IColliderDropperClient>();
-            Assert.IsTrue(client != null);
+            Assert.IsTrue(client != null, "no collider dropper client?");
         }
     }
 
@@ -24,6 +24,8 @@ public class ColliderDropper : MonoBehaviour {
         }
     }
 
+//TODO: with linear actuator, there are a whole bunch of 
+// unintended behaviors surrounding droppers, cursor agents
     void OnTriggerExit(Collider other) {
         highlight(other, false);
         colliders.Remove(other);

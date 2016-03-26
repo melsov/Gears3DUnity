@@ -22,9 +22,7 @@ public class Pole : Drivable
         Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
             if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
-                debugY();
                 setSocketToPeg(aSocket, peg);
-                debugY(); //
                 return true;
             }
         }
@@ -32,19 +30,15 @@ public class Pole : Drivable
         return false;
     }
 
-//TODO: poles teleport up (in y) when they connect to gears: codify what y everything should be on
+    //TODO: poles teleport up (in y) when they connect to gears: codify what y everything should be on
 
     // POLE CONNECT CASES:
     //  A: NEITHER BACKEND CONNECTED: try to set a backend socket
     //  B: ONE BACKEND CONNECTED: try to set a frontend socket
-
-//CONSIDER: make a drivable default version of vMakeConn...
     protected override bool vMakeConnectionWithAfterCursorOverride(Collider other) {
         if (isConnectedTo(other.transform)) {
             return false;
         }
-        // CASE 1: this is a socket that has a hinge connection such that 
-        // we can connect to it and still keep any parent connection? 
         // CASE A:
         if (! _pegboard.getBackendSocketSet().isConnected()) {
             return vConnectTo(other);
@@ -55,11 +49,11 @@ public class Pole : Drivable
         Collider dOC = GetComponent<CursorAgent>().dragOverrideCollider;
         Handle handle = dOC.GetComponent<Handle>();
         Socket frontSocket = handle.widget.GetComponent<Socket>();
-        Assert.IsTrue(frontSocket != null);
+        Assert.IsTrue(frontSocket != null, "Polw handle needs a front socket as its widget");
 
         Peg aPeg = null;
         Socket aSocket = null;
-        ISocketSetContainer ssc = other.GetComponentInChildren<ISocketSetContainer>(); // TransformUtil.FindComponentInThisOrChildren<ISocketSetContainer>(other.transform); 
+        ISocketSetContainer ssc = other.GetComponentInChildren<ISocketSetContainer>(); 
         if (ssc == null) {
             print("no socket set on");
             Bug.printComponents(other.gameObject);
@@ -85,7 +79,6 @@ public class Pole : Drivable
                 return true;
             }
         }
-        // is a constraint applied where available?
         return false;
     }
 
