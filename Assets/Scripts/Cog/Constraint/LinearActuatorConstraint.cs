@@ -19,7 +19,7 @@ public class LinearActuatorConstraint : Constraint
 
     public virtual bool isTargetInRange(bool extendedRange) {
         if (constraintTarget.lineSegmentReference == null) return false;
-        Vector3 rangeV = extendedRange ? (poleDirection * 1.5f) : poleDirection; //TODO: make more precise
+        Vector3 rangeV = extendedRange ? (poleDirection * 1.25f) : poleDirection; //TODO: make more precise
         return 
             (constraintTarget.lineSegmentReference.start.position - constraintTarget.reference.position).sqrMagnitude < rangeV.sqrMagnitude ||
             (constraintTarget.lineSegmentReference.end.position - constraintTarget.reference.position).sqrMagnitude < rangeV.sqrMagnitude;
@@ -37,6 +37,7 @@ public class LinearActuatorConstraint : Constraint
         if (constraintTarget.drivenReference == null ||  !(constraintTarget.drivenReference is LinearActuator)) {
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
+        UnityEditor.EditorApplication.isPaused = true;
         //adjustPosition();
         reignInLineSegment();
         chooseIntersectionIndex();
@@ -129,14 +130,17 @@ public class LinearActuatorConstraint : Constraint
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
         Vector3 gearCenter = gear.transform.position;
         float radius = (gearCenter - constraintTarget.reference.position).magnitude;
-        float poleDistance = new VectorXZ(poleDirection).magnitude;
-        LinearActuator la = constraintTarget.lineSegmentReference.GetComponentInParent<LinearActuator>();
+
         foreach (Vector3 dir in directions(36)) {
             VectorXZ gearRim = new VectorXZ(gearCenter + dir * radius);
             VectorXZ point = intersectionPoint(gearRim.vector3(), constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
+
             if (!point.isFakeNull()) {
-                la.extendToAccommodate(point);
+                VectorXZ dif = point - constraintTarget.lineSegmentReference.startXZ;
+                float dot = constraintTarget.lineSegmentReference.normalized.dot(dif.normalized);
+                constraintTarget.lineSegmentReference.extendToAccommodate(point + (constraintTarget.lineSegmentReference.normalized * dot * 1.1f) );
             }
+
         }
     }
 

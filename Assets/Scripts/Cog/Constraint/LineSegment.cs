@@ -13,6 +13,7 @@ public class LineSegment : MonoBehaviour {
 
     private LineRenderer lr;
     private Vector3 originalDistance;
+    private Vector3 originalStartLocal;
 
     public delegate void AdjustedExtents();
     public AdjustedExtents adjustedExtents;
@@ -21,6 +22,7 @@ public class LineSegment : MonoBehaviour {
     void Awake () {
         lr = GetComponent<LineRenderer>();
         originalDistance = end.position - start.position;
+        originalStartLocal = start.localPosition;
 
         foreach(BoxCollider bc in GetComponentsInChildren<BoxCollider>()) {
             Transform t = bc.transform;
@@ -93,22 +95,43 @@ public class LineSegment : MonoBehaviour {
         p = closestPointOnLine(p);
         if (isOnSegment(p)) { return; }
         VectorXZ dif = p - startXZ;
-        if (dif.dot(distance) > 0f)
-        {
+        if (dif.dot(distance) > 0f) { 
             end.position = p.vector3(end.position.y);
-        } else
-        {
+        } else { 
             start.position = p.vector3(start.position.y);
         }
+
+        adjustSides();
+        adjustedExtents();
+    }
+
+    public void resetExtents() {
+        start.localPosition = originalStartLocal;
+        setDistance(originalDistance.magnitude);
+        adjustSides();
+        adjustedExtents();
+    }
+
+    public void setExtents(VectorXZ a, VectorXZ b) {
+        throw new System.Exception(); // not in use
+        if ((b - a).dot(distance) < 0f) {
+            VectorXZ temp = a;
+            a = b;
+            b = temp;
+        }
+
+        start.position = a.vector3(start.position.y);
+        end.position = b.vector3(end.position.y);
+        adjustSides();
+        adjustedExtents();
+    }
+
+    private void adjustSides() {
         float sideScale = distance.magnitude;
         foreach(Transform side in sides) {
             side.localScale = new Vector3(sideScale, side.localScale.y, side.localScale.z);
-
-            Vector3 localPos = side.localPosition;
-            localPos.x = start.localPosition.x + sideScale / 2f;
-            side.localPosition = localPos;
+            side.localPosition = new Vector3(start.localPosition.x + sideScale / 2f, side.localPosition.y, side.localPosition.z);
         }
-        adjustedExtents();
     }
 
     public void debug() {

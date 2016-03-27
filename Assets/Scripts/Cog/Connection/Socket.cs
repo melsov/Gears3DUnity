@@ -170,20 +170,12 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
             ipp = tr.parent.GetComponent<IPegProxy>();
         }
         if (ipp != null) {
-            print("****%%%%got IPegProxy");
             return ipp.getGuid();
         }
         return null;
     }
 
     public void restoreConnectionData(ref List<byte[]> connectionData) {
-        print("restore connection data in socket: " + name);
-        //if (hasChildPeg()) {
-        //    print("we already have a child peg (from prefab presubably). don't restore anything");
-        //    return;
-        //} else {
-        //    print("no child peg on socket: " + name);
-        //}
         ConnectionData cd;
         try {
             if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
@@ -194,10 +186,8 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                     }
                     Peg peg = connectedGO.GetComponent<Peg>();
                     if (peg == null) {
-                        print("^^^^^^i peg proxy??");
                         if (connectedGO.GetComponent<IPegProxy>() != null) {
                             peg = connectedGO.GetComponent<IPegProxy>().getPeg();
-                            print("getting Ipegproxy: peg null? " + (peg == null));
                         }
                     }
                     if (peg != null) {

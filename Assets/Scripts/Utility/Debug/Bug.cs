@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEditor;
 
 public class Bug : MonoBehaviour {
     public static void printComponents(Transform g) {
@@ -39,5 +40,10 @@ public class Bug : MonoBehaviour {
         if (o is T) {
             print(s);
         }
+    }
+
+    public static void bugAndPause(string s) {
+        Debug.LogError(s);
+        EditorApplication.isPaused = true;
     }
 }

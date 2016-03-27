@@ -13,6 +13,7 @@ public class LinearActuator : Drivable , IPegProxy {
     protected override void awake() {
         base.awake();
         lineSegment = GetComponentInChildren<LineSegment>();
+        lineSegment.adjustedExtents += lineSegmentAdjustedExtents;
     }
 
     public override float driveScalar() {
@@ -48,14 +49,11 @@ public class LinearActuator : Drivable , IPegProxy {
         print("LA connect");
         Pole pole = other.GetComponent<Pole>();
         if (pole != null && drivingPole != null && pole != drivingPole) {
-            print("have a pole already");
+            print("have a pole already"); //TODO: does this ellide re-configuring?
             return false;
         }
 
         print("got something: " + other.name);
-        // if other is a pole. 
-        // that has a free socket 
-
         if (pole != null) {
             return pole.acceptBackendPegOnDrivable(this);
         }
@@ -71,6 +69,7 @@ public class LinearActuator : Drivable , IPegProxy {
         if(lac != null) {
             if (!lac.isTargetInRange()) {
                 base.vDisconnect(); //CONSIDER: has no meaning for linear actuators?
+                lineSegment.resetExtents();
             }
         }
     }
@@ -87,6 +86,7 @@ public class LinearActuator : Drivable , IPegProxy {
             } else {
                 removeParentConstraintAndConstraintTargets();
                 base.vDisconnect();
+                lineSegment.resetExtents();
             }
         }
     }
@@ -111,8 +111,10 @@ public class LinearActuator : Drivable , IPegProxy {
         }
     }
 
-    public void extendToAccommodate(VectorXZ p) {
-        lineSegment.extendToAccommodate(p);
+    protected void lineSegmentAdjustedExtents() {
+        CapsuleCollider cc = GetComponent<CapsuleCollider>();
+        cc.height = Mathf.Abs(lineSegment.end.localPosition.x - lineSegment.start.localPosition.x);
+        cc.center = new Vector3((lineSegment.start.localPosition.x + lineSegment.end.localPosition.x) / 2f, cc.center.y, cc.center.z);
     }
 
 }

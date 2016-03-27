@@ -83,13 +83,11 @@ public class Pole : Drivable
     }
 
     private bool connectToBackendOf(SocketSet otherBackendSet, Socket frontSocket) {
-        Socket aSocket = frontSocket;
-
         // get a peg on backend of other
-        Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(aSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
+        Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(frontSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
         if (childSocket != null) {
             if (childSocket.drivingPeg != null) {
-                childSocket.drivingPeg.beChildOf(aSocket);
+                childSocket.drivingPeg.beChildOf(frontSocket);
                 return true;
             }
         }
@@ -97,6 +95,10 @@ public class Pole : Drivable
     }
 
     public bool acceptBackendPegOnDrivable(Drivable d) {
+        Socket closestFront = _pegboard.getFrontendSocketSet().getSocketClosestTo(d.transform.position);
+        if (closestFront.hasChildPeg()) {
+            return false;
+        }
         Socket frontSocket = _pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(d.transform.position, RotationMode.FREE_OR_FIXED);
 
         // if this front socket is 'on top of' a driven back end socket use the opposite frontend socket instead
@@ -107,9 +109,6 @@ public class Pole : Drivable
                 frontSocket = another;
             }
         }
-        //DBUG
-        BugLine.Instance.markPoint(new VectorXZ(frontSocket.transform.position), 1); //DBUG
-        EditorApplication.isPaused = true;
 
         if (frontSocket == null) { return false; }
         ISocketSetContainer ssc = d.GetComponentInChildren<ISocketSetContainer>();
@@ -121,15 +120,12 @@ public class Pole : Drivable
 
     //CONSIDER: what kinds of parent constraints should go with what kinds of child constraints and where to enforce these decisions
     public override Constraint parentConstraintFor(Constraint childConstraint, Transform childTransform) {
-        print("***welcome to getparent constraint for (in pole)");
         Socket socket = childConstraint.constraintTarget.target.GetComponent<Socket>();
 
-        if (!_pegboard.getFrontendSocketSet().contains(socket)) { // this would be queer
-            return null;
-        }
+        if (!_pegboard.getFrontendSocketSet().contains(socket)) { return null; } //sanity check
+
         Socket otherSideBackSocket = _pegboard.getBackendSocketSet().getSocketFurthestFrom(socket.transform.position);
         if (otherSideBackSocket == null) {
-            print("other side socket is null");
             return null;
         }
 
@@ -137,21 +133,9 @@ public class Pole : Drivable
             //duct tape
             Socket yetAnother = _pegboard.getBackendSocketSet().getAnother(otherSideBackSocket);
             if (yetAnother.hasDrivingPeg()) {
-                print("weird. it was the other back socket?");
-                EditorApplication.isPaused = true;
                 otherSideBackSocket = yetAnother;
-            } else {
-                print("neither back socket has driving peg?");
-            }
+            } 
         }
-        //TODO: when restoring connect data, not finding the free ro socket that we need.
-        //CONSIDER: don't require a particular condition on the other-side backend socket?
-        //foreach (Socket s in _pegboard.getBackendSocketSet().sockets) {
-        //    if (s.isFreeRotatingOnPeg()) {
-        //        otherSideFrontSocket = s;
-        //        break;
-        //    }
-        //}
 
         // set up 'linear actuator constraint'
         LinearActuatorConstraint laConstraint = GetComponent<LinearActuatorConstraint>();
@@ -170,20 +154,22 @@ public class Pole : Drivable
 
         if (otherSideBackSocket.hasDrivingPeg()) {
             laConstraint.constraintTarget.driverReference = otherSideBackSocket.drivingPeg.GetComponentInParent<Drivable>();
-        } else { Debug.LogError("other side back soc driving peg is null??"); }
+        } 
 
         Peg peg = childTransform.GetComponent<Peg>();
         if (peg != null) {
             laConstraint.constraintTarget.drivenReference = peg.GetComponentInParent<Drivable>();
             laConstraint.configure();
         }
-        print("***parent constraint returned");
         return laConstraint;
     }
 
     public void removeLinearActuatorConstraint() {
         LinearActuatorConstraint lac = GetComponent<LinearActuatorConstraint>();
         if (lac != null) {
+            Socket connectedToLASocket = lac.constraintTarget.altReference.GetComponent<Socket>();
+            Assert.IsTrue(connectedToLASocket != null, "something wrong");
+            connectedToLASocket.childPeg = null;
             Destroy(lac);
         } 
     }
