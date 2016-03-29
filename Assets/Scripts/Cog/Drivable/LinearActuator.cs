@@ -46,14 +46,11 @@ public class LinearActuator : Drivable , IPegProxy {
     
 
     protected override bool vConnectTo(Collider other) {
-        print("LA connect");
         Pole pole = other.GetComponent<Pole>();
         if (pole != null && drivingPole != null && pole != drivingPole) {
-            print("have a pole already"); //TODO: does this ellide re-configuring?
             return false;
         }
 
-        print("got something: " + other.name);
         if (pole != null) {
             return pole.acceptBackendPegOnDrivable(this);
         }

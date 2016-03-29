@@ -4,14 +4,16 @@ using System.Collections.Generic;
 
 public class BugLine : Singleton<BugLine> {
 
+    protected BugLine() { }
+
     LineRenderer lineRenderer;
     private int vertices = 25;
-    protected BugLine() { }
     Transform pointMarker;
     List<Transform> markers;
     Color[] colors;
 
     private Dictionary<VecPair, GameObject> lines;
+
     void Awake() {
         colors = new Color[] {
             Color.red,
@@ -81,7 +83,7 @@ public class BugLine : Singleton<BugLine> {
         lr.SetPosition(0, origin);
         lr.SetPosition(1, destination);
         lr.SetColors(Color.green, Color.yellow);
-        lr.SetWidth(.4f, .2f);
+        lr.SetWidth(.01f, .01f);
         line.transform.SetParent(transform);
         lines.Add(vp, line);
     }

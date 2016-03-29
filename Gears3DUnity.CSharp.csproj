@@ -153,6 +153,7 @@
     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\SerializableVecQuat.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\SaveLoad.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\TestSerialize.cs" />
+    <Compile Include="Assets\Scripts\Tests\TestAngleMath.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadController.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\Category.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\InstantiateButton.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Assets\Scripts\UI\View\Inventory\ItemID.cs" />
     <Compile Include="Assets\Scripts\UI\View\Pause.cs" />
     <Compile Include="Assets\Scripts\UI\View\ProjectName.cs" />
+    <Compile Include="Assets\Scripts\Utility\Angles.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLineComponent.cs" />
@@ -177,6 +179,8 @@
     <None Include="Assets\Audio\GuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
+    <None Include="Assets\TSF\Shaders\TSF.shader" />
+    <None Include="Assets\TSF\Shaders\TSFOutline.shader" />
     <None Include="Assets\Temp\hi.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

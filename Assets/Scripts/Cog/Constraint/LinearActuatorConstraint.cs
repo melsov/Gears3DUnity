@@ -52,7 +52,7 @@ public class LinearActuatorConstraint : Constraint
         float radius = (gearCenter - constraintTarget.reference.position).magnitude;
         float poleDistance = new VectorXZ(poleDirection).magnitude;
         LinearActuator la = constraintTarget.lineSegmentReference.GetComponentInParent<LinearActuator>();
-        foreach (Vector3 direction in directions(36))
+        foreach (Vector3 direction in Angles.UnitVectors(36)) 
         {
             VectorXZ gearRim = new VectorXZ(gearCenter + direction * radius);
             VectorXZ closestOnSegment = constraintTarget.lineSegmentReference.closestPoint(gearRim);
@@ -81,21 +81,6 @@ public class LinearActuatorConstraint : Constraint
         }
     }
 
-    private IEnumerable radianAngles(int sections)
-    {
-        for(int i = 0; i < sections; ++i)
-        {
-            yield return Mathf.PI * 2f * i / ((float)sections);
-        }
-    }
-    private IEnumerable directions(int sections)
-    {
-        foreach(float ang in radianAngles(sections))
-        {
-            yield return new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang));
-        }
-    }
-    
     private void chooseIntersectionIndex() {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
         if (gear == null) { return; }
@@ -105,7 +90,7 @@ public class LinearActuatorConstraint : Constraint
         float radius = (gearCenter - constraintTarget.reference.position).magnitude;
         int zeroHit = 0, oneHit = 0;
 
-        foreach (Vector3 direction in directions(36))
+        foreach (Vector3 direction in Angles.UnitVectors(36)) 
         {
             Vector3 testDirection = direction * radius;
             int result = connectedIndicesFromCenter(gearCenter + testDirection);
@@ -131,7 +116,7 @@ public class LinearActuatorConstraint : Constraint
         Vector3 gearCenter = gear.transform.position;
         float radius = (gearCenter - constraintTarget.reference.position).magnitude;
 
-        foreach (Vector3 dir in directions(36)) {
+        foreach (Vector3 dir in Angles.UnitVectors(36)) { 
             VectorXZ gearRim = new VectorXZ(gearCenter + dir * radius);
             VectorXZ point = intersectionPoint(gearRim.vector3(), constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
 
