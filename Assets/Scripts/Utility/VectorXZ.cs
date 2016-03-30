@@ -30,7 +30,7 @@ public struct VectorXZ  {
         return new Vector3(v.x, y, v.y);
     }
 
-    public Vector2 vector2 {
+    public Vector2 toVector2 {
         get {
             return v;
         }

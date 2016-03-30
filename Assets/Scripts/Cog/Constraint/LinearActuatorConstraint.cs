@@ -48,13 +48,13 @@ public class LinearActuatorConstraint : Constraint
     private void reignInLineSegment()
     {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
-        Vector3 gearCenter = gear.transform.position;
-        float radius = (gearCenter - constraintTarget.reference.position).magnitude;
+        VectorXZ gearCenter = new VectorXZ(gear.transform.position);
+        float radius = (gearCenter.vector3() - constraintTarget.reference.position).magnitude;
         float poleDistance = new VectorXZ(poleDirection).magnitude;
         LinearActuator la = constraintTarget.lineSegmentReference.GetComponentInParent<LinearActuator>();
-        foreach (Vector3 direction in Angles.UnitVectors(36)) 
+        foreach (VectorXZ direction in Angles.UnitVectors(36)) 
         {
-            VectorXZ gearRim = new VectorXZ(gearCenter + direction * radius);
+            VectorXZ gearRim = gearCenter + direction * radius;
             VectorXZ closestOnSegment = constraintTarget.lineSegmentReference.closestPoint(gearRim);
             VectorXZ dif = closestOnSegment - gearRim;
             if (dif.magnitudeSquared > poleDistance * poleDistance)
@@ -90,9 +90,9 @@ public class LinearActuatorConstraint : Constraint
         float radius = (gearCenter - constraintTarget.reference.position).magnitude;
         int zeroHit = 0, oneHit = 0;
 
-        foreach (Vector3 direction in Angles.UnitVectors(36)) 
+        foreach (VectorXZ direction in Angles.UnitVectors(36)) 
         {
-            Vector3 testDirection = direction * radius;
+            Vector3 testDirection = (direction * radius).vector3();
             int result = connectedIndicesFromCenter(gearCenter + testDirection);
             if (result == 2) {
                 zeroHit++;
@@ -113,11 +113,11 @@ public class LinearActuatorConstraint : Constraint
     private void extendLineSegment()
     {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
-        Vector3 gearCenter = gear.transform.position;
-        float radius = (gearCenter - constraintTarget.reference.position).magnitude;
+        VectorXZ gearCenter = new VectorXZ(gear.transform.position);
+        float radius = (gearCenter.vector3() - constraintTarget.reference.position).magnitude;
 
-        foreach (Vector3 dir in Angles.UnitVectors(36)) { 
-            VectorXZ gearRim = new VectorXZ(gearCenter + dir * radius);
+        foreach (VectorXZ dir in Angles.UnitVectors(36)) {
+            VectorXZ gearRim = gearCenter + dir * radius;
             VectorXZ point = intersectionPoint(gearRim.vector3(), constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
 
             if (!point.isFakeNull()) {

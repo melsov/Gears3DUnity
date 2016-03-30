@@ -6,11 +6,12 @@ public class BugLine : Singleton<BugLine> {
 
     protected BugLine() { }
 
-    LineRenderer lineRenderer;
+    public LineRenderer lineRenderer;
     private int vertices = 25;
     Transform pointMarker;
     List<Transform> markers;
     Color[] colors;
+    protected Material lineMaterial;
 
     private Dictionary<VecPair, GameObject> lines;
 
@@ -23,11 +24,12 @@ public class BugLine : Singleton<BugLine> {
             Color.yellow
         };
         lines = new Dictionary<VecPair, GameObject>();
-        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer = GetComponent<LineRenderer>(); // gameObject.AddComponent<LineRenderer>();
         lineRenderer.SetWidth(.1f, .2f);
         lineRenderer.SetVertexCount(vertices);
         Material m = Resources.Load<Material>("Materials/BugLineMat.mat");
         lineRenderer.material = m;
+        lineMaterial = m;
 
         pointMarker = GameObject.FindGameObjectWithTag("DebugMarker").transform;
         markers = new List<Transform>();
@@ -82,6 +84,8 @@ public class BugLine : Singleton<BugLine> {
         }
         lr.SetPosition(0, origin);
         lr.SetPosition(1, destination);
+        //lr.material = lineRenderer.material;
+
         lr.SetColors(Color.green, Color.yellow);
         lr.SetWidth(.01f, .01f);
         line.transform.SetParent(transform);
@@ -96,6 +100,12 @@ public class BugLine : Singleton<BugLine> {
             float angle = i * wedge;
             next = origin + new Vector3(radius * Mathf.Cos(angle), 0f, radius * Mathf.Sin(angle));
             lineRenderer.SetPosition(i, next);
+        }
+    }
+
+    public void clear() {
+        foreach(GameObject li in lines.Values) {
+            Destroy(li);
         }
     }
 }

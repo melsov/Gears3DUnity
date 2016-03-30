@@ -344,7 +344,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         VectorXZ globalXZ = new VectorXZ(other.transform.position);
         CapsuleCollider cc = other.GetComponent<CapsuleCollider>();
         if (cc != null) {
-            float centerDistance = (globalXZ - new VectorXZ(transform.position)).vector2.magnitude;
+            float centerDistance = (globalXZ - new VectorXZ(transform.position)).toVector2.magnitude;
             print(centerDistance < cc.radius * other.transform.localScale.x + GetComponent<CapsuleCollider>().radius * transform.localScale.x);
             return centerDistance < cc.radius * other.transform.localScale.x + GetComponent<CapsuleCollider>().radius * transform.localScale.x;
 
