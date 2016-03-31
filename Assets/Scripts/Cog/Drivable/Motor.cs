@@ -3,12 +3,18 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Motor : Drivable // , IGameSerializable
+public class Motor : Drivable
 {
+    protected HandleSet handleSet;
+    protected LeverLimits leverLimits;
+    protected float leverMultiplier;
+    protected float leverMax = 16f;
+    protected Handle lever { get { return handleSet.handles[0]; } }
+
     public float maxAngularVelocity = 10f;
     protected float _power = 1f;
     public virtual float power {
-        get { return _power * _isPaused; }
+        get { return _power * _isPaused * leverMultiplier; }
         set { _power = Mathf.Clamp(value, -1f, 1f); }
     }
     protected float _isPaused = 1f;
@@ -29,12 +35,14 @@ public class Motor : Drivable // , IGameSerializable
     {
         public float maxAngularVelocity;
         public float _power;
+        public float _leverMultiplier;
     }
     public override void Serialize(ref List<byte[]> data) {
         base.Serialize(ref data);
         SerializeStorage stor = new SerializeStorage();
         stor.maxAngularVelocity = maxAngularVelocity;
         stor._power = _power;
+        stor._leverMultiplier = leverMultiplier;
         SaveManager.Instance.SerializeIntoArray(stor, ref data);
     }
 
@@ -44,6 +52,8 @@ public class Motor : Drivable // , IGameSerializable
         if((stor = SaveManager.Instance.DeserializeFromArray<SerializeStorage>(ref data)) != null) {
             maxAngularVelocity = stor.maxAngularVelocity;
             _power = stor._power;
+            leverMultiplier = stor._leverMultiplier;
+            setLeverPositon();
         }
     }
 
@@ -52,6 +62,8 @@ public class Motor : Drivable // , IGameSerializable
         _axel = GetComponentInChildren<Axel>();
         UnityEngine.Assertions.Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 1);
         axel.beChildOf(_pegboard.getFrontendSocketSet().sockets[0]);
+        handleSet = GetComponentInChildren<HandleSet>();
+        leverLimits = GetComponentInChildren<LeverLimits>();
 	}
 
 	protected override void update () {
@@ -75,4 +87,24 @@ public class Motor : Drivable // , IGameSerializable
         power = scalar;
     }
 
+    protected override void vDragOverride(VectorXZ cursorGlobal) {
+        //TODO: set a (separate?) scalar that influences motor power
+        // and raise and lower the lever
+        float z = Mathf.Clamp(cursorGlobal.z, leverLimits.min.z, leverLimits.max.z);
+        Vector3 pos = lever.transform.position;
+        pos.z = z;
+        lever.transform.position = pos;
+        setMultiplier();
+        setLeverPositon();
+    }
+
+    protected void setLeverPositon() {
+        Vector3 pos = lever.transform.position;
+        pos.z = leverLimits.min.z + leverLimits.distance * (leverMultiplier / leverMax);
+        lever.transform.position = pos;
+    }
+
+    protected void setMultiplier() {
+        leverMultiplier = Mathf.Floor((leverMax + .5f) * (lever.transform.position.z - leverLimits.min.z) / leverLimits.distance);
+    }
 }

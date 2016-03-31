@@ -3,10 +3,8 @@ using System.Collections;
 
 public class HandCrank : Motor {
 
-    protected HandleSet handleSet;
     protected override void awake() {
         base.awake();
-        handleSet = GetComponentInChildren<HandleSet>();
         handleSet.handles[0].widget = axel.transform;
     }
 

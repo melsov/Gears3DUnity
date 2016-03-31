@@ -3,12 +3,17 @@ TOOTH_MODE_HULL = 0;
 TOOTH_MODE_MINKOWSKI = 1;
 TOOTH_MODE_SQUARE = 2;
 
-tMode = 1; // TOOTH_MODE_HULL;
+tMode = 0; // TOOTH_MODE_HULL;
 scale_ = 1;
 toothWidth = .25;
+toothCount = 12;
+height = .5;
+toothDepth = .25;
 
+peg();
 //Example
-gearT(6, toothWidth, .5, .25, tMode, scale_);
+//gearT(toothCount, toothWidth, height, toothDepth, tMode, scale_);
+
 
 //Generates a gear mesh
 //Radius scales with tooth width (twidth) and toothCount
@@ -22,8 +27,9 @@ ir = innerR;
 tdepth = tdepth * _scale;
 or = innerR + tdepth;
 wedge = 360 / (t);
-echo(or);
 
+rotate([0,0,90]) {
+difference() {
 union(){
     rotate([0,0,.25 * wedge])translate([0,0,0])
         cylinder($fn = t * 2, hi, ir, ir, true);
@@ -54,6 +60,47 @@ union(){
         }
     }
 }
+//holes
+color([0,.7,1,1]) {
+   translate([0,0,-hi]) {
+       centerSocketR = twidth * .85;
+       holeR = twidth *.65;
+       if (t < 8) {
+           centerSocketR = twidth * .65;
+           holeR = twidth *.45;
+           cylinder($fn = 6, h = hi * 5, r = centerSocketR, true);
+           socketHoles(radius=holeR, distanceFromCenter=innerR * .65);
+       } else {
+           cylinder($fn = 6, h = hi * 5, r = centerSocketR, true);
+           socketHoles(radius=holeR, distanceFromCenter=innerR * .65);
+       }
+   }
+}
+}
+}
+}
+
+module peg() {
+    color([0,.7,1,1]) {
+       centerSocketR = toothWidth * .85;
+       if (toothCount < 8) {
+           centerSocketR = toothWidth * .65;
+           cylinder($fn = 6, h = height * 5, r = centerSocketR, true);
+       } else {
+           cylinder($fn = 6, h = height * 5, r = centerSocketR, true);
+       }
+   }
+}
+
+module socketHoles(radius, distanceFromCenter) {
+   sockets = 4;
+   for(i = [0 : sockets]) {
+       rad = distanceFromCenter;
+       ang = (i/sockets) * 360;
+       translate([rad * sin(ang), rad * cos (ang), 0]) {
+            cylinder($fn = 14, h = hi * 5, r = radius, true);       
+        }
+    }
 }
 
 //tooth width scales with tooth count and inner radius
