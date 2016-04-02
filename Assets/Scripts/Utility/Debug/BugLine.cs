@@ -87,7 +87,7 @@ public class BugLine : Singleton<BugLine> {
         //lr.material = lineRenderer.material;
 
         lr.SetColors(Color.green, Color.yellow);
-        lr.SetWidth(.01f, .01f);
+        lr.SetWidth(.1f, .01f);
         line.transform.SetParent(transform);
         lines.Add(vp, line);
     }

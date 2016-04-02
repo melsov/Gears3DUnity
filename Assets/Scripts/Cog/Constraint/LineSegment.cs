@@ -55,7 +55,7 @@ public class LineSegment : MonoBehaviour {
         return startXZ + normalized * normalized.dot(global - startXZ);
     }
 
-    public VectorXZ closestPoint(VectorXZ global) {
+    public VectorXZ closestPointOnSegment(VectorXZ global) {
         VectorXZ result = closestPointOnLine(global);
         VectorXZ dif = result - startXZ;
         // landed behind start?
@@ -67,6 +67,10 @@ public class LineSegment : MonoBehaviour {
             return endXZ;
         }
         return result;
+    }
+
+    public bool sympatheticDirection(VectorXZ dir) {
+        return distance.dot(dir) > 0f;
     }
 
     public bool isOnSegment(VectorXZ global) {

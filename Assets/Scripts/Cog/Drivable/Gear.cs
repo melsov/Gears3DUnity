@@ -18,10 +18,10 @@ public class Gear : Drivable  {
     }
     protected float toothOffsetAngleDegrees { get { return toothOffsetAngleRadians * Mathf.Rad2Deg; } }
 
-    protected float innerRadius {
+    public virtual float innerRadius {
         get { return toothOffset / Mathf.Sin(Mathf.PI / toothCount);  }
     }
-    protected float outerRadius {
+    public float outerRadius {
         get { return innerRadius + ToothDepth; }
     }
 
@@ -30,13 +30,14 @@ public class Gear : Drivable  {
         CapsuleCollider cc = GetComponent<CapsuleCollider>();
         cc.radius =  innerRadius; // + ToothDepth;
     }
+
     
     private void testOffset() {
         int end = 12;
         int howMany = toothCount * end;
         int i = 0;
         foreach(VectorXZ dir in Angles.UnitVectors(0f, Mathf.PI * 2f , howMany)) {
-            float n = normalizedCWToothOffsetFrom(dir);
+            float n = proportionalCWToothOffsetFrom(dir);
             VectorXZ v = Angles.UnitVectorAt(n * toothOffsetAngleRadians +  Mathf.Floor(i/((float)end)) * toothOffsetAngleRadians );
             BugLine.Instance.drawFromTo(transform.position + Vector3.up, transform.position + Vector3.up + (v * (innerRadius + ToothDepth * n)).vector3());
             i++;
@@ -45,15 +46,18 @@ public class Gear : Drivable  {
 
     public virtual float driveRadius {
         get {
-            return innerRadius * Mathf.Sin(toothOffsetAngleRadians);
-            //return innerRadius + ToothDepth / 2f;
+            return innerRadius + ToothDepth / 2f;
         }
     }
     protected override float radius {
         get {
-            //return base.radius; // + ToothDepth /2f; 
-            return driveRadius;
+            //return base.radius; // + ToothDepth /2f;
+            return innerRadius * Mathf.Sin(toothOffsetAngleRadians);
         }
+    }
+
+    public float tangentVelocity() {
+        return _angleStep.deltaAngle * Mathf.Deg2Rad * innerRadius;
     }
 
     public override float driveScalar() {
@@ -69,12 +73,18 @@ public class Gear : Drivable  {
 
     protected float toothRotationOffsetDegrees { get { return Angles.FloatModSigned(rot, toothOffsetAngleDegrees); } }
 
-    protected float normalizedCWToothOffsetFrom(VectorXZ rel) {
+    public virtual float proportionalCWToothOffsetFromAbsPosition(VectorXZ global) {
+        return proportionalCWToothOffsetFrom(global - xzPosition);
+    }
+    public float proportionalCWToothOffsetFrom(VectorXZ rel) {
         float offset = cwToothOffsetFrom(rel);
         return offset / toothOffsetAngleDegrees;
     }
+    public float normalizedCWToothOffsetFrom(VectorXZ rel) {
+        return Angles.FloatModSigned(cwToothOffsetFrom(rel), toothOffsetAngleDegrees) / toothOffsetAngleDegrees;
+    }
 
-    protected float cwToothOffsetFrom(VectorXZ rel) {
+    protected virtual float cwToothOffsetFrom(VectorXZ rel) {
         float clockAngle = positiveClockAngle(rel); 
         float ctacw = closestToothAngleCW(rel);
         return ctacw - clockAngle;
@@ -105,19 +115,30 @@ public class Gear : Drivable  {
             if (!(_driver is Gear)) { base.positionRelativeTo(_driver); return; }
             Gear gear = (Gear)_driver;
 
-            //set distance
-            Vector3 relPos = transform.position - _driver.transform.position;
-            relPos = relPos.normalized * (innerRadius + gear.innerRadius + ToothDepth);
-            transform.position = _driver.transform.position + relPos;
+            setDistanceFrom(gear);
 
             //set rotation
             Vector3 euler = transform.rotation.eulerAngles;
-            VectorXZ relXZ = new VectorXZ(relPos);
-            float normalizedOther = gear.normalizedCWToothOffsetFrom(relXZ);
+            VectorXZ relXZ = new VectorXZ(transform.position - _driver.transform.position);
+            if (gear is RackGear) {
+                relXZ = xzPosition - ((RackGear)gear).closestPointOnLine(xzPosition);
+            }
+            //float normalizedOther = gear.proportionalCWToothOffsetFrom(relXZ);
+            float normalizedOther = gear.proportionalCWToothOffsetFromAbsPosition(xzPosition);
             float closestOffset = cwToothOffsetFrom(relXZ * -1f);
             euler.y = euler.y + closestOffset + toothOffsetAngleDegrees * (normalizedOther + .5f);
             transform.eulerAngles = euler; 
         }
+    }
+    protected virtual void setDistanceFrom(Gear gear) {
+        Vector3 refPoint = _driver.transform.position;
+        if (gear is RackGear) {
+            RackGear rackGear = (RackGear)gear;
+            refPoint = rackGear.closestPointOnLine(new VectorXZ(transform.position)).vector3(rackGear.transform.position.y);
+        }
+        Vector3 relPos = transform.position - refPoint;
+        relPos = relPos.normalized * (innerRadius + gear.innerRadius + ToothDepth);
+        transform.position = refPoint + relPos;
     }
 
     protected override bool vConnectTo(Collider other) {

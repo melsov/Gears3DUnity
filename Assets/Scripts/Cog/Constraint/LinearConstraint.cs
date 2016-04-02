@@ -13,7 +13,7 @@ public class LinearConstraint : Constraint {
         } else {
             position = constraintTarget.target.position;
         }
-        VectorXZ closestPoint = lineSegment.closestPoint(new VectorXZ(position));
+        VectorXZ closestPoint = lineSegment.closestPointOnSegment(new VectorXZ(position));
         rb.MovePosition(closestPoint.vector3(transform.position.y));
     }
 }

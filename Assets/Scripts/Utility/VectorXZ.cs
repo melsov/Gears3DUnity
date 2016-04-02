@@ -75,6 +75,10 @@ public struct VectorXZ  {
         return Vector2.Dot(v, other.v);
     }
 
+    public bool sympatheticDirection(VectorXZ other) {
+        return dot(other) > 0f;
+    }
+
     public static VectorXZ operator +(VectorXZ a, VectorXZ b) {
         return new VectorXZ(a.v + b.v);
     }

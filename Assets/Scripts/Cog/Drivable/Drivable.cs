@@ -30,6 +30,8 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         get { return  GetComponent<CapsuleCollider>().radius * transform.localScale.x; }
     }
 
+    protected VectorXZ xzPosition { get { return new VectorXZ(transform.position); } }
+
     void Awake () {
         awake();
 	}
@@ -336,20 +338,27 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
     #endregion
 
-    //TODO: make this less 'hacky' when we make a parent Drivable class (replace interface)
     protected virtual bool isInConnectionRange(Collider other) {
         if (other == null) {
             return false;
         }
+        Drivable d = other.GetComponent<Drivable>();
+        
         VectorXZ globalXZ = new VectorXZ(other.transform.position);
+        if (d != null) {
+            globalXZ = d.getConnectionPoint(GetComponent<Collider>());
+        }
         CapsuleCollider cc = other.GetComponent<CapsuleCollider>();
         if (cc != null) {
-            float centerDistance = (globalXZ - new VectorXZ(transform.position)).toVector2.magnitude;
+            float centerDistance = (globalXZ - getConnectionPoint(other)).toVector2.magnitude;
             print(centerDistance < cc.radius * other.transform.localScale.x + GetComponent<CapsuleCollider>().radius * transform.localScale.x);
             return centerDistance < cc.radius * other.transform.localScale.x + GetComponent<CapsuleCollider>().radius * transform.localScale.x;
-
         }
         return false;
+    }
+
+    protected virtual VectorXZ getConnectionPoint(Collider other) {
+        return new VectorXZ(transform.position);
     }
 
     public virtual bool isDriven() {

@@ -55,7 +55,7 @@ public class LinearActuatorConstraint : Constraint
         foreach (VectorXZ direction in Angles.UnitVectors(36)) 
         {
             VectorXZ gearRim = gearCenter + direction * radius;
-            VectorXZ closestOnSegment = constraintTarget.lineSegmentReference.closestPoint(gearRim);
+            VectorXZ closestOnSegment = constraintTarget.lineSegmentReference.closestPointOnSegment(gearRim);
             VectorXZ dif = closestOnSegment - gearRim;
             if (dif.magnitudeSquared > poleDistance * poleDistance)
             {
@@ -172,7 +172,7 @@ public class LinearActuatorConstraint : Constraint
             if (intersected)
             {
                 VectorXZ intersection = points[intersectionIndex];
-                target = constraintTarget.lineSegmentReference.closestPoint(intersection).vector3(target.y);
+                target = constraintTarget.lineSegmentReference.closestPointOnSegment(intersection).vector3(target.y);
             }
 
             if (false && intersected) { 
@@ -268,7 +268,7 @@ public class LinearActuatorConstraint : Constraint
     }
 
     private VectorXZ pointOnLineSegment(VectorXZ p) {
-        return constraintTarget.lineSegmentReference.closestPoint(p);
+        return constraintTarget.lineSegmentReference.closestPointOnSegment(p);
     }
 
     private static bool SameSign(float a, float b) {
