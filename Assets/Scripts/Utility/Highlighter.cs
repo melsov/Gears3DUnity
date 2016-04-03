@@ -3,15 +3,18 @@ using System.Collections;
 
 public class Highlighter : MonoBehaviour {
 
-    private Renderer _renderer;
+    public Renderer _renderer;
     private Color defaultColor;
     public Color highlightColor = Color.red;
 
 	void Awake () {
-        _renderer = GetComponent<Renderer>();
+        if (_renderer == null) {
+            _renderer = GetComponent<Renderer>();
+        }
         if (_renderer == null) {
             _renderer = GetComponentInChildren<Renderer>();
         }
+        Bug.assertPause(_renderer.materials[0] != null, "_renderer [0] is null?");
         defaultColor = material.color != null ? material.color : Color.white;
 	}
 

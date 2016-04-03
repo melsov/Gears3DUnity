@@ -27,7 +27,12 @@ public class ColliderDropper : MonoBehaviour {
 //TODO: with linear actuator, there are a whole bunch of 
 // unintended behaviors surrounding droppers, cursor agents
     void OnTriggerExit(Collider other) {
-        highlight(other, false);
+        try {
+            highlight(other, false);
+        } catch(System.Exception e) {
+            print(other.name + " didnt have mat [o]?");
+            Bug.bugAndPause(e.ToString());
+        }
         colliders.Remove(other);
         if (client.isCursorInteracting()) {
             client.handleTriggerExit(other);

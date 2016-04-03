@@ -44,7 +44,9 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             }
         }
         TransformUtil.PositionOnYLayer(transform);
-        gameObject.AddComponent<Highlighter>();
+        if (GetComponent<Highlighter>() == null) {
+            gameObject.AddComponent<Highlighter>();
+        }
         Pause.Instance.onPause += pause;
     }
 
@@ -194,17 +196,29 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
 
     protected virtual bool isConnectedTo(Transform t) {
+        return isConnectedTo(t, 5);
+    }
+    private bool isConnectedTo(Transform t, int depth) {
+        if (depth <= 0) return false;
         if (t == null) return false;
-        Drivable other = TransformUtil.FindComponentInThisOrParent<Drivable>(t);
+        Drivable other = t.GetComponentInParent<Drivable>(); 
         if (other == null) return false;
         foreach (Socket s in _pegboard.getBackendSocketSet().sockets) {
             if (other == s.connectedDrivable()) {
                 return true;
+            } else if (s.connectedDrivable() != null) {
+                if (s.connectedDrivable().isConnectedTo(t, --depth)) {
+                    return true;
+                }
             }
         }
         foreach(Socket s in _pegboard.getFrontendSocketSet().sockets) {
             if (other == s.connectedDrivable()) {
                 return true;
+            } else if (s.connectedDrivable() != null) {
+                if (s.connectedDrivable().isConnectedTo(t, --depth)) {
+                    return true;
+                }
             }
         }
         return false;

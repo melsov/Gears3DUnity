@@ -12,6 +12,7 @@ public class Pole : Drivable
 {
     protected override void awake() {
         base.awake();
+        Bug.assertPause(_pegboard.getBackendSocketSet().sockets.Length == 2, name + " bk sockets length actually: " + _pegboard.getBackendSocketSet().sockets.Length);
         Assert.IsTrue(_pegboard.getBackendSocketSet().sockets.Length == 2);
         Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 2);
     }
@@ -45,7 +46,8 @@ public class Pole : Drivable
         }
 
         //CASE B:
-        print("vMake connection after cursor override: other name: " + other.name);
+        print("vMake connection after cursor override: other name: " + Bug.GetDrivableParentName(other.transform));
+        
         Collider dOC = GetComponent<CursorAgent>().dragOverrideCollider;
         Handle handle = dOC.GetComponent<Handle>();
         Socket frontSocket = handle.widget.GetComponent<Socket>();
@@ -83,6 +85,7 @@ public class Pole : Drivable
     }
 
     private bool connectToBackendOf(SocketSet otherBackendSet, Socket frontSocket) {
+        Bug.bugAndPause("conn to bk end of other");
         // get a peg on backend of other
         Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(frontSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
         if (childSocket != null) {

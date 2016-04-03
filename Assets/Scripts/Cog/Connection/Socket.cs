@@ -30,7 +30,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         get {
             if (_parentContainer == null) {
                 _parentContainer = GetComponentInParent<ISocketSetContainer>();
-                Assert.IsTrue(_parentContainer != null);
+                Assert.IsTrue(_parentContainer != null, "No parent container??");
             }
             return _parentContainer;
         }

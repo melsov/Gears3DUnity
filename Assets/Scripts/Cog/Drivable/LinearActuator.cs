@@ -12,6 +12,7 @@ public class LinearActuator : Drivable , IPegProxy {
 
     protected override void awake() {
         base.awake();
+        Bug.assertNotNullPause(_pegboard);
         lineSegment = GetComponentInChildren<LineSegment>();
         lineSegment.adjustedExtents += lineSegmentAdjustedExtents;
     }
@@ -101,6 +102,10 @@ public class LinearActuator : Drivable , IPegProxy {
     public Peg getPeg() {
         return GetComponentInChildren<Peg>();
     }
+    
+    public Pegboard getPegboard() {
+        return _pegboard;
+    }
 
     protected Peg drivingPeg {
         get {
@@ -120,4 +125,5 @@ public interface IPegProxy
 {
     Guid getGuid();
     Peg getPeg();
+    Pegboard getPegboard();
 }

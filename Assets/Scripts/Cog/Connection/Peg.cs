@@ -187,11 +187,16 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     public bool connectTo(Collider other) {
         if (other == null) return false;
         Pegboard pegboard = other.GetComponent<Pegboard>();
+        if (pegboard == null) {
+            IPegProxy ipp = other.GetComponent<IPegProxy>();
+            if (ipp != null) { pegboard = ipp.getPegboard(); }
+        }
         if (pegboard != null) {
-            Socket socket = pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode); 
+            print("found pegboard");
+            Socket socket = pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode);
             if (socket == null) return false;
             return beChildOf(socket);
-        }
+        } else print("pegboard null: " +other.name);
         return false;
     }
 
@@ -204,6 +209,8 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
             return transform.parent.GetComponent<Socket>() != null;
         }
     }
+    //TODO: pegs childed to pegboard of LAs are moving around
+    // seem to have (be reacting to????) a constraint? (though none have been added to them!)
 
     public bool beChildOf(Socket socket) {
         return beChildOf(socket, false);

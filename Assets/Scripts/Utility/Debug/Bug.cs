@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using System;
 
 public class Bug : MonoBehaviour {
     public static void printComponents(Transform g) {
@@ -18,6 +19,18 @@ public class Bug : MonoBehaviour {
         }
         printComponents(g.GetComponent<MonoBehaviour>());
     }
+
+    public static void assertPause(bool v, string msg) {
+        if (!v) {
+            Debug.LogError(msg);
+            EditorApplication.isPaused = true;
+        }
+    }
+
+    public static void assertNotNullPause(MonoBehaviour m) {
+        assertPause(m != null, " " + m.name + ", is actually null");
+    }
+
     public static void printComponents(MonoBehaviour mb) {
         string compos = "components of: " + (mb == null ? "a null thing \n" : ( mb.name + " \n"));
         if (mb == null) {
@@ -45,5 +58,18 @@ public class Bug : MonoBehaviour {
     public static void bugAndPause(string s) {
         Debug.LogError(s);
         EditorApplication.isPaused = true;
+    }
+
+    public static string GetDrivableParentName(Transform transform) {
+        string result = "";
+        foreach (Cog d in transform.GetComponentsInParent<Cog>()) {
+            result += d.name + "_";
+        }
+        return result;
+    }
+
+    public static void printDrivableParentName(Transform t) { printDrivableParentName(t, ""); }
+    public static void printDrivableParentName(Transform t, string msg) {
+        print(msg + ": " + GetDrivableParentName(t));
     }
 }
