@@ -37,8 +37,6 @@ public class LinearActuatorConstraint : Constraint
         if (constraintTarget.drivenReference == null ||  !(constraintTarget.drivenReference is LinearActuator)) {
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
-        UnityEditor.EditorApplication.isPaused = true;
-        //adjustPosition();
         reignInLineSegment();
         chooseIntersectionIndex();
         extendLineSegment();
@@ -66,20 +64,20 @@ public class LinearActuatorConstraint : Constraint
         
     }
 
-    private void adjustPosition() {
-        Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
-        VectorXZ center = new VectorXZ(gear.transform.position);
-        VectorXZ closest = constraintTarget.lineSegmentReference.closestPointOnLine(center);
-        float radius = gear.radiusInDirection(closest.vector3() - gear.transform.position);
-        float minDistanceFromCenter =  poleDirection.magnitude - radius;
-        float closestDistFromCenter = (closest - center).magnitude;
-        if (minDistanceFromCenter > closestDistFromCenter && constraintTarget.lineSegmentReference.isOnSegment(closest)) {
-            LinearActuator la = constraintTarget.target.GetComponentInParent<LinearActuator>();
-            VectorXZ dif = closest - center;
-            VectorXZ nudge = center + dif.normalized * minDistanceFromCenter - closest;
-            la.transform.position += nudge.vector3();
-        }
-    }
+    //private void adjustPosition() {
+    //    Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
+    //    VectorXZ center = new VectorXZ(gear.transform.position);
+    //    VectorXZ closest = constraintTarget.lineSegmentReference.closestPointOnLine(center);
+    //    float radius = gear.radiusInDirection(closest.vector3() - gear.transform.position);
+    //    float minDistanceFromCenter =  poleDirection.magnitude - radius;
+    //    float closestDistFromCenter = (closest - center).magnitude;
+    //    if (minDistanceFromCenter > closestDistFromCenter && constraintTarget.lineSegmentReference.isOnSegment(closest)) {
+    //        LinearActuator la = constraintTarget.target.GetComponentInParent<LinearActuator>();
+    //        VectorXZ dif = closest - center;
+    //        VectorXZ nudge = center + dif.normalized * minDistanceFromCenter - closest;
+    //        la.transform.position += nudge.vector3();
+    //    }
+    //}
 
     private void chooseIntersectionIndex() {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
@@ -147,67 +145,23 @@ public class LinearActuatorConstraint : Constraint
 
     int testConfig = 0;
 
-    //CONSIDER: THIS SHOULD REALLY BE CALLED 'LINESEGMENT CONSTRAINT'
     protected override void constrain() {
         if (constraintTarget.target == null) {
             return;
         }
 
-        //if (needToConfigure) {
-        //if (testConfig++ < 5) { //TEST : TODO erase this
-        //    configure();
-        //    return;
-        //}
-
-        Vector3 curDirection = poleDirection; // constraintTarget.altReference.position - constraintTarget.reference.position;
+        Vector3 curDirection = poleDirection; 
         Vector3 target = constraintTarget.target.position;
-        Vector3 nudge = constraintTarget.reference.position - prevTargetPosition; // constraintTarget.target.rotation.eulerAngles * testFactor; // Dot(constraintTarget.target.rotation.eulerAngles, curDirection.normalized) * .3f * constraintTarget.target.rotation.eulerAngles;
+        Vector3 nudge = constraintTarget.reference.position - prevTargetPosition;
 
         if (nudge.sqrMagnitude > 0f) {
             VectorXZ[] points = new VectorXZ[2];
             VectorXZ n = new VectorXZ(nudge);
 
             bool intersected = intersectionPoints(ref points, constraintTarget.reference.position, constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
-            BugLine.Instance.markPoint(points[intersectionIndex], 0);
-            if (intersected)
-            {
-                VectorXZ intersection = points[intersectionIndex];
-                target = constraintTarget.lineSegmentReference.closestPointOnSegment(intersection).vector3(target.y);
-            }
 
-            if (false && intersected) { 
-                bool zedOnSeg = constraintTarget.lineSegmentReference.isOnSegment(points[0]);
-                bool oneOneSeg = constraintTarget.lineSegmentReference.isOnSegment(points[1]);
-                if (zedOnSeg && oneOneSeg) { // uh-oh? TODO: figure definitive way of knowing
-                    // hack?
-                    float dist0 = (new VectorXZ(constraintTarget.altReference.position) - points[0]).magnitudeSquared;
-                    float dist1 = (new VectorXZ(constraintTarget.altReference.position) - points[1]).magnitudeSquared;
-                    if (dist0 < dist1) {
-                        target = pointOnLineSegment(points[0]).vector3(target.y);
-                    } else {
-                        target = pointOnLineSegment(points[1]).vector3(target.y);
-                    }
-                } else if (zedOnSeg) {
-                    target = pointOnLineSegment(points[0]).vector3(target.y);
-                } else if (oneOneSeg) {
-                    target = pointOnLineSegment(points[1]).vector3(target.y);
-                }
-
-                //// choose the point that 'nudge' points towards
-                //VectorXZ tXZ = new VectorXZ(target);
-                //float nudgeDotPole = constraintTarget.lineSegmentReference.distance.dot(n);
-                //float dirP0 = constraintTarget.lineSegmentReference.distance.dot(points[0] - tXZ);
-                //float dirP1 = constraintTarget.lineSegmentReference.distance.dot(points[1] - tXZ);
-
-                //if (SameSign(nudgeDotPole, dirP0)) {
-                //    target = pointOnLineSegment(points[0]).vector3(target.y);
-                //} else if (SameSign(nudgeDotPole, dirP1)) {
-                //    target = pointOnLineSegment(points[1]).vector3(target.y);
-                //} 
-            } else {
-                //float dot = constraintTarget.lineSegmentReference.normalized.dot(n) * testFactor;
-                //n = constraintTarget.lineSegmentReference.normalized * dot;
-                //target = target + n.vector3();
+            if (intersected) { 
+                target = constraintTarget.lineSegmentReference.closestPointOnSegment(points[intersectionIndex]).vector3(target.y);
             }
         }
         Vector3 nextDirection = target - constraintTarget.reference.position;
@@ -223,23 +177,13 @@ public class LinearActuatorConstraint : Constraint
         return VectorXZ.fakeNull;
     }
 
-    private static int tick = 0;
-
     private static bool intersectionPoints(ref VectorXZ[] points, Vector3 center, Vector3 pointOnCircle, LineSegment lineSegment) {
-
-        // p and q are x and y offsets for circle defined by r = pole-length, center = pinned down end of pole (reference.position)
+        // p and q are x and y offsets for circle defined by r = pole length, center = pinned down end of pole (a.k.a. reference.position)
         float p = center.x; 
         float q = center.z; 
         VectorXZ pole = new VectorXZ(pointOnCircle - center);
         float slope = lineSegment.slopeXZ;
         float intercept = lineSegment.interceptXZ;
-
-        if (tick++ > 30) {
-            tick = 0;
-            //BugLine.Instance.markPoint(new VectorXZ(constraintTarget.altReference.position), 2);
-            //BugLine.Instance.markPoint(new VectorXZ(constraintTarget.reference.position), 3);
-            BugLine.Instance.circle(center, pole.magnitude); // constraintTarget.reference.position, pole.magnitude);
-        }
 
         //coefficients
         float a = slope*slope + 1;

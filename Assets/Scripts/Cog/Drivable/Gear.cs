@@ -63,9 +63,13 @@ public class Gear : Drivable  {
     public override float driveScalar() {
         return _angleStep.deltaAngle / toothOffsetAngleRadians;
     }
-
+    public float testRackGearRo = 1f;
     public override Drive receiveDrive(Drive drive) {
-        transform.eulerAngles += new Vector3(0f, drive.amount * -1f * toothOffsetAngleRadians, 0f);
+        if (_driver is RackGear) {
+            transform.eulerAngles += new Vector3(0f, -Mathf.Rad2Deg * drive.amount * testRackGearRo / innerRadius, 0f);
+        } else {
+            transform.eulerAngles += new Vector3(0f, drive.amount * -1f * toothOffsetAngleRadians, 0f);
+        }
         return drive;
     }
 
@@ -149,7 +153,7 @@ public class Gear : Drivable  {
 
         // If this is an axel, get driven by it
         Axel axel = getAxel(other);
-        if (axel != null) {
+        if (axel != null && !axel.hasChild) {
             setSocketClosestToAxel(axel);
             return true;
         }

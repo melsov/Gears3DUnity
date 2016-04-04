@@ -298,7 +298,7 @@ public class SocketSet
     }
 
     protected ISocketSetContainer findSocketSetContainer(Transform other) {
-        return other.GetComponent<ISocketSetContainer>();
+        return other.GetComponentInChildren<ISocketSetContainer>();
     }
 
     protected ISocketSetContainer findSocketSetContainer(Collider other) {

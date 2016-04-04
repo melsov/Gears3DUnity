@@ -154,6 +154,9 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         gameObject.AddComponent<Highlighter>();
         GetComponent<Highlighter>().highlightColor = Color.green;
         _owner = GetComponentInParent<Drivable>();
+        if (GetComponent<Rigidbody>() != null) {
+            GetComponent<Rigidbody>().isKinematic = true; // OK for all pegs? This helps pegs not act weird when childed to LA pegboards
+        }
     }
 
     public void disconnect() {

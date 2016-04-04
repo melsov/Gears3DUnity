@@ -223,6 +223,30 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         }
         return false;
     }
+    public List<Drivable> drivableParents() {
+        return drivableParents(20);
+    }
+    private List<Drivable> drivableParents(int depth) {
+        if (depth <= 0) return null;
+        List<Drivable> result = new List<Drivable>();
+        foreach(Socket s in _pegboard.getBackendSocketSet().sockets) {
+            if(s.connectedDrivable() != null) {
+                result.Add(s.connectedDrivable());
+                List<Drivable> recur = s.connectedDrivable().drivableParents(--depth);
+                if (recur != null) {
+                    result.AddRange(recur);
+                }
+                return result;
+            }
+        }
+        return new List<Drivable>();
+    }
+    public T getDrivableParent<T>() {
+        foreach (Drivable d in drivableParents()) {
+            if (d is T) { return d.GetComponent<T>(); }
+        }
+        return default(T);
+    }
 
     public void suspendConnection() {
         vSuspendConnection();

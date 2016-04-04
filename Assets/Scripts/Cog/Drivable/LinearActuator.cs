@@ -17,6 +17,10 @@ public class LinearActuator : Drivable , IPegProxy {
         lineSegment.adjustedExtents += lineSegmentAdjustedExtents;
     }
 
+    public VectorXZ direction {
+        get { return lineSegment.normalized; }
+    }
+
     public override float driveScalar() {
         return 0f;
     }

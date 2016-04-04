@@ -4,17 +4,35 @@ using System.Collections;
 public class RackGear : Gear {
     protected LineSegment lineSegment;
     protected const float ToothBaseHeight = ToothDepth * 2.7f;
+
     protected VectorXZ basePosition;
+    protected VectorXZ baseDirection;
+    protected Transform anchor;
+
     protected float toothWidth { get { return toothOffset * 2f; } } //TODO: difference btwn toothWidth and toothOffest? why is there one?
-    protected VectorXZ xzPosition {
-        get { return new VectorXZ(transform.position); }
+
+    protected VectorXZ offset {
+        get { return (xzPosition - basePosition); }
     }
-    protected float offset {
-        get { return (xzPosition - basePosition).magnitude; }
+    protected float offsetDirection {
+        get {
+            float r = offset.dot(new VectorXZ(transform.rotation * Vector3.right));
+            if (r < 0f) return -1f;
+            return 1f;
+        }
+    }
+
+    protected void updateBasePosition() {
+        basePosition = xzPosition;
     }
     protected override void updateAngleStep() {
         if (!isDriven()) { return; }
-        _angleStep.update(offset);
+        
+        _angleStep.update(offset.magnitude * offsetDirection);
+    }
+    public override bool isDriven() {
+        if (base.isDriven()) { return true; }
+        return anchor != null;
     }
     protected Gear drivingGear {
         get {
@@ -31,8 +49,64 @@ public class RackGear : Gear {
         base.awake();
         lineSegment = GetComponent<LineSegment>();
     }
+
+    protected LinearActuator findConnectedLinearActuator(Collider other) {
+        Drivable d = other.GetComponentInParent<Drivable>();
+        if (d == null) { return null; }
+        return d.getDrivableParent<LinearActuator>();
+    }
+
+    protected VectorXZ direction {
+        get {
+            return new VectorXZ(transform.rotation * Vector3.right);
+        }
+    }
+
+    protected void rotateInDirection(VectorXZ dir, Transform pivot) {
+        if (!dir.sympatheticDirection(direction)) {
+            dir *= -1f;
+        }
+        transform.rotation.SetLookRotation(dir.vector3());
+    }
+
+    protected override bool vConnectTo(Collider other) {
+        if(base.vConnectTo(other)) {
+            return true;
+        }
+
+        Socket aSocket;
+        Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
+        if (peg != null) {
+            if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
+                LinearActuator la = findConnectedLinearActuator(other);
+                if (la == null) { print("la null"); return false; }
+                print("Got LA");
+                rotateInDirection(la.direction, peg.transform);
+                setSocketToPeg(aSocket, peg);
+                anchor = peg.transform;
+                basePosition = xzPosition;
+                return true;
+            }
+        }
+
+        return false;
+    }
+    protected override void vDisconnect() {
+        base.vDisconnect();
+        anchor = null;
+    }
+
+    protected override bool vMakeConnectionWithAfterCursorOverride(Collider other) {
+        if (isConnectedTo(other.transform)) {
+            return false;
+        }
+        if (!_pegboard.getBackendSocketSet().isConnected()) {
+            return vConnectTo(other);
+        }
+        return false;
+    }
     public override float driveScalar() {
-        return _angleStep.deltaAngle / toothWidth;
+        return _angleStep.deltaAngle; // / toothWidth;
     }
 
     public override Drive receiveDrive(Drive drive) {
