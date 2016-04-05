@@ -3,10 +3,8 @@ using System.Collections;
 
 public class LinearActuatorConstraint : Constraint
 {
-    public float testFactor = 1.2f;
     protected Vector3 prevTargetPosition = Vector3.zero;
     protected int intersectionIndex = -1;
-
     private bool needToConfigure = true;
 
     protected override void awake() {
@@ -37,19 +35,22 @@ public class LinearActuatorConstraint : Constraint
         if (constraintTarget.drivenReference == null ||  !(constraintTarget.drivenReference is LinearActuator)) {
             print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
         }
-        reignInLineSegment();
+        if(!reignInLineSegment()) {
+            return;
+        }
         chooseIntersectionIndex();
         extendLineSegment();
         needToConfigure = false;
     }
 
-    private void reignInLineSegment()
-    {
+    private bool reignInLineSegment() {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
+        if (gear == null) { return false; }
         VectorXZ gearCenter = new VectorXZ(gear.transform.position);
         float radius = (gearCenter.vector3() - constraintTarget.reference.position).magnitude;
         float poleDistance = new VectorXZ(poleDirection).magnitude;
         LinearActuator la = constraintTarget.lineSegmentReference.GetComponentInParent<LinearActuator>();
+        if (la == null) { return false; }
         foreach (VectorXZ direction in Angles.UnitVectors(36)) 
         {
             VectorXZ gearRim = gearCenter + direction * radius;
@@ -61,7 +62,7 @@ public class LinearActuatorConstraint : Constraint
                 la.transform.position += nudge.vector3();
             }
         }
-        
+        return true;
     }
 
     //private void adjustPosition() {
@@ -108,8 +109,7 @@ public class LinearActuatorConstraint : Constraint
         }
     }
 
-    private void extendLineSegment()
-    {
+    private void extendLineSegment() {
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
         VectorXZ gearCenter = new VectorXZ(gear.transform.position);
         float radius = (gearCenter.vector3() - constraintTarget.reference.position).magnitude;
@@ -143,11 +143,12 @@ public class LinearActuatorConstraint : Constraint
         return result;
     }
 
-    int testConfig = 0;
-
     protected override void constrain() {
         if (constraintTarget.target == null) {
             return;
+        }
+        if(needToConfigure) {
+            configure();
         }
 
         Vector3 curDirection = poleDirection; 

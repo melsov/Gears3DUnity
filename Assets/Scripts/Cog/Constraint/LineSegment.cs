@@ -96,17 +96,23 @@ public class LineSegment : MonoBehaviour {
 
     public void extendToAccommodate(VectorXZ p)
     {
-        p = closestPointOnLine(p);
-        if (isOnSegment(p)) { return; }
-        VectorXZ dif = p - startXZ;
-        if (dif.dot(distance) > 0f) { 
-            end.position = p.vector3(end.position.y);
-        } else { 
-            start.position = p.vector3(start.position.y);
-        }
+        try {
+            if (p == default(VectorXZ)) { return; }
+            p = closestPointOnLine(p);
+            if (isOnSegment(p)) { return; }
+            VectorXZ dif = p - startXZ;
+            if (dif.dot(distance) > 0f) {
+                end.position = p.vector3(end.position.y);
+            } else {
+                start.position = p.vector3(start.position.y);
+            }
 
-        adjustSides();
-        adjustedExtents();
+            adjustSides();
+            adjustedExtents();
+        } catch(System.NullReferenceException nre) {
+            Debug.LogError("caught null ref exception in extend to accommodate");
+            print("vec xz questionable? x: " + p.x + ", z: " + p.z);
+        }
     }
 
     public void resetExtents() {

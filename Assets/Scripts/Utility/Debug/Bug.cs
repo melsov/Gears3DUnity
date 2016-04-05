@@ -60,7 +60,7 @@ public class Bug : MonoBehaviour {
         EditorApplication.isPaused = true;
     }
 
-    public static string GetDrivableParentName(Transform transform) {
+    public static string GetCogParentName(Transform transform) {
         string result = "";
         foreach (Cog d in transform.GetComponentsInParent<Cog>()) {
             result += d.name + "_";
@@ -68,8 +68,15 @@ public class Bug : MonoBehaviour {
         return result;
     }
 
-    public static void printDrivableParentName(Transform t) { printDrivableParentName(t, ""); }
-    public static void printDrivableParentName(Transform t, string msg) {
-        print(msg + ": " + GetDrivableParentName(t));
+    public static void printDrivableParentName(Transform t) { printCogParentName(t, ""); }
+
+    internal static void bugIfNull(UnityEngine.Object t, string msg) {
+        if (t == null) {
+            print(msg);
+        }
+    }
+
+    public static void printCogParentName(Transform t, string msg) {
+        print(msg + ": " + GetCogParentName(t));
     }
 }

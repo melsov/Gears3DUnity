@@ -131,7 +131,7 @@ public class SaveManager : Singleton<SaveManager> {
         foreach(GameObject go in GameObject.FindObjectsOfType<GameObject>()) {
             if (go.GetComponent<Guid>() != null) {
                 foreach (IConstrainable constrainable in go.GetComponentsInChildren<IConstrainable>()) {
-                    print("found I contstrainable");
+                    print("found I contstrainable in game O: " + go.name );
                     constrainable.setupConstraint();
                 }
             }

@@ -46,8 +46,6 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         }
         set {
             if (value != null) {
-                //print("driving peg got a value");
-                //EditorApplication.isPaused = true;
                 _drivingPeg = value;
                 _drivingPeg.receiveChild(this);
             } else {
@@ -151,7 +149,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
     }
     public void storeConnectionData(ref List<byte[]> connectionData) {
         ConnectionData cd = new ConnectionData();
-        if (hasChildPeg()) {
+        if (hasChildPeg() && !(childPeg is Axel)) {
             cd.hasChildPeg = hasChildPeg();
             Guid connectedGuid = childPeg.GetComponent<Guid>();
             if (connectedGuid == null) {
@@ -159,7 +157,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
             }
             if (connectedGuid != null) {
                 cd.connectedGuid = connectedGuid.guid.ToString();
-            } else Debug.LogError("No connected guid for child peg: " + childPeg.name + " of socket: " + name);
+            } else Debug.LogError("No connected guid for child peg: " + childPeg.name + " of socket: " + name + " parent: " + Bug.GetCogParentName(childPeg.transform));
         }
         SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
     }
@@ -196,7 +194,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                 }
             }
         } catch (System.InvalidCastException ice) {
-            Debug.LogError("caught invalid cast exception for");
+            Debug.LogError("caught invalid cast exception for sock w parent " + transform.parent.parent.name);
         }
     }
 

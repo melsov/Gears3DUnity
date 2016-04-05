@@ -18,6 +18,10 @@ public class SaveLoad : Singleton<SaveLoad> {
         set { _filename = value; }
     }
 
+    protected void blockCursorInput(bool block) {
+        //Camera.main.GetComponent<CursorInput>().blocked = block;
+    }
+
     private List<Cog> allCogsInScene() {
         List<Cog> result = new List<Cog>();
         foreach (GameObject ga in GameObject.FindObjectsOfType<GameObject>()) {
@@ -29,6 +33,7 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void save() {
+        blockCursorInput(true);
         string doesntmatter = Application.dataPath + "/TempSaveFile";
         print(Application.persistentDataPath);
         Browser.Instance.SaveFile(doesntmatter, Application.persistentDataPath, handleSaveFile);
@@ -36,6 +41,7 @@ public class SaveLoad : Singleton<SaveLoad> {
 
     private void handleSaveFile(string filename) {
         SaveManager.Instance.SaveGame(filename);
+        blockCursorInput(false);
     }
 
     public void load() {
@@ -45,6 +51,7 @@ public class SaveLoad : Singleton<SaveLoad> {
     private void handleLoadFile(string filename) {
         newScene();
         SaveManager.Instance.LoadGame(filename);
+        blockCursorInput(false);
     }
     
 

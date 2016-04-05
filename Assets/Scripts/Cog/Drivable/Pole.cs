@@ -46,7 +46,7 @@ public class Pole : Drivable
         }
 
         //CASE B:
-        print("vMake connection after cursor override: other name: " + Bug.GetDrivableParentName(other.transform));
+        print("vMake connection after cursor override: other name: " + Bug.GetCogParentName(other.transform));
         
         Collider dOC = GetComponent<CursorAgent>().dragOverrideCollider;
         Handle handle = dOC.GetComponent<Handle>();
@@ -85,7 +85,7 @@ public class Pole : Drivable
     }
 
     private bool connectToBackendOf(SocketSet otherBackendSet, Socket frontSocket) {
-        Bug.bugAndPause("conn to bk end of other");
+        print("conn to bk end of other");
         // get a peg on backend of other
         Socket childSocket = otherBackendSet.getChildSocketWithParentPegClosestTo(frontSocket.transform.position, RotationMode.FREE_OR_FIXED); //CONSIDER: do we care about ro mode?
         if (childSocket != null) {

@@ -11,7 +11,7 @@ public class CursorInput : MonoBehaviour {
     public LineRenderer line;
 
     private CursorInteraction ci;
-    public Image itemProxyImage; // TODO: actually get from button
+    public Image itemProxyImage; 
     public Sprite putBackInInventoryIcon;
     private bool triggeredDragEnterScene;
     private bool ciDragEnterInventory;
@@ -19,6 +19,7 @@ public class CursorInput : MonoBehaviour {
     private int layerMask;
     private int dragOverrideMask;
     private InstantiateButton ib;
+    public bool blocked;
 
     // Use this for initialization
     void Awake () {
@@ -31,6 +32,7 @@ public class CursorInput : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (blocked) { return; }
         if (Input.GetButtonDown("Fire1")) {
             ib = getInstantiateButton();
             if (ib != null) {
@@ -53,9 +55,8 @@ public class CursorInput : MonoBehaviour {
             }
             if (ci != null) {
                 if (pointerOverInventory() && !ci.isOverridingDrag(new VectorXZ(mousePositionOnRootPegboard))) {
-                    if (!ciDragEnterInventory) { //TODO: and not drag override
+                    if (!ciDragEnterInventory) { 
                         ciDragEnterInventory = true;
-                        //TODO: hide the ci
                         setRemoveFromSceneProxyImage();
                     }
                     positionProxyImage();

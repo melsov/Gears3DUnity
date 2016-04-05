@@ -67,8 +67,10 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     public void receiveChild(Socket socket) {
+        Bug.bugIfNull(socket, "socket is null");
         if (pegIsParentRotationMode == RotationMode.FREE_ONLY || socket.socketIsChildRotationMode == RotationMode.FREE_ONLY) {
             TransformUtil.AlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
+            Bug.bugIfNull(getHinge(), "hinge null");
             getHinge().connect(socket.parentContainer.getRigidbodyWithGravity());
             getHinge().getHingeJoint().connectedAnchor = socket.transform.localPosition;
         } else {
@@ -233,7 +235,9 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
 
     public void setupConstraint() {
         if (_parentSocket != null && _parentSocket.Target != null && isChildConstraint != null) {
+            Debug.LogError("setting up is child constraint: " + Bug.GetCogParentName(transform));
             Socket socket = (Socket)_parentSocket.Target;
+            Debug.LogError("using socket: " + Bug.GetCogParentName(socket.transform));
             isChildConstraint.constraintTarget = socket.getConstraintTargetForChildPegConstraint();
             isChildConstraint.constraintTarget.parentConstraint = socket.parentContainer.getTransform().GetComponent<Drivable>().parentConstraintFor(isChildConstraint, transform);
         }
@@ -260,6 +264,9 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
 
     public void triggerExitDuringDrag(Collider other) {
     }
+    public bool isAutoConnectPeg() {
+        return hasChild && child.autoconnectPeg == this;
+    }
 
     [System.Serializable]
     class ConnectionData
@@ -270,7 +277,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
     public void storeConnectionData(ref List<byte[]> connectionData) {
         ConnectionData cd = new ConnectionData();
-        if (hasChild) {
+        if (hasChild && !isAutoConnectPeg()) {
             cd.hasChild = hasChild;
             Transform connectedT = child.parentContainer.getTransform();
             Guid connectedGuid = connectedT.GetComponent<Guid>();
@@ -288,7 +295,10 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         ConnectionData cd;
         if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
             if (cd.hasChild) {
-                if (cd.connectedGuid == null || string.IsNullOrEmpty(cd.connectedGuid)) { return; }
+                if (cd.connectedGuid == null || string.IsNullOrEmpty(cd.connectedGuid)) {
+                    Debug.LogError("conn GUID null for: " + name + " cog parent: " + Bug.GetCogParentName(transform));
+                    return;
+                }
                 GameObject connectedGO = SaveManager.Instance.FindGameObjectByGuid(cd.connectedGuid);
                 if (connectedGO != null)
                     print("found game object for guid: " + connectedGO.name);

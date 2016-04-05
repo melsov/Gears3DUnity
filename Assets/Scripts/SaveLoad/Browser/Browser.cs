@@ -14,7 +14,15 @@ public class Browser : Singleton<Browser>
     public int minWidth = 50;
     public GUISkin skin;
 
-    bool WindowOpen = false;
+    bool _WindowOpen = false;
+    bool WindowOpen {
+        get {
+            return _WindowOpen;  
+        } set {
+            blockCursorInput(value);
+            _WindowOpen = value;
+        }
+    }
     WindowType WinType;
     String MainFolder = "";
     String FileToSave = "";
@@ -54,15 +62,9 @@ public class Browser : Singleton<Browser>
             NameOfFileToSave = value;
         }
     }
-
-    void Awake() {
-        //projectNameInput = GameObject.Find("ProjectNameInput").GetComponent<InputField>();
-        //UnityEngine.Assertions.Assert.IsTrue(projectNameInput != null, "no project input field?? (Browser.cs)");
-        //NameOfFileToSave = projectNameInput.text;
-        //if (NameOfFileToSave == "") {
-        //    NameOfFileToSave = projectNameInput.placeholder.GetComponentInChildren<Text>().text;
-        //}
-
+    
+    protected void blockCursorInput(bool block) {
+        Camera.main.GetComponent<CursorInput>().blocked = block;
     }
 
     public void OpenFile(String mainFolder, HandleOpenFile _handleOpenFile) {
@@ -70,7 +72,7 @@ public class Browser : Singleton<Browser>
         if (Directory.Exists(mainFolder)) {
             WindowOpen = true;
             WinType = WindowType.Open;
-            DragStat.Dragging = false;    // Ensure nothing is being draged.
+            DragStat.Dragging = false; // Ensure nothing is being draged.
 
             MainFolder = mainFolder; // example: Application.dataPath/Saves;
             GetAllSubDirectoriesAndFiles(MainFolder);
@@ -95,7 +97,7 @@ public class Browser : Singleton<Browser>
         }
         if (Directory.Exists(mainFolder)) {
             if (File.Exists(FilePath) || Directory.Exists(FilePath)) {
-            } else Debug.LogError("I need a path for a temporary save file that actually exists! This one doesn't: \n" + FilePath);
+            } else print("I need a path for a temporary save file that actually exists! This one doesn't: \n" + FilePath);
             WindowOpen = true;
             WinType = WindowType.Save;
             DragStat.Dragging = false;    // Ensure nothing is being draged.
@@ -110,7 +112,7 @@ public class Browser : Singleton<Browser>
             AddPath(MainFolder, 0);
         } else {
             if (File.Exists(mainFolder)) Debug.LogError("I need a main directory, not a file!");
-            else Debug.LogError("I need a path for a main directory that actually exists!");
+            else print("I need a path for a main directory that actually exists!");
         }
     }
 
