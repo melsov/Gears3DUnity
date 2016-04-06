@@ -8,6 +8,8 @@ public class LinearActuator : Drivable , IPegProxy {
     // TOOD: make LA's slider length settable
 
     protected LineSegment lineSegment;
+    public LineSegment getLineSegment() { return lineSegment; }
+
     protected HandleSet handleSet;
 
     protected override void awake() {
@@ -122,6 +124,7 @@ public class LinearActuator : Drivable , IPegProxy {
         cc.height = Mathf.Abs(lineSegment.end.localPosition.x - lineSegment.start.localPosition.x);
         cc.center = new Vector3((lineSegment.start.localPosition.x + lineSegment.end.localPosition.x) / 2f, cc.center.y, cc.center.z);
     }
+
 
 }
 

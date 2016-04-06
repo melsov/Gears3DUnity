@@ -153,6 +153,11 @@ public class SocketSet
         }
         return result;
     }
+    public bool hasUniqueParentPeg() {
+        List<Socket> socs = childSocketsWithParents();
+        if (socs.Count == 1) return true;
+        return false;
+    }
 
     public virtual Socket openBackendSocketOnOtherClosestToOpenPegOnThis(Transform other, out Peg closestPeg) {
         Socket aSocket = null;

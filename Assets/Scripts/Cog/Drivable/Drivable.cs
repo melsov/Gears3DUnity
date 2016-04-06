@@ -290,6 +290,15 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     protected virtual void updateCursorRotationPivot(Collider dragOverrideCollider) {
         if (_cursorRotationPivot == null) {
             _cursorRotationPivot = this.transform;
+
+            //doomed? since maybe we disconnect before this?
+            if (_pegboard.getBackendSocketSet().hasUniqueParentPeg()) {
+                Peg peg = _pegboard.getBackendSocketSet().childSocketsWithParents()[0].drivingPeg;
+                if (peg != null) {
+                    _cursorRotationPivot = peg.transform;
+                }
+            }
+
             HandleSet handleSet = dragOverrideCollider.GetComponentInParent<HandleSet>();
             if (handleSet == null) {
                 return;

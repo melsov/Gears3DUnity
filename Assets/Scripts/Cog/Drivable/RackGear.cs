@@ -66,7 +66,7 @@ public class RackGear : Gear {
         if (!dir.sympatheticDirection(direction)) {
             dir *= -1f;
         }
-        transform.rotation.SetLookRotation(dir.vector3());
+        transform.RotateAround(pivot.position, Vector3.up, Quaternion.FromToRotation(direction.vector3(), dir.vector3()).eulerAngles.y); // .SetLookRotation(dir.vector3());
     }
 
     protected override bool vConnectTo(Collider other) {
@@ -80,7 +80,6 @@ public class RackGear : Gear {
             if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
                 LinearActuator la = findConnectedLinearActuator(other);
                 if (la == null) { print("la null"); return false; }
-                print("Got LA");
                 rotateInDirection(la.direction, peg.transform);
                 setSocketToPeg(aSocket, peg);
                 anchor = peg.transform;

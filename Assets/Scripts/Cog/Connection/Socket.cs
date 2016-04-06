@@ -189,6 +189,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                         }
                     }
                     if (peg != null) {
+                        print("restore soc " + Bug.GetCogParentName(transform) + " got peg: " + Bug.GetCogParentName(peg.transform));
                         peg.beChildOf(this, true);
                     }
                 }

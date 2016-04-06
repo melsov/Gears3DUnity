@@ -27,7 +27,6 @@ public class Pole : Drivable
                 return true;
             }
         }
-        
         return false;
     }
 
@@ -147,7 +146,7 @@ public class Pole : Drivable
         }
         LineSegment ls = null;
         if (childTransform.GetComponentInParent<LinearActuator>() != null) {
-            ls = childTransform.GetComponentInParent<LinearActuator>().GetComponentInChildren<LineSegment>();
+            ls = childTransform.GetComponentInParent<LinearActuator>().getLineSegment();
             laConstraint.constraintTarget.lineSegmentReference = ls;
         }
         laConstraint.constraintTarget.target = childTransform;

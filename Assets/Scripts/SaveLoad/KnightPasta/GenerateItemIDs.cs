@@ -8,6 +8,7 @@ public class GenerateItemIDs : ScriptableWizard {
     static void Generate() {
         ItemID[] prefabs = Resources.LoadAll<ItemID>("Prefabs/Cog");
         HashSet<int> ids = new HashSet<int>();
+        Debug.Log("hi " + prefabs.Length + ".");
         foreach(ItemID itemID in prefabs) {
             int increment = 1;
             while(ids.Contains(itemID.id)) {
@@ -15,15 +16,18 @@ public class GenerateItemIDs : ScriptableWizard {
                 if (increment == 1) {
                     index = 0;
                 }
-                itemID.updateIDWith("" + (increment++) + itemID.itemID.Substring(index));
+                string idstr = "" + (increment++) + itemID.itemID.Substring(index);
+                itemID.updateIDWith(idstr);
             }
+            Debug.LogError(itemID.id);
+            UnityEngine.Assertions.Assert.IsTrue(!ids.Contains(itemID.id));
             ids.Add(itemID.id);
             GUI.changed = true;
             EditorUtility.SetDirty( itemID.gameObject);
         }
     }
 
-    [MenuItem("Custom/Add Guids ItemIDs to Prefabs")]
+    [MenuItem("Custom/Add Gui ItemIDs Manifests to Prefabs")]
     static void AddGuidAndItemId() {
         MonoBehaviour[] prefabs = Resources.LoadAll<MonoBehaviour>("Prefabs/Cog");
         foreach(MonoBehaviour mb in prefabs) {
@@ -33,16 +37,6 @@ public class GenerateItemIDs : ScriptableWizard {
             if (mb.GetComponent<Guid>() == null) {
                 mb.gameObject.AddComponent<Guid>();
             }
-            GUI.changed = true;
-            EditorUtility.SetDirty(mb.gameObject);
-        }
-    }
-
-
-    [MenuItem("Custom/Add Manifests to Prefabs")]
-    static void AddManifestToPrefabs() {
-        MonoBehaviour[] prefabs = Resources.LoadAll<MonoBehaviour>("Prefabs/Cog");
-        foreach(MonoBehaviour mb in prefabs) {
             if (mb.GetComponent<Manifest>() == null) {
                 mb.gameObject.AddComponent<Manifest>();
             }
@@ -50,6 +44,16 @@ public class GenerateItemIDs : ScriptableWizard {
             EditorUtility.SetDirty(mb.gameObject);
         }
     }
+
+
+    //[MenuItem("Custom/Add Manifests to Prefabs")]
+    //static void AddManifestToPrefabs() {
+    //    MonoBehaviour[] prefabs = Resources.LoadAll<MonoBehaviour>("Prefabs/Cog");
+    //    foreach(MonoBehaviour mb in prefabs) {
+    //        GUI.changed = true;
+    //        EditorUtility.SetDirty(mb.gameObject);
+    //    }
+    //}
 
     [MenuItem("Custom/Test Guid")]
     static void TestGuid() {

@@ -235,9 +235,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
 
     public void setupConstraint() {
         if (_parentSocket != null && _parentSocket.Target != null && isChildConstraint != null) {
-            Debug.LogError("setting up is child constraint: " + Bug.GetCogParentName(transform));
             Socket socket = (Socket)_parentSocket.Target;
-            Debug.LogError("using socket: " + Bug.GetCogParentName(socket.transform));
             isChildConstraint.constraintTarget = socket.getConstraintTargetForChildPegConstraint();
             isChildConstraint.constraintTarget.parentConstraint = socket.parentContainer.getTransform().GetComponent<Drivable>().parentConstraintFor(isChildConstraint, transform);
         }

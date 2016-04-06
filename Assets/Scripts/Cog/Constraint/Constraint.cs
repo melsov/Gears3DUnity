@@ -48,11 +48,13 @@ public struct ConstraintTarget
     public Transform altReference;
     public LineSegment lineSegmentReference;
     public Constraint parentConstraint;
-
     private Drivable _driverReference;
     public Drivable driverReference {
         get {
             if (_driverReference == null) {
+                if (reference == null) {
+                    MonoBehaviour.print("null conTar reference. can't get driver ref"); return null;
+                }
                 Socket s = reference.GetComponent<Socket>();
                 if (s == null) { MonoBehaviour.print("ref socket null"); return null; }
                 Peg dPeg = s.drivingPeg;
@@ -89,5 +91,22 @@ public struct ConstraintTarget
 
     public bool isPsuedoNull() {
         return target == null;
+    }
+
+    public string debug() {
+        string result = "";
+        result += infoFor(target, "target: ");
+        result += infoFor(reference, "ref: ");
+        result += infoFor(altReference, "alt ref: ");
+        if (driverReference != null)
+            result += infoFor(driverReference.transform, "driver ref: ");
+        if (_drivenReference != null)
+            result += infoFor(_drivenReference.transform, "driven ref: ");
+        if (lineSegmentReference != null)
+            result += infoFor(lineSegmentReference.transform, "line seg ref: ");
+        return result;
+    }
+    private string infoFor(Transform t, string msg) {
+        return msg + (t== null ? "null" : t.name) + " of " + Bug.GetCogParentName(t) + "\n";
     }
 }

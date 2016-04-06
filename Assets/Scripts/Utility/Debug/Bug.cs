@@ -61,6 +61,7 @@ public class Bug : MonoBehaviour {
     }
 
     public static string GetCogParentName(Transform transform) {
+        if (transform == null) { return "null transform"; }
         string result = "";
         foreach (Cog d in transform.GetComponentsInParent<Cog>()) {
             result += d.name + "_";
