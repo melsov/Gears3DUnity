@@ -16,6 +16,7 @@ public class Funnel : Duct , IGameSerializable {
         pullToCenter(other);
     }
 
+    //TODO: make funnel actually pull to center
     private void pullToCenter(Collider other) {
         Vector3 towards = transform.position - other.transform.position;
         Rigidbody rb = other.GetComponent<Rigidbody>();
