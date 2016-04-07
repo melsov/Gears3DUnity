@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class BugLine : Singleton<BugLine> {
 
@@ -14,6 +15,7 @@ public class BugLine : Singleton<BugLine> {
     protected Material lineMaterial;
 
     private Dictionary<VecPair, GameObject> lines;
+    private bool drawOnKeyPress;
 
     void Awake() {
         colors = new Color[] {
@@ -35,8 +37,22 @@ public class BugLine : Singleton<BugLine> {
         markers = new List<Transform>();
     }
 
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.B)) {
+            drawOnKeyPress = true;
+        }
+    }
+
     private Color colorForIndex(int i) {
         return colors[i % colors.Length];
+    }
+
+    public void drawFromOnKey(Vector3 position, Vector3 direction) {
+        if (drawOnKeyPress) {
+            print("drawfrom on key");
+            drawOnKeyPress = false;
+            drawFrom(position, direction);
+        }
     }
 
     public void markPoint(VectorXZ point, int pointIndex) {

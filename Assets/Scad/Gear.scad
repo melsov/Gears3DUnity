@@ -6,14 +6,14 @@ TOOTH_MODE_SQUARE = 2;
 tMode = 0; // TOOTH_MODE_HULL;
 scale_ = 1;
 toothWidth = .25;
-toothCount = 16;
+toothCount = 8;
 height = .5;
 toothDepth = .25;
 
 //peg();
 //Example
-sawTooth(toothCount, toothWidth, height, toothDepth, toothDepth * 2.7, tMode, scale_);
-//gearT(toothCount, toothWidth, height, toothDepth, tMode, scale_);
+//sawTooth(toothCount, toothWidth, height, toothDepth, toothDepth * 2.7, tMode, scale_);
+gearT(toothCount, toothWidth, height, toothDepth, tMode, scale_);
 
 //Generates a gear mesh
 //Radius scales with tooth width (twidth) and toothCount

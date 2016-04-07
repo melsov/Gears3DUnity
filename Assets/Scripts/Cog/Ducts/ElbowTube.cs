@@ -4,6 +4,7 @@ using System.Collections;
 public class ElbowTube : Tube {
 
     protected Transform center;
+
     protected override void awake() {
         base.awake();
         center = TransformUtil.FindChildWithName(transform, "Center");
@@ -11,7 +12,7 @@ public class ElbowTube : Tube {
 
     protected override Vector3 down {
         get {
-            return transform.rotation * (Vector3.forward * -1f);
+            return transform.rotation * EnvironmentSettings.gravityDirection;
         }
     }
 
@@ -20,17 +21,17 @@ public class ElbowTube : Tube {
     }
 
     protected Vector3 outOfExit {
-        //get { return exit.transform.rotation * (Vector3.up * 1f); }
-        get { return exit.transform.rotation * (Vector3.up * exitLeft); }
+        get { return exit.transform.rotation * (Vector3.up * 1f); }
     }
 
-    protected float exitLeft {
-        get {
-            float sign = Mathf.Sign(transform.position.x - exit.transform.position.x);
-            if (Mathf.Abs(sign) < Mathf.Epsilon) { return 1f; }
-            return sign * -1f;
-        }
-    }
+    //protected float exitLeft {
+    //    get {
+    //        return isExitLeft ? 1f : -1f;
+    //        //float sign = Mathf.Sign(transform.position.x - exit.transform.position.x);
+    //        //if (Mathf.Abs(sign) < Mathf.Epsilon) { return 1f; }
+    //        //return sign * -1f;
+    //    }
+    //}
     
     protected Vector3 centerToEntrance {
         get { return entrance.transform.position - center.position; } // transform.position; }

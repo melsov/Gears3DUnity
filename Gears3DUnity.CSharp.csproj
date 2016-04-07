@@ -143,6 +143,7 @@
     <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
     <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
     <Compile Include="Assets\Scripts\Interaction\CursorInteraction.cs" />
+    <Compile Include="Assets\Scripts\Interaction\GenericCursorAgentClient.cs" />
     <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />

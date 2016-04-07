@@ -19,7 +19,7 @@ public class Tube : Duct {
     }
 
     protected virtual Vector3 down {
-        get { return transform.rotation * (Vector3.up * -1f); }
+        get { return transform.rotation * EnvironmentSettings.gravityDirection; }
     }
 
     private Vector3 normal() {
@@ -57,8 +57,6 @@ public class Tube : Duct {
         return Vector3.Dot(rb.velocity, down) > 0f;
     }
 
-
-//TODO: either way tubes
     protected virtual Vector3 isEntering(Transform t) {
         Vector3 towards, reverse, n, exitward;
         if (closerToEntrance(t)) {
