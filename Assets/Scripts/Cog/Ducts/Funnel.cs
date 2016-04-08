@@ -27,6 +27,7 @@ public class Funnel : Duct , IGameSerializable {
             rb.velocity = Vector3.Lerp(transform.rotation * EnvironmentSettings.gravityDirection, rb.velocity.normalized, .5f) * rb.velocity.magnitude * .95f;
         }
     }
+    
 
     #region serialize
     [System.Serializable]

@@ -7,15 +7,20 @@ public class Tube : Duct {
     protected Transform entrance;
     protected Transform exit;
     protected HashSet<Rigidbody> occupants;
+    protected float width;
 
     void Awake() {
         awake();
-        occupants = new HashSet<Rigidbody>();
     }
 
     protected virtual void awake() {
+        occupants = new HashSet<Rigidbody>();
         entrance = GetComponentInChildren<TubeEntrance>().transform;
         exit = GetComponentInChildren<TubeExit>().transform;
+        CapsuleCollider cc = GetComponent<CapsuleCollider>();
+        if (cc != null) {
+            width = cc.radius * 2f;
+        }
     }
 
     protected virtual Vector3 down {
@@ -26,7 +31,7 @@ public class Tube : Duct {
         return new VectorXZ(down).normal.vector3();
     }
 
-    private Vector3 awayFromEntrance {
+    protected Vector3 awayFromEntrance {
         get { return entrance.position - exit.transform.position; }
     }
     private Vector3 awayFromExit {
@@ -53,29 +58,27 @@ public class Tube : Duct {
         return false;
     }
     
-    private bool movingTowardsExit(Rigidbody rb) {
+    protected virtual bool movingTowardsExit(Rigidbody rb) {
         return Vector3.Dot(rb.velocity, down) > 0f;
     }
 
     protected virtual Vector3 isEntering(Transform t) {
         Vector3 towards, reverse, n, exitward;
+        n = normal();
         if (closerToEntrance(t)) {
             towards = entrance.position - t.position;
             reverse = awayFromEntrance;
-            n = normal();
             exitward = down;
         } else {
             towards = exit.position - t.position;
             reverse = awayFromExit;
-            n = normal();
             exitward = down * -1;
         }
         if(towards.sqrMagnitude > .1f && Vector3.Dot(reverse, towards) < 0f) {
-            n = normal();
             if (Vector3.Dot(towards, n) < 0f) {
                 n *= -1f;
             }
-            n = Vector3.Lerp(exitward, n, towards.magnitude * .5f);
+            n = Vector3.Lerp(exitward, n, towards.magnitude / (width * .5f));
             return n;
         }
         return Vector3.zero;

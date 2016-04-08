@@ -8,6 +8,7 @@ public class EnvironmentSettings : MonoBehaviour {
     }
     public static float gravityAmount = 9.8f;
     public static Vector3 towardsCameraDirection = new Vector3(0f, 1f, 0f);
+    public static Vector3 right = new Vector3(1f, 0f, 0f);
 
     void Awake() {
         Physics.gravity = gravityDirection.normalized * gravityAmount;
