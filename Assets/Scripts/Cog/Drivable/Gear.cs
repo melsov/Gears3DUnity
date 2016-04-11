@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEditor;
+//using UnityEditor;
 using System.Collections;
 using System;
 using System.Collections.Generic;
@@ -63,10 +63,10 @@ public class Gear : Drivable  {
     public override float driveScalar() {
         return _angleStep.deltaAngle / toothOffsetAngleRadians;
     }
-    public float testRackGearRo = 1f;
+
     public override Drive receiveDrive(Drive drive) {
         if (_driver is RackGear) {
-            transform.eulerAngles += new Vector3(0f, -Mathf.Rad2Deg * drive.amount * testRackGearRo / innerRadius, 0f);
+            transform.eulerAngles += new Vector3(0f, -Mathf.Rad2Deg * drive.amount / innerRadius, 0f);
         } else {
             transform.eulerAngles += new Vector3(0f, drive.amount * -1f * toothOffsetAngleRadians, 0f);
         }
@@ -147,28 +147,37 @@ public class Gear : Drivable  {
 
     protected override bool vConnectTo(Collider other) {
         if (isDriven()) {
+            print("is driven already");
             return false;
         }
-        if (isConnectedTo(other.transform)) { return false; }
+        if (isConnectedTo(other.transform)) {
+            print("is connected to " + other.name + " already");
+            return false;
+        }
 
         // If this is an axel, get driven by it
         Axel axel = getAxel(other);
         if (axel != null && !axel.hasChild) {
+            print("axel not null");
             setSocketClosestToAxel(axel);
             return true;
         }
         if (!isInConnectionRange(other)) {
+            print("connection not in range");
             return false;
         }
 
         // Otherwise, if this is a gear, get driven by it
         Gear gear = other.GetComponent<Gear>(); 
         if (gear != null && gear is Drivable) {
+            print("conn to gear: " + gear.name);
             _driver = gear;
             gear.addDrivable(this);
             positionRelativeTo(gear);
+            AudioManager.Instance.play(this, true);
             return true;
         }
+        print("gear wasn't drivabe??");
         return false;
     }
 

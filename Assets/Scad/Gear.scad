@@ -6,7 +6,7 @@ TOOTH_MODE_SQUARE = 2;
 tMode = 0; // TOOTH_MODE_HULL;
 scale_ = 1;
 toothWidth = .25;
-toothCount = 8;
+toothCount = 24;
 height = .5;
 toothDepth = .25;
 

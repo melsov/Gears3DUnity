@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Gears1.unity
+- path: Assets/Gears_start.unity
   isLoaded: 1
   isActive: 1

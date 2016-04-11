@@ -70,7 +70,9 @@ public class RackGear : Gear {
     }
 
     protected override bool vConnectTo(Collider other) {
+        print("Rack gear vConnect");
         if(base.vConnectTo(other)) {
+            print("base connect");
             return true;
         }
 
@@ -82,14 +84,21 @@ public class RackGear : Gear {
                 if (la == null) { print("la null"); return false; }
                 rotateInDirection(la.direction, peg.transform);
                 setSocketToPeg(aSocket, peg);
-                anchor = peg.transform;
-                basePosition = xzPosition;
+                //anchor = peg.transform;
+                //basePosition = xzPosition;
                 return true;
             }
         }
 
         return false;
     }
+
+    protected override void onSocketToParentPeg(Socket socket) {
+        base.onSocketToParentPeg(socket);
+        anchor = socket.drivingPeg.transform;
+        basePosition = xzPosition;
+    }
+
     protected override void vDisconnect() {
         base.vDisconnect();
         anchor = null;

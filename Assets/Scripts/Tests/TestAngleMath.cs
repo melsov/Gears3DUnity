@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
+
 using UnityEngine.Assertions;
 using System.Collections;
 
@@ -44,3 +46,4 @@ public class TestAngleMath : ScriptableWizard {
     }
 
 }
+#endif

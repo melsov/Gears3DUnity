@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System.Collections.Generic;
 
 public abstract class Socket : MonoBehaviour, IRestoreConnection {
@@ -39,6 +41,8 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         return parentContainer.getTransform().GetComponent<Drivable>();
     }
 
+    public delegate void SocketToParentPeg(Socket socket);
+    public SocketToParentPeg socketToParentPeg;
     private Peg _drivingPeg;
     public Peg drivingPeg {
         get {
@@ -48,6 +52,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
             if (value != null) {
                 _drivingPeg = value;
                 _drivingPeg.receiveChild(this);
+                socketToParentPeg(this);
             } else {
                 if (_drivingPeg != null) {
                     _drivingPeg.releaseChild(this);

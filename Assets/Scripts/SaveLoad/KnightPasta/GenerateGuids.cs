@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
 
 public class GenerateGuids : ScriptableWizard
@@ -21,3 +22,4 @@ public class GenerateGuids : ScriptableWizard
 	//	}
 	//}
 }
+#endif

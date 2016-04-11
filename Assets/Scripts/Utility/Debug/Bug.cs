@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using System;
 
 public class Bug : MonoBehaviour {
@@ -23,7 +25,9 @@ public class Bug : MonoBehaviour {
     public static void assertPause(bool v, string msg) {
         if (!v) {
             Debug.LogError(msg);
+#if UNITY_EDITOR
             EditorApplication.isPaused = true;
+#endif
         }
     }
 
@@ -57,7 +61,9 @@ public class Bug : MonoBehaviour {
 
     public static void bugAndPause(string s) {
         Debug.LogError(s);
+#if UNITY_EDITOR
         EditorApplication.isPaused = true;
+#endif
     }
 
     public static string GetCogParentName(Transform transform) {

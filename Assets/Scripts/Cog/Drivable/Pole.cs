@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using UnityEngine.Assertions;
 using System.Collections.Generic;
-using UnityEditor;
+//using UnityEditor;
 
 //TODO: connectTo method will apply for any free-rotatable drivable
 // make class FreeRotatableDrivabe

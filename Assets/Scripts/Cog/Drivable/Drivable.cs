@@ -48,6 +48,12 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             gameObject.AddComponent<Highlighter>();
         }
         Pause.Instance.onPause += pause;
+        setupSocketDelegates();
+    }
+    private void setupSocketDelegates() {
+        foreach(Socket s in _pegboard.getBackendSocketSet().sockets) {
+            s.socketToParentPeg = onSocketToParentPeg;
+        }
     }
 
     protected virtual void pause(bool isPaused) {
@@ -108,6 +114,10 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         socket.drivingPeg = peg;
     }
 
+    protected virtual void onSocketToParentPeg(Socket socket) {
+
+    }
+
     public virtual void addDrivable(Drivable _drivable) {
         if (drivables.Contains(_drivable)) { print("already contains drivable: " + _drivable.name); }
         if (!drivables.Contains(_drivable) && _drivable != this)
@@ -138,7 +148,15 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             _driver.removeDrivable(this);
         disconnectFromDriver();
         disconnectSockets();
+        //disconnectDrivens(); //WANT
         transform.SetParent(null);
+    }
+
+    protected virtual void disconnectDrivens() {
+        foreach (Drivable d in drivables) {
+            d.disconnectFromDriver();
+        }
+        drivables.RemoveAll(delegate (Drivable d) { return true; });
     }
 
     protected virtual void disconnectSockets() {
