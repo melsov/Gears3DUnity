@@ -12,7 +12,6 @@ public class Dispenser : Drivable {
     protected float timer;
     protected bool hasBuiltInButton;
 
-    // Use this for initialization
     protected override void awake() {
         base.awake();
         ControllerAddOn cao = GetComponentInChildren<ControllerAddOn>();

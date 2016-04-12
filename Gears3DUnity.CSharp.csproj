@@ -106,9 +106,12 @@
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearActuatorConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
+    <Compile Include="Assets\Scripts\Cog\Dispensable\Anvil.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Combinable.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
+    <Compile Include="Assets\Scripts\Cog\Dispensable\RedGem.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Rock.cs" />
+    <Compile Include="Assets\Scripts\Cog\Dispensable\Turnip.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Axel.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Bopper.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Catapult.cs" />
@@ -190,6 +193,8 @@
     <None Include="Assets\Audio\ClassicGuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\GuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
+    <None Include="Assets\Models\broccoli\broccoli\EULA.txt" />
+    <None Include="Assets\Models\broccoli\broccoli\Info.txt" />
     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
     <None Include="Assets\TSF\Shaders\TSF.shader" />
     <None Include="Assets\TSF\Shaders\TSFOutline.shader" />

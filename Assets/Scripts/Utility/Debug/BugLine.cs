@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+
+
 public class BugLine : Singleton<BugLine> {
 
     protected BugLine() { }
@@ -89,6 +91,7 @@ public class BugLine : Singleton<BugLine> {
         createAndDraw(origin, destination, null);
     }
     private void createAndDraw(Vector3 origin, Vector3 destination, LineRenderer lr) {
+#if UNITY_EDITOR
         VecPair vp = new VecPair(origin, destination);
         if (lines.ContainsKey(vp)) {
             return;
@@ -106,9 +109,11 @@ public class BugLine : Singleton<BugLine> {
         lr.SetWidth(.1f, .01f);
         line.transform.SetParent(transform);
         lines.Add(vp, line);
+#endif
     }
 
     public void circle(Vector3 origin, float radius) {
+#if UNITY_EDITOR
         float sections = vertices - 1;
         float wedge = Mathf.PI * 2 / sections;
         Vector3 next;
@@ -117,6 +122,7 @@ public class BugLine : Singleton<BugLine> {
             next = origin + new Vector3(radius * Mathf.Cos(angle), 0f, radius * Mathf.Sin(angle));
             lineRenderer.SetPosition(i, next);
         }
+#endif
     }
 
     public void clear() {

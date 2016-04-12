@@ -76,6 +76,8 @@
     <None Include="Assets\Audio\ClassicGuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\GuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
+    <None Include="Assets\Models\broccoli\broccoli\EULA.txt" />
+    <None Include="Assets\Models\broccoli\broccoli\Info.txt" />
     <None Include="Assets\Standard Assets\Skyboxes\_skybox info.txt" />
     <None Include="Assets\TSF\Shaders\TSF.shader" />
     <None Include="Assets\TSF\Shaders\TSFOutline.shader" />

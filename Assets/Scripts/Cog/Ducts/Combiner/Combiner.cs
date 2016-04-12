@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 //TODO: save / restore combiner
+//TODO: score keeper: items created adds points
 public class Combiner : Drivable {
 
     public Transform outTube;

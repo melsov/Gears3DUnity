@@ -14,9 +14,11 @@ public class Inventory : Singleton<Inventory> {
     public RectTransform categorySelectPanel;
     public Button categorySelectButtonPrefab;
     protected CursorInput cursorInput;
-    public Transform root;
 
     private List<Transform> sceneObjects = new List<Transform>();
+
+    public ScrollRect itemScrollRect;
+//TODO: force horiz scroll to turn off
 
     protected Inventory() { }
 
@@ -56,6 +58,7 @@ public class Inventory : Singleton<Inventory> {
         RectTransform panel = category.getPanel();
         panel.gameObject.SetActive(true);
         panel.transform.SetParent(categoryParentPanel.transform);
+        itemScrollRect.content.position = new Vector3(itemScrollRect.content.position.x, 0f, itemScrollRect.content.position.z);
     }
 
     private void hideAllCateories() {

@@ -8,7 +8,6 @@ using System;
 public class CursorInput : MonoBehaviour {
 
     private RaycastHit rayHit;
-    public LineRenderer line;
 
     private CursorInteraction ci;
     public Image itemProxyImage; 
@@ -23,7 +22,6 @@ public class CursorInput : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
-        line = GetComponent<LineRenderer>();
         layerMask = ~(LayerMask.GetMask("DragOverride") | LayerMask.GetMask("CogComponent"));
         dragOverrideMask = LayerMask.GetMask("DragOverride");
         itemProxyImage.raycastTarget = false;
@@ -128,7 +126,6 @@ public class CursorInput : MonoBehaviour {
     private void getInteractable() {
         releaseItems();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        line.SetPosition(0, ray.origin);
         if (Physics.Raycast(ray, out rayHit, 100f, dragOverrideMask)) {
             ci = rayHit.collider.GetComponent<CursorInteraction>();
             if (ci == null) {
@@ -148,7 +145,6 @@ public class CursorInput : MonoBehaviour {
             return;
         }
         ci.mouseDown(new VectorXZ(rayHit.point));
-        line.SetPosition(1, ray.origin + ray.direction * 20f);
     }
 
     private void setProxyImage() {
