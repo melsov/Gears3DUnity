@@ -174,7 +174,7 @@ public class Gear : Drivable  {
             _driver = gear;
             gear.addDrivable(this);
             positionRelativeTo(gear);
-            AudioManager.Instance.play(this, true);
+            AudioManager.Instance.play(this, AudioLibrary.GearSoundName);
             return true;
         }
         print("gear wasn't drivabe??");

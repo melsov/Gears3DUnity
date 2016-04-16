@@ -536,13 +536,14 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
 
     public virtual void restoreConnectionData(ref List<byte[]> connectionData) {
-        print("--restore connection data in drivable: " + name);
         ConnectionData cd;
         if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
             foreach(String drivableGuid in cd.drivableGuids) {
                 GameObject drivenGO = SaveManager.Instance.FindGameObjectByGuid(drivableGuid);
                 Drivable d = drivenGO.GetComponent<Drivable>();
                 addDrivable(d);
+                if (this is RackGear)
+                    Assert.IsTrue(drivables.Count > 0);
             }
         }
     }

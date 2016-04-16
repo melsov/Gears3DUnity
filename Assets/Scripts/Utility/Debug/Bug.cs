@@ -31,6 +31,10 @@ public class Bug : MonoBehaviour {
         }
     }
 
+    public static void assertNotNullPause(System.Object m) {
+        assertPause(m != null, " this object " + m.ToString() + ", is actually null");
+    }
+
     public static void assertNotNullPause(MonoBehaviour m) {
         assertPause(m != null, " " + m.name + ", is actually null");
     }

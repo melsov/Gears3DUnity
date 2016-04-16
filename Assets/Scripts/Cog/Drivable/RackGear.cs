@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//TODO: debug rack gear restore from save: driven gears are not moving
 public class RackGear : Gear {
     protected LineSegment lineSegment;
     protected const float ToothBaseHeight = ToothDepth * 2.7f;
@@ -26,7 +27,8 @@ public class RackGear : Gear {
         basePosition = xzPosition;
     }
     protected override void updateAngleStep() {
-        if (!isDriven()) { return; }
+        if (!isDriven()) {
+            return; }
         
         _angleStep.update(offset.magnitude * offsetDirection);
     }

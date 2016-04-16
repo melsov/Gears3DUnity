@@ -39,6 +39,7 @@ public class Tube : Duct {
     }
 
     void OnTriggerEnter(Collider other) {
+        AudioManager.Instance.play(this, AudioLibrary.TubeEnterSoundName);
         pullThrough(other);
     }
 

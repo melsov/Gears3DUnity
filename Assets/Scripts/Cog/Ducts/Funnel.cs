@@ -8,6 +8,7 @@ public class Funnel : Duct , IGameSerializable {
     public float strength = 20f;
     
     void OnTriggerEnter(Collider other) {
+        AudioManager.Instance.play(this, AudioLibrary.TubeEnterSoundName);
         pullToCenter(other);
     }
 

@@ -4,31 +4,60 @@ using System;
 using System.Collections;
 
 public class AudioManager : Singleton<AudioManager> {
+    // TODO: know which (note) sounds are playing when (not nec. in AudioManager?)
 
-    protected HashSet<AudioSource> sources = new HashSet<AudioSource>();
-    public SoundType[] soundTypes = new SoundType[] { };
-    //protected Dictionary<Type, AudioSource> lookup = new Dictionary<Type, AudioSource>();
+    public uint maxAllowedAudioSources = 16; //a guess
+    Dictionary<Cog, AudioEntity> sources = new Dictionary<Cog, AudioEntity>();
 
-    public void play(Cog cog, bool repeat) {
-        AudioSource aus = sourceFor(cog);
-        if (aus == null) { return; }
-        aus.loop = repeat;
-        aus.Play();
+    public void play(Cog cog, string soundName) {
+        AudioEntity ae = audioEntityFor(cog, soundName);
+        if (ae == null) {
+            ae = attachAudioEntity(cog, soundName);
+        }
+        ae.getAudioSource().Play();
     }
 
-    private AudioSource sourceFor(Cog cog) {
-        foreach(SoundType soundT in soundTypes) {
-            if (cog.GetType() == soundT.cog.GetType()) {
-                return soundT.audioSource;
-            }
+    private AudioEntity audioEntityFor(Cog cog, string soundName) {
+        foreach (AudioEntity ae in cog.GetComponentsInChildren<AudioEntity>()) {
+            if (ae.name.Equals(soundName)) { return ae; }
         }
         return null;
     }
+
+    private AudioEntity attachAudioEntity(Cog cog, string soundName) {
+        cullIfLimit();
+        AudioEntity ae = Instantiate(AudioLibrary.Instance.getAudioEntity(soundName));
+        ae.transform.position = cog.transform.position;
+        ae.transform.parent = cog.transform;
+        sources.Add(cog, ae);
+        return ae;
+    }
+
+//CONSIDER: doesn't really do what we want: assumes one audio entity per cog...
+    private void cullIfLimit() {
+        if (sources.Count > maxAllowedAudioSources) {
+            AudioEntity ae = null;
+            Cog cog = null;
+            foreach(Cog c in sources.Keys) {
+                cog = c;
+                ae = sources[cog];
+                if (ae == null) {
+                    sources.Remove(cog);
+                    continue;
+                }
+                break;
+            }
+            sources.Remove(cog);
+            Destroy(ae.gameObject);
+        }
+    }
+
+    public void remove(Cog cog) {
+        sources.Remove(cog);
+    }
+
+
 }
 
-[Serializable]
-public struct SoundType
-{
-    public Cog cog;
-    public AudioSource audioSource;
-}
+
+
