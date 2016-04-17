@@ -7,12 +7,16 @@ public class ColliderDropper : MonoBehaviour {
     public List<Collider> colliders = new List<Collider>();
     private IColliderDropperClient client;
 
+    private Cog knowYourCog;
+
     void Awake() {
         client = GetComponent<IColliderDropperClient>();
         if (client == null) {
             client = GetComponentInParent<IColliderDropperClient>();
             Assert.IsTrue(client != null, "no collider dropper client?");
         }
+
+        knowYourCog = GetComponent<Cog>();
     }
 
     void OnTriggerEnter(Collider other) {
@@ -34,8 +38,12 @@ public class ColliderDropper : MonoBehaviour {
             Bug.bugAndPause(e.ToString());
         }
         colliders.Remove(other);
-        if (client.isCursorInteracting()) {
-            client.handleTriggerExit(other);
+        try {
+            if (client.isCursorInteracting()) {
+                client.handleTriggerExit(other);
+            }
+        } catch(System.NullReferenceException nre) {
+            Debug.LogError(((knowYourCog != null) ? knowYourCog.name + "'s coll dropper got a null RE" : " coll dropper with no cog got a null RE") + nre.StackTrace);
         }
     }
 

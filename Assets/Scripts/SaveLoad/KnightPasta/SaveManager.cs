@@ -111,7 +111,6 @@ public class SaveManager : Singleton<SaveManager> {
 		{
             if ( (go.GetComponent("Guid") as Guid) != null && go.GetComponent<ItemID>() != null )
 			{
-                print("new save entry: " + go.name);
                 mSaveData.entries.Add(new SaveEntry(go));
 			}
 		}
@@ -131,7 +130,6 @@ public class SaveManager : Singleton<SaveManager> {
         foreach(GameObject go in GameObject.FindObjectsOfType<GameObject>()) {
             if (go.GetComponent<Guid>() != null) {
                 foreach (IConstrainable constrainable in go.GetComponentsInChildren<IConstrainable>()) {
-                    print("found I contstrainable in game O: " + go.name );
                     constrainable.setupConstraint();
                 }
             }
@@ -209,7 +207,6 @@ public class SaveManager : Singleton<SaveManager> {
 			MemoryStream ms = new MemoryStream (array[0]);
 			T storage = (T)bf.Deserialize (ms);
 			array.RemoveAt (0);
-			
 			return storage;
 		}
 		

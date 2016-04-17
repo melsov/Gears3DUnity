@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class LinearActuatorConstraint : Constraint
 {
@@ -113,6 +115,9 @@ public class LinearActuatorConstraint : Constraint
         Gear gear = constraintTarget.driverReference.GetComponent<Gear>();
         VectorXZ gearCenter = new VectorXZ(gear.transform.position);
         float radius = (gearCenter.vector3() - constraintTarget.reference.position).magnitude;
+#if UNITY_EDITOR
+        EditorApplication.isPaused = true;
+#endif
 
         foreach (VectorXZ dir in Angles.UnitVectors(36)) {
             VectorXZ gearRim = gearCenter + dir * radius;

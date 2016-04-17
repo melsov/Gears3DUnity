@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class LinearActuator : Drivable , IPegProxy {
@@ -125,7 +125,25 @@ public class LinearActuator : Drivable , IPegProxy {
         cc.center = new Vector3((lineSegment.start.localPosition.x + lineSegment.end.localPosition.x) / 2f, cc.center.y, cc.center.z);
     }
 
+    #region serialize
+    [System.Serializable]
+    class SerializeStorage
+    {
+        public List<byte[]> lineSegmentData = new List<byte[]>();
+    }
+    public override void Serialize(ref List<byte[]> data) {
+        SerializeStorage stor = new SerializeStorage();
+        lineSegment.MiniSerialize(ref stor.lineSegmentData);
+        SaveManager.Instance.SerializeIntoArray(stor, ref data);
+    }
 
+    public override void Deserialize(ref List<byte[]> data) {
+        SerializeStorage stor;
+        if ((stor = SaveManager.Instance.DeserializeFromArray<SerializeStorage>(ref data)) != null) {
+            lineSegment.MiniDeserialize(ref stor.lineSegmentData);
+        }
+    }
+    #endregion
 }
 
 public interface IPegProxy

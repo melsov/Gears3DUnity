@@ -7,7 +7,7 @@ public class AudioManager : Singleton<AudioManager> {
     // TODO: know which (note) sounds are playing when (not nec. in AudioManager?)
 
     public uint maxAllowedAudioSources = 16; //a guess
-    Dictionary<Cog, AudioEntity> sources = new Dictionary<Cog, AudioEntity>();
+    List<Cog> sources = new List<Cog>();
 
     public void play(Cog cog, string soundName) {
         AudioEntity ae = audioEntityFor(cog, soundName);
@@ -29,33 +29,38 @@ public class AudioManager : Singleton<AudioManager> {
         AudioEntity ae = Instantiate(AudioLibrary.Instance.getAudioEntity(soundName));
         ae.transform.position = cog.transform.position;
         ae.transform.parent = cog.transform;
-        sources.Add(cog, ae);
+        
+        if (!sources.Contains(cog)) {
+            sources.Add(cog);
+        }
         return ae;
     }
 
-//CONSIDER: doesn't really do what we want: assumes one audio entity per cog...
     private void cullIfLimit() {
-        if (sources.Count > maxAllowedAudioSources) {
-            AudioEntity ae = null;
-            Cog cog = null;
-            foreach(Cog c in sources.Keys) {
-                cog = c;
-                ae = sources[cog];
-                if (ae == null) {
-                    sources.Remove(cog);
-                    continue;
-                }
-                break;
-            }
-            sources.Remove(cog);
-            Destroy(ae.gameObject);
+        if (sources.Count <= maxAllowedAudioSources) {
+            return;
         }
-    }
+        AudioEntity ae = null;
+        AudioEntity[] entities = null;
+        Cog cog = null;
 
-    public void remove(Cog cog) {
-        sources.Remove(cog);
+        for(int i = 0; i < sources.Count; ++i) {
+            cog = sources[i];
+            if (cog == null) { sources.RemoveAt(i--); continue; }
+            entities = cog.GetComponentsInChildren<AudioEntity>();
+            if (entities == null || entities.Length == 0) {
+                sources.RemoveAt(i--);
+                continue;
+            }
+            ae = entities[0];
+            break;
+        }
+        Destroy(ae.gameObject);
+        if (cog == null || cog.GetComponentsInChildren<AudioEntity>().Length == 0) {
+            sources.Remove(cog);
+        }
+        
     }
-
 
 }
 

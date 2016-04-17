@@ -37,17 +37,14 @@ public class SaveEntry
 
     public void StoreGameobject(GameObject obj)
 	{
-		if (obj.GetComponent<Guid>())
-		{
+		if (obj.GetComponent<Guid>()) {
 			guid = (obj.GetComponent ("Guid") as Guid).guid.ToString ();
 		}
 
         //MMP
         if (obj.GetComponent<ItemID>()) {
             itemID = obj.GetComponent<ItemID>().id;
-        } else {
-            throw new System.Exception("no itemID componenent for: " + obj.name);
-        }
+        } else { throw new System.Exception("no itemID componenent for: " + obj.name); }
 
 
         position = obj.transform.position;
@@ -56,17 +53,14 @@ public class SaveEntry
 		active = obj.activeSelf;
 		
 		// serialize IGameSerializable
-        // CONSIDER: should children get a chance to serialize data as well?
         foreach(IGameSerializable ser in obj.GetComponents<IGameSerializable>()) {
             ser.Serialize(ref scriptData);
         }
 
         //Save connection data
         Manifest manifest = obj.GetComponent<Manifest>();
-        if (manifest == null) {
-            Debug.LogError("this object needs a manifest: " + obj.name);
-            return;
-        }
+        if (manifest == null) { Debug.LogError("this object needs a manifest: " + obj.name); return; }
+
         foreach(MonoBehaviour mb in manifest.prefabComponents) {
             if (mb is IRestoreConnection) {
                 ((IRestoreConnection)mb).storeConnectionData(ref connectionData);
@@ -88,18 +82,7 @@ public class SaveEntry
 		reinstantiatedGameObject.SetActive (active);
         reinstantiatedGameObject.GetComponent<Guid>().guid = new System.Guid(guid);
 		
-		//// deserialize custom classes
-		//MonoBehaviour[] mbs = reinstantiatedGameObject.GetComponents<MonoBehaviour> ();
-		
-		//foreach (MonoBehaviour mb in mbs)
-		//{
-		//	if( mb is IGameSerializable )
-		//	{
-		//		IGameSerializable ser = (IGameSerializable)mb;
-		//		ser.Deserialize(ref scriptData);
-		//	}
-		//}
-
+		// deserialize custom classes
         foreach(IGameSerializable ser in reinstantiatedGameObject.GetComponents<IGameSerializable>()) {
             ser.Deserialize(ref scriptData);
         }
@@ -107,7 +90,7 @@ public class SaveEntry
 
     public void RestoreConnections() {
         if (reinstantiatedGameObject == null) { throw new Exception("game object not reinstantiated yet"); }
-        //CONSIDER: unpredictable order of this enumeration causes errors (possibly?) 
+        // CONSIDER: unpredictable order of this enumeration causes errors possibly?
         // Is it possible to make connectionData be a dictionary? 
         foreach (IRestoreConnection rc in reinstantiatedGameObject.GetComponentsInChildren<IRestoreConnection>()) {
             rc.restoreConnectionData(ref connectionData);

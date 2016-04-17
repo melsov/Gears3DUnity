@@ -29,16 +29,18 @@ public class GenerateItemIDs : ScriptableWizard {
         }
     }
 
-    [MenuItem("Custom/Add Gui ItemIDs Manifests to Prefabs")]
+    [MenuItem("Custom/Add Gui ItemIDs Manifests GenerateGuids")]
     static void AddGuidAndItemId() {
         MonoBehaviour[] prefabs = Resources.LoadAll<MonoBehaviour>("Prefabs/Cog");
         foreach(MonoBehaviour mb in prefabs) {
             if (mb.GetComponent<ItemID>() == null) {
                 mb.gameObject.AddComponent<ItemID>();
             }
-            if (mb.GetComponent<Guid>() == null) {
-                mb.gameObject.AddComponent<Guid>();
+            Guid guid = mb.GetComponent<Guid>(); // null;
+            if (guid == null) {
+                guid = mb.gameObject.AddComponent<Guid>();
             }
+            guid.Generate();
             if (mb.GetComponent<Manifest>() == null) {
                 mb.gameObject.AddComponent<Manifest>();
             }
@@ -66,4 +68,6 @@ public class GenerateItemIDs : ScriptableWizard {
     }
 
 }
+#else
+public class GenerateItemIDs {}
 #endif

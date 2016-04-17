@@ -2,6 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 
+/*
+Maintains a set of all mono behaviours attached
+a prefab originally. Useful for distinguishing 
+'integral' components from children that were 
+attached at runtime.
+*/
 public class Manifest : MonoBehaviour {
 
     private MonoBehaviour[] _components;

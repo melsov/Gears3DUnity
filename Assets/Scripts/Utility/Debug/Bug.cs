@@ -30,6 +30,22 @@ public class Bug : MonoBehaviour {
 #endif
         }
     }
+    public static bool DEBUG_SAVE_RESTORE = true;
+    public static void bugSaveRestore(string msg) {
+        if (DEBUG_SAVE_RESTORE) {
+            print(msg);
+        }
+    }
+
+    private static int tick;
+    
+    public static void bugLessFrequently(string msg) {
+        if (tick++ > 20) {
+            tick = 0;
+            print(msg);
+        }
+    }
+
 
     public static void assertNotNullPause(System.Object m) {
         assertPause(m != null, " this object " + m.ToString() + ", is actually null");
@@ -89,5 +105,9 @@ public class Bug : MonoBehaviour {
 
     public static void printCogParentName(Transform t, string msg) {
         print(msg + ": " + GetCogParentName(t));
+    }
+
+    public static void bugError(string v) {
+        Debug.LogError(v);
     }
 }

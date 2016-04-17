@@ -110,7 +110,7 @@ public class LineSegment : MonoBehaviour {
             adjustSides();
             adjustedExtents();
         } catch(System.NullReferenceException nre) {
-            Debug.LogError("caught null ref exception in extend to accommodate");
+            Debug.LogError("caught null ref exception in extend to accommodate \n" + nre.StackTrace);
             print("vec xz questionable? x: " + p.x + ", z: " + p.z);
         }
     }
@@ -129,12 +129,12 @@ public class LineSegment : MonoBehaviour {
             a = b;
             b = temp;
         }
-
         start.position = a.vector3(start.position.y);
         end.position = b.vector3(end.position.y);
         adjustSides();
         adjustedExtents();
     }
+
 
     private void adjustSides() {
         float sideScale = distance.magnitude;
@@ -143,6 +143,31 @@ public class LineSegment : MonoBehaviour {
             side.localPosition = new Vector3(start.localPosition.x + sideScale / 2f, side.localPosition.y, side.localPosition.z);
         }
     }
+
+    #region mini-serialize
+    [System.Serializable]
+    class SerializeStorage
+    {
+        public SerializableVector3 start;
+        public SerializableVector3 end;
+    }
+    public void MiniSerialize(ref List<byte[]> data) {
+        SerializeStorage stor = new SerializeStorage();
+        stor.start = start.position;
+        stor.end = end.position;
+        SaveManager.Instance.SerializeIntoArray(stor, ref data);
+    }
+
+    public void MiniDeserialize(ref List<byte[]> data) {
+        SerializeStorage stor;
+        if ((stor = SaveManager.Instance.DeserializeFromArray<SerializeStorage>(ref data)) != null) {
+            start.position = stor.start;
+            end.position = stor.end;
+            adjustSides();
+            adjustedExtents();
+        }
+    }
+    #endregion
 
     public void debug() {
         if (lr == null) { print("line rend null"); return; }

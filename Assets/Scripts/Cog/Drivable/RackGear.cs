@@ -23,13 +23,10 @@ public class RackGear : Gear {
         }
     }
 
-    protected void updateBasePosition() {
-        basePosition = xzPosition;
-    }
     protected override void updateAngleStep() {
         if (!isDriven()) {
-            return; }
-        
+            return;
+        }
         _angleStep.update(offset.magnitude * offsetDirection);
     }
     public override bool isDriven() {
@@ -86,8 +83,6 @@ public class RackGear : Gear {
                 if (la == null) { print("la null"); return false; }
                 rotateInDirection(la.direction, peg.transform);
                 setSocketToPeg(aSocket, peg);
-                //anchor = peg.transform;
-                //basePosition = xzPosition;
                 return true;
             }
         }

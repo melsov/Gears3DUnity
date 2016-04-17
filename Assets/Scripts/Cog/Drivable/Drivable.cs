@@ -120,8 +120,9 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 
     public virtual void addDrivable(Drivable _drivable) {
         if (drivables.Contains(_drivable)) { print("already contains drivable: " + _drivable.name); }
-        if (!drivables.Contains(_drivable) && _drivable != this)
+        if (!drivables.Contains(_drivable) && _drivable != this) {
             drivables.Add(_drivable);
+        }
     }
 
     public virtual void removeDrivable(Drivable _drivable) {
@@ -504,6 +505,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         _pegboard.unsetRigidbodyWithGravity();
     }
 
+    #region serialize
     [System.Serializable]
     class SerializeStorage
     {
@@ -511,7 +513,6 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
     public virtual void Serialize(ref List<byte[]> data) {
         SerializeStorage stor = new SerializeStorage();
-
         SaveManager.Instance.SerializeIntoArray(stor, ref data);
     }
 
@@ -521,7 +522,9 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 
         }
     }
+    #endregion
 
+    #region connection data
     [System.Serializable]
     class ConnectionData
     {
@@ -542,11 +545,10 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
                 GameObject drivenGO = SaveManager.Instance.FindGameObjectByGuid(drivableGuid);
                 Drivable d = drivenGO.GetComponent<Drivable>();
                 addDrivable(d);
-                if (this is RackGear)
-                    Assert.IsTrue(drivables.Count > 0);
             }
         }
     }
+    #endregion
 
 }
 

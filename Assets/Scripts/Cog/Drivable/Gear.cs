@@ -170,18 +170,20 @@ public class Gear : Drivable  {
         // Otherwise, if this is a gear, get driven by it
         Gear gear = other.GetComponent<Gear>(); 
         if (gear != null && gear is Drivable) {
-            print("conn to gear: " + gear.name);
-            _driver = gear;
-            gear.addDrivable(this);
-            positionRelativeTo(gear);
-            AudioManager.Instance.play(this, AudioLibrary.GearSoundName);
+            Bug.bugError(name + " conn to gear: " + gear.name);
+            beDrivenBy(gear);
             return true;
         }
         print("gear wasn't drivabe??");
         return false;
     }
 
-
+    public void beDrivenBy(Gear gear) {
+        gear.addDrivable(this);
+        _driver = gear;
+        positionRelativeTo(gear);
+        AudioManager.Instance.play(this, AudioLibrary.GearSoundName);
+    }
 
     protected override bool connectToControllerAddOn(ControllerAddOn cao) {
         return false;
@@ -190,5 +192,40 @@ public class Gear : Drivable  {
     protected override bool connectToReceiverAddOn(ReceiverAddOn rao) {
         return false;
     }
+
+    #region connection data
+    [System.Serializable]
+    class ConnectionData
+    {
+        public List<string> drivableGuids = new List<string>();
+    }
+    public override void storeConnectionData(ref List<byte[]> connectionData) {
+        ConnectionData cd = new ConnectionData();
+        foreach(Drivable d in drivables) {
+            cd.drivableGuids.Add(d.GetComponent<Guid>().guid.ToString());
+        }
+        SaveManager.Instance.SerializeIntoArray(cd, ref connectionData);
+    }
+
+    public override void restoreConnectionData(ref List<byte[]> connectionData) {
+        ConnectionData cd;
+        if ((cd = SaveManager.Instance.DeserializeFromArray<ConnectionData>(ref connectionData)) != null) {
+            foreach(String drivableGuid in cd.drivableGuids) {
+                GameObject drivenGO = SaveManager.Instance.FindGameObjectByGuid(drivableGuid);
+                Drivable d = drivenGO.GetComponent<Drivable>();
+                if (d is Gear) {
+                    ((Gear)d).beDrivenBy(this);
+                } else {
+                    addDrivable(d);
+                }
+            }
+        }
+    }
+    #endregion
+
+    //TODO: restore conn data for gears / rack gears.
+    //remember position , rotation.
+    //figure out: do rack gears tend to move along with LAs? when LAs reconnect / restore with LACs?
 }
+
 
