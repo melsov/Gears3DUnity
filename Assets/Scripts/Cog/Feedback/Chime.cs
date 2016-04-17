@@ -4,18 +4,23 @@ using System;
 
 public class Chime : Cog , ICollisionProxyClient {
 
-//TODO: Audio source manager singleton. Else there's a risk of adding too many audio listeners?
-//Singleton should reject sounds if too many are playing
+    //TODO: Audio source manager singleton. Else there's a risk of adding too many audio listeners?
+    //Singleton should reject sounds if too many are playing
 
-    protected AudioSource _audioSource;
+    //protected AudioSource _audioSource;
+    protected WhiteKeysScale whiteKeyScale;
+    [Range(0,8)]
+    public int note = 0;
 
     void Awake () {
-        _audioSource = GetComponent<AudioSource>();
+        whiteKeyScale = FindObjectOfType<WhiteKeysScale>();
+        //_audioSource = GetComponent<AudioSource>();
 	}
 
     public void proxyCollisionEnter(Collision collision) {
-        if (!_audioSource.isPlaying || _audioSource.time > .9f) {
-            _audioSource.Play();
+        AudioEntity ae = AudioManager.Instance.audioEntityFor(this, whiteKeyScale.noteName(note));
+        if (!ae.getAudioSource().isPlaying || ae.getAudioSource().time > .9f) {
+            AudioManager.Instance.play(this, whiteKeyScale.noteName(note));
         }
     }
 

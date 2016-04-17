@@ -81,6 +81,7 @@
     <Compile Include="Assets\Scripts\Audio\AudioEntity.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioLibrary.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioManager.cs" />
+    <Compile Include="Assets\Scripts\Audio\WhiteKeysScale.cs" />
     <Compile Include="Assets\Scripts\Camera\ViewControls.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\AddOn.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />

@@ -9,7 +9,7 @@ public class CollisionProxy : MonoBehaviour {
 	void Awake () {
         Assert.IsTrue(GetComponent<Collider>() != null);
         Assert.IsTrue(GetComponent<Collider>().isTrigger == false);
-        client = GetComponentInParent<ICollisionProxyClient>(); // TransformUtil.FindTypeInParentRecursive<ICollisionProxyClient>(transform, 3);
+        client = GetComponentInParent<ICollisionProxyClient>(); 
         Assert.IsTrue(client != null);
     }
 	

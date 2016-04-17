@@ -18,7 +18,7 @@ public class Inventory : Singleton<Inventory> {
     private List<Transform> sceneObjects = new List<Transform>();
 
     public ScrollRect itemScrollRect;
-//TODO: force horiz scroll to turn off
+    //TODO: force horiz scroll to turn off
 
     protected Inventory() { }
 

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AudioEntity : MonoBehaviour {
 
-    public string name;
+    //public string name;
     protected AudioSource audioSource;
 
 	void Awake () {
