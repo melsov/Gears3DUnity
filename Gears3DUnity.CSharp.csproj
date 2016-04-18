@@ -147,6 +147,7 @@
     <Compile Include="Assets\Scripts\Cog\Feedback\Chime.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\CollisionProxy.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\TriggerProxy.cs" />
+    <Compile Include="Assets\Scripts\EditorActions\UpdateChimes.cs" />
     <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
     <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
     <Compile Include="Assets\Scripts\Interaction\CursorInput.cs" />
@@ -180,6 +181,8 @@
     <Compile Include="Assets\Scripts\UI\View\Pause.cs" />
     <Compile Include="Assets\Scripts\UI\View\ProjectName.cs" />
     <Compile Include="Assets\Scripts\Utility\Angles.cs" />
+    <Compile Include="Assets\Scripts\Utility\Color\ColorRange.cs" />
+    <Compile Include="Assets\Scripts\Utility\Color\HSBColor.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLineComponent.cs" />

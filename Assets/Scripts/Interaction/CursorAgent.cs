@@ -39,11 +39,13 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         _cursorInteracting = true;
         _dragOverrideCollider = null;
         _dragOverrideCollider = RayCastUtil.getColliderUnderCursor(dragOverrideLayer, out rayHit);
-        if (overridingDrag) {
-            client.startDragOverride(cursorGlobal, _dragOverrideCollider);
-        } else {
-            client.disconnect();
-            disableCollider(true);
+        if (client != null) {
+            if (overridingDrag) {
+                client.startDragOverride(cursorGlobal, _dragOverrideCollider);
+            } else {
+                client.disconnect();
+                disableCollider(true);
+            }
         }
     }
 
@@ -56,6 +58,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     public void cursorInteracting(VectorXZ cursorGlobal) {
+        if (client == null) { return; }
         disableCollider(false);
         if (overridingDrag) {
             client.dragOverride(cursorGlobal);
@@ -63,11 +66,13 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     public void handleTriggerExit(Collider other) {
+        if (client == null) { return; }
         client.triggerExitDuringDrag(other);
     }
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = false;
+        if (client == null) { return; }
         if (overridingDrag) {
             client.endDragOverride(cursorGlobal);
         } 

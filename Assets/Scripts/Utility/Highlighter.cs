@@ -32,6 +32,18 @@ public class Highlighter : MonoBehaviour {
         material.color = color;
     }
 
+    public void highlightForSeconds(float seconds) {
+        highlightForSeconds(seconds, highlightColor);
+    }
+    public void highlightForSeconds(float seconds, Color color) {
+        StartCoroutine(_highlightForSeconds(seconds, color));
+    }
+    protected IEnumerator _highlightForSeconds(float seconds, Color color) {
+        highlight(color);
+        yield return new WaitForSeconds(seconds);
+        unhighlight();
+    }
+
     public void unhighlight() {
         material.color = defaultColor;
     }
