@@ -4,8 +4,8 @@ using System.Collections.Generic;
 public class Tube : Duct {
 
     public float strength = 300f;
-    protected Transform entrance;
-    protected Transform exit;
+    public Transform entrance;
+    public Transform exit;
     protected HashSet<Rigidbody> occupants;
     protected float width;
 
@@ -15,8 +15,8 @@ public class Tube : Duct {
 
     protected virtual void awake() {
         occupants = new HashSet<Rigidbody>();
-        entrance = GetComponentInChildren<TubeEntrance>().transform;
-        exit = GetComponentInChildren<TubeExit>().transform;
+        //entrance = GetComponentInChildren<TubeEntrance>().transform;
+        //exit = GetComponentInChildren<TubeExit>().transform;
         CapsuleCollider cc = GetComponent<CapsuleCollider>();
         if (cc != null) {
             width = cc.radius * 2f;
@@ -39,6 +39,10 @@ public class Tube : Duct {
     }
 
     void OnTriggerEnter(Collider other) {
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+        if (rb != null) {
+            rb.useGravity = false;
+        }
         AudioManager.Instance.play(this, AudioLibrary.TubeEnterSoundName);
         pullThrough(other);
     }
@@ -50,6 +54,10 @@ public class Tube : Duct {
     void OnTriggerExit(Collider other) {
         pullThrough(other);
         occupants.Remove(other.GetComponent<Rigidbody>());
+        Rigidbody rb = other.GetComponent<Rigidbody>();
+        if (rb != null) {
+            rb.useGravity = true;
+        }
     }
 
     private bool closerToEntrance(Transform t) {
