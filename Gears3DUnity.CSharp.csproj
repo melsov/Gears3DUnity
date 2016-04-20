@@ -121,6 +121,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\ConveyorBelt.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Dispenser.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\EmitterDevice.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Gear.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\HandCrank.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\LinearActuator.cs" />

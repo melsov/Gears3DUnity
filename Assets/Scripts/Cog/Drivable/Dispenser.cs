@@ -16,7 +16,6 @@ public class Dispenser : Drivable {
         base.awake();
         ControllerAddOn cao = GetComponentInChildren<ControllerAddOn>();
         if (cao != null) {
-            print("connect to cao? hasBuiltInButton is (already) : " + hasBuiltInButton);
             cao.connectTo(GetComponent<Collider>());
             hasBuiltInButton = true;
         }
@@ -33,20 +32,12 @@ public class Dispenser : Drivable {
         set {
             if (Time.fixedTime - timer > fireRate) {
                 shouldDispense = true;
-                _power = 1f;// Mathf.Clamp(value, 0f, 1f);
+                _power = 1f;
                 timer = Time.fixedTime;
             }
         }
     }
 
-    //protected virtual float interval {
-    //    get {
-    //        if (power < Mathf.Epsilon) {
-    //            return float.MaxValue;
-    //        }
-    //        return baseFrequency / power;
-    //    }
-    //}
 
     public override float driveScalar() {
         return 0f;

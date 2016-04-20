@@ -8,7 +8,13 @@ public abstract class Combinable : MonoBehaviour {
         get { return GetComponent<Rigidbody>(); }
     }
     protected Renderer renderr {
-        get { return GetComponent<Renderer>(); }
+        get {
+            Renderer r = GetComponent<Renderer>();
+            if (r == null) {
+                r = GetComponentInChildren<Renderer>();
+            }
+            return r;
+        }
     }
 
     void OnTriggerEnter(Collider other) {

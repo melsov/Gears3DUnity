@@ -6,6 +6,8 @@ public class AudioLibrary : Singleton<AudioLibrary>
 
     public static string GearSoundName = "GearAudioEntity";
     public static string TubeEnterSoundName = "TubeAudioEntity";
+    public static string WhooshSoundName = "WhooshAudioEntiry";
+
     private WhiteKeysScale whiteKeyScale;
 
     private Dictionary<string, AudioEntity> lookup; 
