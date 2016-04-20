@@ -14,6 +14,8 @@ public class Inventory : Singleton<Inventory> {
     public RectTransform categorySelectPanel;
     public Button categorySelectButtonPrefab;
     protected CursorInput cursorInput;
+    [SerializeField]
+    private Vector2 categoryButtonOffset = new Vector2(10f, 10f);
 
     private List<Transform> sceneObjects = new List<Transform>();
 
@@ -40,7 +42,7 @@ public class Inventory : Singleton<Inventory> {
         Vector3 anchor = new Vector3(4,-4,1);
         foreach(Category cat in categories) {
             createCategorySelectButton(cat, anchor);
-            anchor.y -= categorySelectButtonPrefab.GetComponent<RectTransform>().rect.height + 2;
+            //anchor.y -= categoryButtonOffset.y + categorySelectButtonPrefab.GetComponent<RectTransform>().rect.height + 2; //NO NEED?
         }
     }
 

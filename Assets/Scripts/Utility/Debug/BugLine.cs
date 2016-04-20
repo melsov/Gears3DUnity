@@ -9,12 +9,11 @@ public class BugLine : Singleton<BugLine> {
 
     protected BugLine() { }
 
-    public LineRenderer lineRenderer;
+    private LineRenderer lineRenderer;
     private int vertices = 25;
     Transform pointMarker;
     List<Transform> markers;
     Color[] colors;
-    protected Material lineMaterial;
 
     private Dictionary<VecPair, GameObject> lines;
     private bool drawOnKeyPress;
@@ -28,13 +27,13 @@ public class BugLine : Singleton<BugLine> {
             Color.yellow
         };
         lines = new Dictionary<VecPair, GameObject>();
-        lineRenderer = GetComponent<LineRenderer>(); // gameObject.AddComponent<LineRenderer>();
+        lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.SetWidth(.1f, .2f);
         lineRenderer.SetVertexCount(vertices);
-        Material m = Resources.Load<Material>("Materials/BugLineMat.mat");
-        lineRenderer.material = m;
-        lineMaterial = m;
-
+        // Setting all vertex positions after setting vertex count prevents the scary AABB errors
+        for(int i = 0; i < vertices; ++i) {
+            lineRenderer.SetPosition(i, Vector3.zero);
+        }
         pointMarker = GameObject.FindGameObjectWithTag("DebugMarker").transform;
         markers = new List<Transform>();
     }
