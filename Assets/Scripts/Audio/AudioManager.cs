@@ -10,21 +10,33 @@ public class AudioManager : Singleton<AudioManager> {
     List<Cog> sources = new List<Cog>();
 
     public void play(Cog cog, string soundName) {
-        audioEntityFor(cog, soundName).getAudioSource().Play();
+        getAudioEntityFor(cog, soundName).getAudioSource().Play();
+    }
+
+    public void stop(Cog cog, string soundName) {
+        AudioEntity ae = lookupAudioEntiryFor(cog, soundName);
+        if (ae != null) {
+            ae.getAudioSource().Stop();
+        }
     }
 
 //CONSIDER: is this too slow (using GetCIC<> everytime)?
-    public AudioEntity audioEntityFor(Cog cog, string soundName) {
+    public AudioEntity getAudioEntityFor(Cog cog, string soundName) {
+        AudioEntity ae = lookupAudioEntiryFor(cog, soundName);
+        if (ae != null) { return ae; }
+        return attachAudioEntity(cog, soundName);
+    }
+
+    public AudioEntity lookupAudioEntiryFor(Cog cog, string soundName) {
         foreach (AudioEntity ae in cog.GetComponentsInChildren<AudioEntity>()) {
             string n = ae.name;
             string clone = "(Clone)";
             if (ae.name.EndsWith(clone)) {
                 n = n.Substring(0, n.Length - clone.Length);
             }
-            print(n);
             if (n.Equals(soundName)) { return ae; }
         }
-        return attachAudioEntity(cog, soundName);
+        return null;
     }
 
     private AudioEntity attachAudioEntity(Cog cog, string soundName) {

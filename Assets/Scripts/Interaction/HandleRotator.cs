@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 
-public class HandleRotator : MonoBehaviour , ICursorAgentClient {
+public class HandleRotator : MonoBehaviour {
 
     protected HandleSet handleSet;
     protected Transform _cursorRotationPivot = null;
     protected Transform _cursorRotationHandle = null;
-    protected Collider _mainCollider;
 
     public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
         vStartDragOverride(cursorGlobal, dragOverrideCollider);
@@ -60,44 +57,12 @@ public class HandleRotator : MonoBehaviour , ICursorAgentClient {
     protected virtual void vEndDragOverride(VectorXZ cursorGlobal) {
     }
 
-    public Collider mainCollider() {
-        return _mainCollider;
-    }
-    #region unused icursoragent
-
-    public bool makeConnectionWithAfterCursorOverride(Collider other) {
-        return false;
-    }
-
-    public Collider shouldPreserveConnection() {
-        return null;
-    }
-
-    public void suspendConnection() {
-    }
-
-    public void triggerExitDuringDrag(Collider other) {
-    }
-    
-    public bool connectTo(Collider other) {
-        return false;
-    }
-
-    public void disconnect() {
-    }
-    #endregion
-
-    // Use this for initialization
-    void Awake () {
-        handleSet = GetComponent<HandleSet>();
-        _mainCollider = TransformUtil.FindComponentInThisOrChildren<Collider>(transform);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
     public void onDragEnd() {
     }
+
+    void Awake () { 
+        handleSet = GetComponent<HandleSet>();
+	}
 }
+
+

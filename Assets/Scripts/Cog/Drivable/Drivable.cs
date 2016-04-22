@@ -305,7 +305,6 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         vEndDragOverride(cursorGlobal);
     }
 
-
     protected virtual void updateCursorRotationPivot(Collider dragOverrideCollider) {
         if (_cursorRotationPivot == null) {
             _cursorRotationPivot = this.transform;

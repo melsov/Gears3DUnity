@@ -27,7 +27,7 @@ public class ViewControls : MonoBehaviour {
             float scroll = Input.GetAxis("Mouse ScrollWheel");
             if (scroll < -float.Epsilon || scroll > float.Epsilon) {
                 if (mouseIsOverScreen())
-                    cam.orthographicSize += scroll * zoomSpeed *-1f;
+                    cam.orthographicSize = Mathf.Clamp(cam.orthographicSize + scroll * zoomSpeed *-1f, .45f, 40f);
             }
 
             //MMB

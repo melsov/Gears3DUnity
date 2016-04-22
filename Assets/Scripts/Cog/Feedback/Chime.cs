@@ -21,7 +21,7 @@ public class Chime : Cog , ICollisionProxyClient {
 	}
 
     public void proxyCollisionEnter(Collision collision) {
-        AudioEntity ae = AudioManager.Instance.audioEntityFor(this, whiteKeyScale.noteName(note));
+        AudioEntity ae = AudioManager.Instance.getAudioEntityFor(this, whiteKeyScale.noteName(note));
         if (!ae.getAudioSource().isPlaying || ae.getAudioSource().time > .9f) {
             AudioManager.Instance.play(this, whiteKeyScale.noteName(note));
             highlighter.highlightForSeconds(.9f, colorRange[note]);

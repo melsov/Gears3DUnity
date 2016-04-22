@@ -7,12 +7,22 @@ public class EmitterDevice : Dispenser {
     public float emissionTimeSeconds = 1f;
     [SerializeField]
     protected string soundName = AudioLibrary.WhooshSoundName;
+    public bool toggleOnOff = false;
 
     protected override void awake() {
         base.awake();
         emitter.gameObject.SetActive(false);
     }
     protected override void dispense() {
+        if (toggleOnOff) {
+            emitter.gameObject.SetActive(!emitter.gameObject.activeSelf);
+            if (emitter.gameObject.activeSelf) {
+                AudioManager.Instance.play(this, soundName);
+            } else {
+                AudioManager.Instance.stop(this, soundName);
+            }
+            return;
+        }
         StartCoroutine(emit());
     }
 

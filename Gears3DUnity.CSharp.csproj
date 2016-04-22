@@ -148,6 +148,7 @@
     <Compile Include="Assets\Scripts\Cog\Feedback\Chime.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\CollisionProxy.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\TriggerProxy.cs" />
+    <Compile Include="Assets\Scripts\Cog\Sticker\Sticker.cs" />
     <Compile Include="Assets\Scripts\EditorActions\UpdateChimes.cs" />
     <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
     <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />

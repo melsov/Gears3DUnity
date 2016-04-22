@@ -9,10 +9,12 @@ public class YLayer {
     private static float wall = -.5f;
     private static float cogLayer = wall + increment;
     private static float cogLayerRope = -3f;
+    private static float stickerLayer = 2.5f;
     private static Dictionary<System.Type, float> lookup = new Dictionary<System.Type, float>() {
         { typeof(Motor) , wall },
         { typeof(HandCrank) , wall },
-        { typeof(Rope), cogLayerRope }
+        { typeof(Rope), cogLayerRope },
+        { typeof(Sticker), stickerLayer },
     };
 
     public static float Layer(System.Type type) {

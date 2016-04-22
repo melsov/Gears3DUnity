@@ -6,7 +6,8 @@ public class AudioLibrary : Singleton<AudioLibrary>
 
     public static string GearSoundName = "GearAudioEntity";
     public static string TubeEnterSoundName = "TubeAudioEntity";
-    public static string WhooshSoundName = "WhooshAudioEntiry";
+    public static string WhooshSoundName = "WhooshAudioEntity";
+    public static string WaterfallSoundName = "WaterfallAudioEntity";
 
     private WhiteKeysScale whiteKeyScale;
 
@@ -22,12 +23,8 @@ public class AudioLibrary : Singleton<AudioLibrary>
             }
             AudioEntity[] aes = Resources.LoadAll<AudioEntity>("Prefabs/Audio/Cog");
             foreach (AudioEntity ae in aes) {
+                print(ae.name);
                 lookup.Add(ae.name, ae);
-                Debug.LogError(ae.name);
-            }
-            //DBUG
-            foreach (string k in lookup.Keys) {
-                print(k);
             }
         }
         return lookup;
