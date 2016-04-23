@@ -157,6 +157,7 @@
     <Compile Include="Assets\Scripts\Interaction\GenericCursorAgentClient.cs" />
     <Compile Include="Assets\Scripts\Interaction\Handle.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
+    <Compile Include="Assets\Scripts\Interaction\HandleRotatorClient.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
     <Compile Include="Assets\Scripts\Interaction\LinearHandleSet.cs" />
     <Compile Include="Assets\Scripts\Interaction\PhysicsCursorInteraction.cs" />

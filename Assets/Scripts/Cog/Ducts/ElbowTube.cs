@@ -4,19 +4,13 @@ using System.Collections;
 public class ElbowTube : Tube {
 
     protected Transform center;
-    protected Transform elbowLocation;
+    protected Transform elbowBase;
 
     protected override void awake() {
         base.awake();
         center = TransformUtil.FindChildWithName(transform, "Center");
-        elbowLocation = TransformUtil.FindChildWithName(transform, "ElbowLocation");
+        elbowBase = TransformUtil.FindChildWithName(transform, "ElbowLocation");
         width = entrance.GetComponent<CapsuleCollider>().radius * 2f;
-    }
-
-    protected override Vector3 down {
-        get {
-            return transform.rotation * EnvironmentSettings.gravityDirection;
-        }
     }
 
     protected Vector3 intoEntrance {
@@ -33,6 +27,25 @@ public class ElbowTube : Tube {
     protected Vector3 centerToExit {
         get { return exit.transform.position - center.position; }
     }
+
+    protected override Vector3 isEntering(Transform t) {
+        Vector3 towards, exitward, entrPos;
+        if (closerToEntrance(t)) {
+            entrPos = entrance.position;
+            towards = entrance.position - t.position;
+            exitward = intoEntrance;
+        } else {
+            entrPos = exit.position;
+            towards = exit.position - t.position;
+            exitward = outOfExit * -1f;
+        }
+        if(towards.sqrMagnitude > .1f && Vector3.Dot(exitward, towards) > 0f) {
+            Vector3 targetPos = entrPos + (elbowBase.position - entrPos) * .2f;
+            return targetPos - t.position;
+        }
+        return Vector3.zero;
+    }
+
     protected override bool movingTowardsExit(Rigidbody rb) {
         Vector3 entranceToExit = exit.transform.position - entrance.transform.position;
         return Vector3.Dot(rb.velocity, entranceToExit) > 0f;
@@ -47,8 +60,11 @@ public class ElbowTube : Tube {
     }
 
     protected void setVelocity(Rigidbody rb, Vector3 centerTo, Vector3 entering, Vector3 exiting) {
+        TESTROCK(rb, Color.cyan);
         Vector3 rel = rb.transform.position - center.position;
         float m = Vector3.Dot(rel.normalized, centerTo.normalized);
         rb.velocity = Vector3.Lerp(exiting, entering, m) * strength;
     }
+
+    
 }

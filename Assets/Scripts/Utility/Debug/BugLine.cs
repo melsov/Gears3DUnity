@@ -42,13 +42,16 @@ public class BugLine : Singleton<BugLine> {
         if (Input.GetKeyDown(KeyCode.B)) {
             drawOnKeyPress = true;
         }
+        if (Input.GetKeyDown(KeyCode.C)) {
+            clear();
+        }
     }
 
     private Color colorForIndex(int i) {
         return colors[i % colors.Length];
     }
 
-    public void drawFromOnKey(Vector3 position, Vector3 direction) {
+    public void drawFromOnBKeyPress(Vector3 position, Vector3 direction) {
         if (drawOnKeyPress) {
             print("drawfrom on key");
             drawOnKeyPress = false;

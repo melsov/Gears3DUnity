@@ -27,14 +27,14 @@ public class Tube : Duct {
         get { return transform.rotation * EnvironmentSettings.gravityDirection; }
     }
 
-    private Vector3 normal() {
+    protected Vector3 normal() {
         return new VectorXZ(down).normal.vector3();
     }
 
-    protected Vector3 awayFromEntrance {
+    protected virtual Vector3 awayFromEntrance {
         get { return entrance.position - exit.transform.position; }
     }
-    private Vector3 awayFromExit {
+    protected virtual Vector3 awayFromExit {
         get { return exit.transform.position - entrance.position; }
     }
 
@@ -60,7 +60,7 @@ public class Tube : Duct {
         }
     }
 
-    private bool closerToEntrance(Transform t) {
+    protected bool closerToEntrance(Transform t) {
         if ((t.position - entrance.position).sqrMagnitude < (t.position - exit.position).sqrMagnitude) {
             return true;
         }
@@ -72,23 +72,26 @@ public class Tube : Duct {
     }
 
     protected virtual Vector3 isEntering(Transform t) {
-        Vector3 towards, reverse, n, exitward;
-        n = normal();
+        Vector3 towards, entrPos, exitward, exitPos;
         if (closerToEntrance(t)) {
+            entrPos = entrance.position;
+            exitPos = exit.position;
             towards = entrance.position - t.position;
-            reverse = awayFromEntrance;
-            exitward = down;
+            exitward = down; 
         } else {
+            entrPos = exit.position;
+            exitPos = entrance.position;
             towards = exit.position - t.position;
-            reverse = awayFromExit;
             exitward = down * -1;
         }
-        if(towards.sqrMagnitude > .1f && Vector3.Dot(reverse, towards) < 0f) {
-            if (Vector3.Dot(towards, n) < 0f) {
-                n *= -1f;
-            }
-            n = Vector3.Lerp(exitward, n, towards.magnitude / (width * .5f));
-            return n;
+        if(towards.sqrMagnitude > .1f && Vector3.Dot(exitward, towards) > 0f) {
+            Vector3 targetPos = entrPos + (exitPos - entrPos) * .1f;
+            return targetPos - t.position;
+            //if (Vector3.Dot(towards, n) < 0f) {
+            //    n *= -1f;
+            //}
+            //n = Vector3.Lerp(exitward, n, towards.magnitude / (width * .5f));
+            //return n;
         }
         return Vector3.zero;
     }
@@ -98,6 +101,7 @@ public class Tube : Duct {
         if (rb == null) return;
 
         if (!occupants.Contains(rb)) {
+            TESTROCK(rb, Color.red);
             Vector3 enter = isEntering(other.transform);
             if (!enter.Equals(Vector3.zero)) {
                 rb.velocity = Vector3.Lerp(enter, rb.velocity.normalized, .2f) * strength;
@@ -114,6 +118,10 @@ public class Tube : Duct {
         } else {
             rb.velocity = Vector3.Lerp(down * -1f, rb.velocity.normalized, .2f) * strength;
         }
+    }
+
+    protected void TESTROCK(Rigidbody rb, Color color) {
+        rb.GetComponentInChildren<Renderer>().material.color = color;
     }
 
 

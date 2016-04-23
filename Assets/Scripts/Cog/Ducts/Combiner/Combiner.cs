@@ -38,9 +38,6 @@ public class Combiner : Drivable {
     }
 
     protected void combine(Transform combined) {
-        foreach (Combinable com in combinables()) {
-            print(com.name);
-        }
         Transform result = Instantiate<Transform>(combined);
         result.position = outTube.position;
     }
