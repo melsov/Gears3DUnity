@@ -123,22 +123,17 @@ public class CursorInput : MonoBehaviour {
         return false;
     }
 
+//TODO: make pegs take precedence over all others
     private void getInteractable() {
         releaseItems();
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out rayHit, 100f, dragOverrideMask)) {
-            ci = rayHit.collider.GetComponent<CursorInteraction>();
-            if (ci == null) {
-                ci = rayHit.collider.GetComponentInParent<CursorInteraction>(); 
-            }
+            ci = rayHit.collider.GetComponentInParent<CursorInteraction>();
         }
 
         if (ci == null) {
             if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) {
-                ci = rayHit.collider.GetComponent<CursorInteraction>();
-                if (ci == null) {
-                    ci = rayHit.collider.GetComponentInParent<CursorInteraction>();// TransformUtil.FindTypeInParentRecursive<CursorInteraction>(rayHit.collider.transform, 4);
-                }
+                ci = rayHit.collider.GetComponentInParent<CursorInteraction>();
             }
         }
         if (ci == null) {

@@ -188,14 +188,18 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
 
     protected virtual bool vConnectTo(Collider other) {
+        print("conn to");
         if (isConnectedTo(other.transform)) return false;
+        print("not is conn to");
         // Connect to any peg or axel
         Socket aSocket;
         Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
         if (peg != null) {
+            print("peg not null");
             setSocketToPeg(aSocket, peg);
             return true;
         }
+        print("peg null");
         return false;
     }
 

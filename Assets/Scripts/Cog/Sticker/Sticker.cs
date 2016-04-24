@@ -2,6 +2,8 @@
 using System.Collections;
 using System;
 
+//TODO: sticker appears always over gears and all
+
 public class Sticker : Cog, ICursorAgentClient
 {
     protected HandleRotator handleRotator;
@@ -20,15 +22,21 @@ public class Sticker : Cog, ICursorAgentClient
     public bool connectTo(Collider other) {
         Cog cog = other.GetComponentInParent<Cog>();
         if (cog == null) { return false; }
-        transform.parent = other.transform;
+        transform.parent = cog.transform;
+        transform.position = TransformUtil.SetY(transform.position, Mathf.Max(YLayer.Layer(typeof(Sticker)), cog.transform.position.y + 1f));
         return true;
     }
 
     public void disconnect() {
         transform.parent = null;
+        foreach(Sticker s in GetComponentsInChildren<Sticker>()) {
+            if (s == this) { continue; }
+            s.disconnect();
+        }
     }
     
     public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+        disconnect();
         handleRotator.startDragOverride(cursorGlobal, dragOverrideCollider);
     }
 
