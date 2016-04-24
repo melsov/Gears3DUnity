@@ -162,7 +162,7 @@ public class SocketSet
     public virtual Socket openBackendSocketOnOtherClosestToOpenPegOnThis(Transform other, out Peg closestPeg) {
         Socket aSocket = null;
         closestPeg = null;
-        ISocketSetContainer ssc = findSocketSetContainer(other); // other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = findSocketSetContainer(other); 
         if (ssc == null) return null;
         Vector3 distance = VectorXZ.maxVector3;
         List<Socket> openBackendSockets = ssc.getBackendSocketSet().openChildableSockets();
@@ -179,6 +179,9 @@ public class SocketSet
         }
         return aSocket;
     }
+
+//Connect to frontend of other regardless of peg (peg will be instantiated)
+//Only condition: socket not already occupied
 
     public virtual Peg drivingPegOnBackendOfOtherClosestToOpenSocketOnThis(Transform other, out Socket closestOpenSocket) {
         Peg aPeg = null;
@@ -213,22 +216,38 @@ public class SocketSet
     //    return closestOpenPegOn(other, out closestSocket, false);
     //}
 
+    public virtual Socket closestSocketOnFrontendOfRegardlessOfPeg(Collider other, out Socket closestSocket) {
+        Socket otherSocket = null;
+        closestSocket = null;
+        ISocketSetContainer ssc = findSocketSetContainer(other);
+        if (ssc == null) return null;
+        Vector3 distance = new Vector3(9999999F, 9999999F, 9999999F);
+        SocketSet otherSocketSet = ssc.getFrontendSocketSet(); 
+        foreach (Socket s in otherSocketSet.sockets) { 
+            if (s.childPeg != null && s.childPeg.occupiedByChild) { continue; }
+            Socket soc = getOpenChildSocketClosestTo(s.transform.position, RotationMode.FREE_OR_FIXED);
+
+            if (distance.sqrMagnitude > (s.transform.position - soc.transform.position).sqrMagnitude) {
+                distance = s.transform.position - soc.transform.position;
+                otherSocket = s;
+                closestSocket = soc;
+            }
+        }
+        return otherSocket;
+    }
+
     public virtual Peg closestOpenPegOnFrontendOf(Collider other, out Socket closestSocket) {
         Peg aPeg = null;
         closestSocket = null;
-        ISocketSetContainer ssc = findSocketSetContainer(other); // other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = findSocketSetContainer(other); 
         if (ssc == null) return null;
-        Vector3 distance = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+        Vector3 distance = new Vector3(9999999F, 9999999F, 9999999F);
         SocketSet otherSocketSet = ssc.getFrontendSocketSet(); //  wantFrontEndSocketSetOfOther ? ssc.getFrontendSocketSet() : ssc.getBackendSocketSet();
         foreach(Socket s in otherSocketSet.sockets) {
             if (s.childPeg != null && !s.childPeg.occupiedByChild ) {
                 Socket soc = getOpenChildSocketClosestTo(s.childPeg.transform.position, s.childPeg.pegIsChildRotationMode);
-                if (soc == null) {
-                    MonoBehaviour.print("null socket with Collider: " + other.name);
-                }
-                MonoBehaviour.print("front end socket " + s.name + "and its child peg: " + s.childPeg.name + "child position: " + s.childPeg.transform.position.ToString());
-                
-                if (distance.magnitude > (s.childPeg.transform.position - soc.transform.position).magnitude) {
+
+                if (distance.sqrMagnitude > (s.childPeg.transform.position - soc.transform.position).sqrMagnitude) {
                     distance = s.childPeg.transform.position - soc.transform.position;
                     aPeg = s.childPeg;
                     closestSocket = soc;
@@ -300,6 +319,24 @@ public class SocketSet
             if (socket != s) return s;
         }
         return null;
+    }
+
+    public T connectedCog<T>() where T : Cog {
+        foreach(Socket s in sockets) {
+            if (s.hasChildPeg()) {
+                if (s.childPeg.occupiedByChild && s.childPeg.child.getParentDrivable() is T) {
+                    return s as T;
+                }
+            } else if (s.hasDrivingPeg()) {
+                if (s.drivingPeg.hasParentSocket && s.drivingPeg.parent.getParentDrivable() is T) {
+                    return s as T;
+                }
+            }
+        }
+        return null;
+    }
+    public bool isConnectedToCog<T>() where T : Cog {
+        return connectedCog<T>() != null;
     }
 
     protected ISocketSetContainer findSocketSetContainer(Transform other) {

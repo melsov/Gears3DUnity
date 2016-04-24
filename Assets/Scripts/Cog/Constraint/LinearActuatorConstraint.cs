@@ -8,6 +8,7 @@ public class LinearActuatorConstraint : Constraint
     protected Vector3 prevTargetPosition = Vector3.zero;
     protected int intersectionIndex = -1;
     private bool needToConfigure = true;
+    private FreeRotationPeg freeRotationPeg;
 
     protected override void awake() {
         base.awake();
@@ -32,17 +33,26 @@ public class LinearActuatorConstraint : Constraint
     public override void configure() {
         base.configure();
         if (constraintTarget.driverReference == null) {
-            print("null driver ref in linear actuator constraint"); return;
+            return;
         }
-        if (constraintTarget.drivenReference == null ||  !(constraintTarget.drivenReference is LinearActuator)) {
-            print("wrong kind of drivable: " + constraintTarget.drivenReference.name); return;
+        if (!(constraintTarget.drivenReference is LinearActuator)) {
+            return;
         }
         if(!reignInLineSegment()) {
             return;
         }
+        forceFreeRotationPeg();
         chooseIntersectionIndex();
         extendLineSegment();
         needToConfigure = false;
+    }
+
+    protected void forceFreeRotationPeg() {
+        if (freeRotationPeg == null) {
+            Socket poleBackSocket = constraintTarget.reference.GetComponent<Socket>();
+            poleBackSocket.forceFreeRotationPeg(true);
+            freeRotationPeg = (FreeRotationPeg) poleBackSocket.childPeg;
+        }
     }
 
     private bool reignInLineSegment() {
@@ -155,6 +165,7 @@ public class LinearActuatorConstraint : Constraint
         if(needToConfigure) {
             configure();
         }
+        if (intersectionIndex < 0 || intersectionIndex > 1) { return; }
 
         Vector3 curDirection = poleDirection; 
         Vector3 target = constraintTarget.target.position;

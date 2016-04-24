@@ -79,6 +79,14 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         }
     }
 
+    public void forceFreeRotationPeg(bool wantParentPeg) {
+        if (wantParentPeg && hasDrivingPeg()) {
+            drivingPeg._pegIsParentRotationMode = RotationMode.FREE_ONLY;
+        } else if (!wantParentPeg && hasChildPeg()) {
+            childPeg._pegIsParentRotationMode = RotationMode.FREE_ONLY;
+        }
+    }
+
     public void disconnectDrivingPeg() {
         drivingPeg = null;
     }

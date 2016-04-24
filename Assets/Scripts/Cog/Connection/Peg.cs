@@ -11,7 +11,8 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
 
     private RotationMode __pegIsParentRotationMode = RotationMode.FREE_OR_FIXED;
 
-    public Hinge hingePrefab;
+    protected Hinge hingePrefab;
+    protected Hinge hinge;
 
     protected Drivable _owner; //owners permanently own pegs (pegboards with pegs on them are not owners)
     public Drivable owner {
@@ -42,13 +43,11 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     protected Hinge getHinge() {
-        Hinge hinge = GetComponentInChildren<Hinge>();
+        hinge = GetComponentInChildren<Hinge>();
         if (hinge == null) {
-            if (hingePrefab != null) {
-                hinge = Instantiate<Hinge>(hingePrefab);
-                hinge.gameObject.SetActive(true);
-                TransformUtil.ParentToAndAlignXZ(hinge.transform, transform, null);
-            }
+            hinge = Instantiate<Hinge>(getHingePrefab());
+            hinge.gameObject.SetActive(true);
+            TransformUtil.ParentToAndAlignXZ(hinge.transform, transform, null);
         }
         return hinge;
     }
@@ -58,11 +57,16 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         get { return _isChildConstraint; }
     }
 
-    protected RotationMode _pegIsParentRotationMode {
+    public RotationMode _pegIsParentRotationMode {
         get { return __pegIsParentRotationMode; }
         set {
-            __pegIsParentRotationMode = value;
-            setMaterial();
+            if (__pegIsParentRotationMode != value) {
+                __pegIsParentRotationMode = value;
+                setMaterial();
+                if (hasChild) {
+                    receiveChild(child);
+                }
+            }
         }
     }
 
@@ -80,8 +84,8 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     } 
 
     public void releaseChild(Socket socket) {
-        if (getHinge() != null) {
-            getHinge().disconnectObject();
+        if (hinge != null) {
+            hinge.disconnectObject();
         }
         _childSocket.Target = null;
     }
@@ -160,6 +164,17 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
             GetComponent<Rigidbody>().isKinematic = true; // OK for all pegs? This helps pegs not act weird when childed to LA pegboards
         }
     }
+    private Hinge getHingePrefab() {
+        if (hingePrefab == null) {
+            foreach (Hinge h in Resources.LoadAll<Hinge>("Prefabs")) {
+                if (h.name.Equals("HingePrefab")) {
+                    hingePrefab = h;
+                }
+            }
+        }
+        Assert.IsTrue(hingePrefab != null, "wha? couldn't find hinge prefab");
+        return hingePrefab;
+    }
 
     public void disconnect() {
         Socket socket = GetComponentInParent<Socket>();
@@ -197,11 +212,10 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
             if (ipp != null) { pegboard = ipp.getPegboard(); }
         }
         if (pegboard != null) {
-            print("found pegboard");
             Socket socket = pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode);
             if (socket == null) return false;
             return beChildOf(socket);
-        } else print("pegboard null: " +other.name);
+        }
         return false;
     }
 
@@ -315,6 +329,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
 
     public void onDragEnd() {
     }
+
 }
 
 public enum RotationMode
