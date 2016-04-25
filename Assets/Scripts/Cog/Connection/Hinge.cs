@@ -11,6 +11,14 @@ public class Hinge : MonoBehaviour {
         return _hingeJoint;
     }
 
+    public void Awake() {
+        Pause.Instance.onPause += onPause;
+    }
+
+    protected void onPause(bool paused) {
+        getHingeJoint().connectedBody.isKinematic = paused;
+    }
+
     public void connect(Rigidbody rb) {
         rb.useGravity = true;
         rb.isKinematic = false;

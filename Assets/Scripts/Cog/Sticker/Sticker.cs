@@ -23,6 +23,7 @@ public class Sticker : Cog, ICursorAgentClient
         Cog cog = other.GetComponentInParent<Cog>();
         if (cog == null) { return false; }
         transform.parent = cog.transform;
+// TODO: ensure that camera isn't below the bow collider
         transform.position = TransformUtil.SetY(transform.position, Mathf.Max(YLayer.Layer(typeof(Sticker)), cog.transform.position.y + 1f));
         return true;
     }
