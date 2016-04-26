@@ -6,8 +6,12 @@ using System.Collections.Generic;
 
 public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnection, IConstrainable
 {
-    public Material freeRotationMaterial;
-    public Material fixedRotationMaterial;
+    //public Material freeRotationMaterial;
+    //public Material fixedRotationMaterial;
+    [SerializeField]
+    protected Transform freeRotationMesh;
+    [SerializeField]
+    protected Transform fixedRotationMesh;
 
     private RotationMode __pegIsParentRotationMode = RotationMode.FREE_OR_FIXED;
 
@@ -42,7 +46,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         get { return child != null; }
     }
 
-    protected Hinge getHinge() {
+    public Hinge getHinge() {
         hinge = GetComponentInChildren<Hinge>();
         if (hinge == null) {
             hinge = Instantiate<Hinge>(getHingePrefab());
@@ -60,9 +64,11 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     public RotationMode _pegIsParentRotationMode {
         get { return __pegIsParentRotationMode; }
         set {
+            print(__pegIsParentRotationMode);
+            print(value);
             if (__pegIsParentRotationMode != value) {
                 __pegIsParentRotationMode = value;
-                setMaterial();
+                setMesh();
                 if (hasChild) {
                     receiveChild(child);
                 }
@@ -75,13 +81,21 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         if (pegIsParentRotationMode == RotationMode.FREE_ONLY || socket.socketIsChildRotationMode == RotationMode.FREE_ONLY) {
             TransformUtil.AlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
             Bug.bugIfNull(getHinge(), "hinge null");
+            forceUnparentConnectedBody(socket.parentContainer.getRigidbodyWithGravity());
             getHinge().connect(socket.parentContainer.getRigidbodyWithGravity());
             getHinge().getHingeJoint().connectedAnchor = socket.transform.localPosition;
+            
         } else {
             TransformUtil.ParentToAndAlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
         }
         _childSocket = new WeakReference(socket);
     } 
+    private void forceUnparentConnectedBody(Rigidbody rb) {
+        Drivable d = rb.GetComponentInParent<Drivable>();
+        if (d.transform.parent == transform) {
+            d.transform.parent = null;
+        }
+    }
 
     public void releaseChild(Socket socket) {
         if (hinge != null) {
@@ -90,25 +104,31 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         _childSocket.Target = null;
     }
 
-    private Renderer findRenderer() {
-        Renderer result = GetComponent<Renderer>();
-        if (result == null) {
-             foreach(Renderer r in GetComponentsInChildren<Renderer>()) {
-                if(r.gameObject.tag == "ChildMesh") {
-                    result = r;
-                }
-            }
-        }
-        return result;
-    }
+    //private Renderer findRenderer() {
+    //    Renderer result = GetComponent<Renderer>();
+    //    if (result == null) {
+    //         foreach(Renderer r in GetComponentsInChildren<Renderer>()) {
+    //            if(r.gameObject.tag == "ChildMesh") {
+    //                result = r;
+    //            }
+    //        }
+    //    }
+    //    return result;
+    //}
 
-    private void setMaterial() {
-        Renderer renderer = findRenderer();
-        if (renderer == null) return;
+    private void setMesh() {
+        //Renderer renderer = findRenderer();
+        //if (renderer == null) return;
+
         if (pegIsParentRotationMode == RotationMode.FREE_ONLY) {
-            renderer.material = freeRotationMaterial;
+            freeRotationMesh.gameObject.SetActive(true);
+            fixedRotationMesh.gameObject.SetActive(false);
+            //renderer.material = freeRotationMaterial;
+
         } else if (pegIsParentRotationMode == RotationMode.FIXED_ONLY) {
-            renderer.material = fixedRotationMaterial;
+            freeRotationMesh.gameObject.SetActive(false);
+            fixedRotationMesh.gameObject.SetActive(true);
+            //renderer.material = fixedRotationMaterial;
         }
     }
 
@@ -155,7 +175,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     #endregion
 
     protected virtual void awake() {
-        setMaterial();
+        setMesh();
         _isChildConstraint = GetComponent<Constraint>();
         gameObject.AddComponent<Highlighter>();
         GetComponent<Highlighter>().highlightColor = Color.green;

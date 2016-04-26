@@ -48,11 +48,11 @@ public class LinearActuatorConstraint : Constraint
     }
 
     protected void forceFreeRotationPeg() {
-        if (freeRotationPeg == null) {
-            Socket poleBackSocket = constraintTarget.reference.GetComponent<Socket>();
-            poleBackSocket.forceFreeRotationPeg(true);
-            freeRotationPeg = (FreeRotationPeg) poleBackSocket.childPeg;
-        }
+        ////if (freeRotationPeg == null) {
+        Socket poleBackSocket = constraintTarget.reference.GetComponent<Socket>();
+        poleBackSocket.forceFreeRotationPeg(true);
+        freeRotationPeg = (FreeRotationPeg)poleBackSocket.childPeg;
+        //}
     }
 
     private bool reignInLineSegment() {

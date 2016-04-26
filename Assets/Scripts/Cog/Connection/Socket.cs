@@ -80,7 +80,9 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
     }
 
     public void forceFreeRotationPeg(bool wantParentPeg) {
+        print("force");
         if (wantParentPeg && hasDrivingPeg()) {
+            print("force driving peg");
             drivingPeg._pegIsParentRotationMode = RotationMode.FREE_ONLY;
         } else if (!wantParentPeg && hasChildPeg()) {
             childPeg._pegIsParentRotationMode = RotationMode.FREE_ONLY;
