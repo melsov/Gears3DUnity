@@ -50,7 +50,6 @@ public class Browser : Singleton<Browser>
 
     private string savePath;
     private void invalidateSavePath() {
-        print("setting save null");
         savePath = null;
     }
 

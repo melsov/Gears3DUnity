@@ -21,10 +21,13 @@ public class CursorInteraction : MonoBehaviour {
             }
         }
         interactables = cis.ToArray();
+        print("ci awoke");
+        print("inter null? " + (interactables == null));
 	}	
 
     public virtual void mouseDown(VectorXZ worldPoint) {
         _shouldOverrideDrag = false;
+        Bug.bugIfNull(interactables, "inter is null");
         foreach (ICursorInteractable ci  in interactables) {
             ci.startCursorInteraction(worldPoint);
             _shouldOverrideDrag = ci.shouldOverrideDrag(worldPoint);

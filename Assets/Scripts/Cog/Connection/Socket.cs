@@ -51,15 +51,15 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         set {
             if (value != null) {
                 _drivingPeg = value;
+                print("driving peg: " + _drivingPeg.name);
                 _drivingPeg.receiveChild(this);
-                socketToParentPeg(this);
+                if (socketToParentPeg != null) { socketToParentPeg(this); }
             } else {
                 if (_drivingPeg != null) {
                     _drivingPeg.releaseChild(this);
                     _drivingPeg = value;
                     parentContainer.getTransform().SetParent(null);
                     parentContainer.unsetRigidbodyWithGravity();
-                    print("unset driving peg called for socket in " + parentContainer.getTransform().gameObject.name);
                 }
             }
         }

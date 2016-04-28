@@ -186,7 +186,7 @@ public class SocketSet
     public virtual Peg drivingPegOnBackendOfOtherClosestToOpenSocketOnThis(Transform other, out Socket closestOpenSocket) {
         Peg aPeg = null;
         closestOpenSocket = null;
-        if (findSocketSetContainer(other) == null) { //  other.GetComponent<ISocketSetContainer>() == null) {
+        if (findSocketSetContainer(other) == null) { 
             MonoBehaviour.print("no i socket set container with collider: " + other.name);
             return null;
         }
@@ -208,21 +208,15 @@ public class SocketSet
         return aPeg;
     }
 
-    //public virtual Peg closestOpenPegOn(Collider other, out Socket closestSocket, bool wantFrontEndSocketSetOfOther) {
-    //    return closestOpenPegOn(other, out closestSocket, true);
-    //}
-
-    //public virtual Peg closestOpenPegOnBackendOf(Collider other, out Socket closestSocket) {
-    //    return closestOpenPegOn(other, out closestSocket, false);
-    //}
 
     public virtual Socket closestSocketOnFrontendOfRegardlessOfPeg(Collider other, out Socket closestSocket) {
         Socket otherSocket = null;
         closestSocket = null;
         ISocketSetContainer ssc = findSocketSetContainer(other);
-        if (ssc == null) return null;
+        if (ssc == null) { Debug.LogError("no socket set"); return null; }
         Vector3 distance = new Vector3(9999999F, 9999999F, 9999999F);
-        SocketSet otherSocketSet = ssc.getFrontendSocketSet(); 
+        SocketSet otherSocketSet = ssc.getFrontendSocketSet();
+        Debug.LogError("other set socket count: " + otherSocketSet.sockets.Length);
         foreach (Socket s in otherSocketSet.sockets) { 
             if (s.childPeg != null && s.childPeg.occupiedByChild) { continue; }
             Socket soc = getOpenChildSocketClosestTo(s.transform.position, RotationMode.FREE_OR_FIXED);
@@ -340,7 +334,9 @@ public class SocketSet
     }
 
     protected ISocketSetContainer findSocketSetContainer(Transform other) {
-        return other.GetComponentInChildren<ISocketSetContainer>();
+        Cog cog = other.GetComponentInParent<Cog>();
+        if (cog == null) { Debug.LogError("no cog ??"); return null; }
+        return cog.GetComponentInChildren<ISocketSetContainer>();
     }
 
     protected ISocketSetContainer findSocketSetContainer(Collider other) {

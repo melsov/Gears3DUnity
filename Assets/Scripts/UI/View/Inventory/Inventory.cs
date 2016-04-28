@@ -87,6 +87,7 @@ public class Inventory : Singleton<Inventory> {
 
     private void instantiatePrefab(Transform prefab) {
         Transform tr = Instantiate<Transform>(prefab);
+        tr.gameObject.SetActive(true);
         setPosition(tr);
         CursorInteraction ci = tr.GetComponent<CursorInteraction>();
         Assert.IsTrue(ci != null, "no cursor interaction on prefab: " + prefab.name);

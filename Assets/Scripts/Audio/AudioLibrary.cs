@@ -23,7 +23,6 @@ public class AudioLibrary : Singleton<AudioLibrary>
             }
             AudioEntity[] aes = Resources.LoadAll<AudioEntity>("Prefabs/Audio/Cog");
             foreach (AudioEntity ae in aes) {
-                print(ae.name);
                 lookup.Add(ae.name, ae);
             }
         }

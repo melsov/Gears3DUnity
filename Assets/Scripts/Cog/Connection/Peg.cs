@@ -64,8 +64,6 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     public RotationMode _pegIsParentRotationMode {
         get { return __pegIsParentRotationMode; }
         set {
-            print(__pegIsParentRotationMode);
-            print(value);
             if (__pegIsParentRotationMode != value) {
                 __pegIsParentRotationMode = value;
                 setMesh();
@@ -77,23 +75,20 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     public void receiveChild(Socket socket) {
-        Bug.bugIfNull(socket, "socket is null");
         if (pegIsParentRotationMode == RotationMode.FREE_ONLY || socket.socketIsChildRotationMode == RotationMode.FREE_ONLY) {
             TransformUtil.AlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
-            Bug.bugIfNull(getHinge(), "hinge null");
             forceUnparentConnectedBody(socket.parentContainer.getRigidbodyWithGravity());
             getHinge().connect(socket.parentContainer.getRigidbodyWithGravity());
             getHinge().getHingeJoint().connectedAnchor = socket.transform.localPosition;
-            
         } else {
             TransformUtil.ParentToAndAlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
         }
         _childSocket = new WeakReference(socket);
     } 
     private void forceUnparentConnectedBody(Rigidbody rb) {
-        Drivable d = rb.GetComponentInParent<Drivable>();
-        if (d.transform.parent == transform) {
-            d.transform.parent = null;
+        Cog c = rb.GetComponentInParent<Cog>();
+        if (c.transform.parent == transform) {
+            c.transform.parent = null;
         }
     }
 
@@ -104,31 +99,13 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         _childSocket.Target = null;
     }
 
-    //private Renderer findRenderer() {
-    //    Renderer result = GetComponent<Renderer>();
-    //    if (result == null) {
-    //         foreach(Renderer r in GetComponentsInChildren<Renderer>()) {
-    //            if(r.gameObject.tag == "ChildMesh") {
-    //                result = r;
-    //            }
-    //        }
-    //    }
-    //    return result;
-    //}
-
     private void setMesh() {
-        //Renderer renderer = findRenderer();
-        //if (renderer == null) return;
-
         if (pegIsParentRotationMode == RotationMode.FREE_ONLY) {
             freeRotationMesh.gameObject.SetActive(true);
             fixedRotationMesh.gameObject.SetActive(false);
-            //renderer.material = freeRotationMaterial;
-
         } else if (pegIsParentRotationMode == RotationMode.FIXED_ONLY) {
             freeRotationMesh.gameObject.SetActive(false);
             fixedRotationMesh.gameObject.SetActive(true);
-            //renderer.material = fixedRotationMaterial;
         }
     }
 
@@ -261,6 +238,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         if (!skipConstraint && isChildConstraint != null) {
             setupConstraint();
             GetComponent<Highlighter>().highlight(Color.cyan);
+            Bug.bugAndPause("be child of");
         } else if (isChildConstraint == null) {
             TransformUtil.ParentToAndAlignXZ(transform, socket.transform, null);
         }

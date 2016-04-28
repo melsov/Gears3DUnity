@@ -31,6 +31,8 @@ public class Bug : MonoBehaviour {
         }
     }
     public static bool DEBUG_SAVE_RESTORE = true;
+
+
     public static void bugSaveRestore(string msg) {
         if (DEBUG_SAVE_RESTORE) {
             print(msg);
@@ -100,6 +102,12 @@ public class Bug : MonoBehaviour {
     internal static void bugIfNull(UnityEngine.Object t, string msg) {
         if (t == null) {
             print(msg);
+        }
+    }
+
+    public static void bugIfNull(System.Object[] interactables, string v) {
+        if (interactables == null) {
+            print(v);
         }
     }
 

@@ -175,6 +175,8 @@
     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\SerializableVecQuat.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\SaveLoad.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\TestSerialize.cs" />
+    <Compile Include="Assets\Scripts\Score\Scorable.cs" />
+    <Compile Include="Assets\Scripts\Score\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Tests\TestAngleMath.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadController.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\Category.cs" />
