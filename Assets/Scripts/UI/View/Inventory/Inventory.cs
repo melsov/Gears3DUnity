@@ -71,6 +71,7 @@ public class Inventory : Singleton<Inventory> {
 
     public static void createButton(RectTransform instantiatePanelPrefab, Sprite sprite, string title, Transform t, Transform prefab, Vector3 anchoredPosition) {
         RectTransform instPanel = Instantiate<RectTransform>(instantiatePanelPrefab);
+        instPanel.gameObject.SetActive(true);
         InstantiateButton b = instPanel.GetComponentInChildren<InstantiateButton>();
         b.prefab = prefab;
         b.instantiateItem = Inventory.Instance.instantiatePrefab;

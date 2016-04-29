@@ -146,6 +146,8 @@
     <Compile Include="Assets\Scripts\Cog\Ducts\TubeEntrance.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\TubeExit.cs" />
     <Compile Include="Assets\Scripts\Cog\Feedback\Chime.cs" />
+    <Compile Include="Assets\Scripts\Cog\Feedback\Instrument.cs" />
+    <Compile Include="Assets\Scripts\Cog\Feedback\Percussion.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\CollisionProxy.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\TriggerProxy.cs" />
     <Compile Include="Assets\Scripts\Cog\Sticker\Sticker.cs" />

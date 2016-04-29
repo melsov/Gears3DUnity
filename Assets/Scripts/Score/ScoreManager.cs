@@ -12,20 +12,10 @@ public class ScoreManager : Singleton<ScoreManager> {
     }
     public Text scoreText;
 
-    public void Awake() {
-        Combinable[] combinables = Resources.LoadAll<Combinable>("Prefabs/Dispensables");
-        foreach(Combinable c in combinables) {
-            
-        }
-    }
-
-
     public void notify(Scorable scorable) {
         _score += scorable.value;
         scoreText.text = "" + _score;
     }
-
-
 
 }
 
