@@ -216,7 +216,7 @@ public class SocketSet
         if (ssc == null) { Debug.LogError("no socket set"); return null; }
         Vector3 distance = new Vector3(9999999F, 9999999F, 9999999F);
         SocketSet otherSocketSet = ssc.getFrontendSocketSet();
-        Debug.LogError("other set socket count: " + otherSocketSet.sockets.Length);
+
         foreach (Socket s in otherSocketSet.sockets) { 
             if (s.childPeg != null && s.childPeg.occupiedByChild) { continue; }
             Socket soc = getOpenChildSocketClosestTo(s.transform.position, RotationMode.FREE_OR_FIXED);

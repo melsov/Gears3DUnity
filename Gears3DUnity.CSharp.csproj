@@ -161,6 +161,8 @@
     <Compile Include="Assets\Scripts\Interaction\HandleRotator.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleRotatorClient.cs" />
     <Compile Include="Assets\Scripts\Interaction\HandleSet.cs" />
+    <Compile Include="Assets\Scripts\Interaction\Highlightable.cs" />
+    <Compile Include="Assets\Scripts\Interaction\Highlighter.cs" />
     <Compile Include="Assets\Scripts\Interaction\LinearHandleSet.cs" />
     <Compile Include="Assets\Scripts\Interaction\PhysicsCursorInteraction.cs" />
     <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
@@ -194,7 +196,6 @@
     <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLineComponent.cs" />
     <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
-    <Compile Include="Assets\Scripts\Utility\Highlighter.cs" />
     <Compile Include="Assets\Scripts\Utility\LayerLookup.cs" />
     <Compile Include="Assets\Scripts\Utility\RayCastUtil.cs" />
     <Compile Include="Assets\Scripts\Utility\Singleton\Singleton.cs" />

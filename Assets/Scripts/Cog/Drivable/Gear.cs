@@ -134,6 +134,7 @@ public class Gear : Drivable  {
             transform.eulerAngles = euler; 
         }
     }
+
     protected virtual void setDistanceFrom(Gear gear) {
         Vector3 refPoint = _driver.transform.position;
         if (gear is RackGear) {
@@ -145,39 +146,70 @@ public class Gear : Drivable  {
         transform.position = refPoint + relPos;
     }
 
-    protected override bool vConnectTo(Collider other) {
-        if (isDriven()) {
-            print("is driven already");
-            return false;
+    protected override DrivableConnection getDrivableConnection(Collider other) {
+        GearConnection gc = new GearConnection(this);
+        if (isDriven() || isConnectedTo(other.transform) || !isInConnectionRange(other)) { return gc; }
+        gc.axel = getAxel(other);
+        if (gc.axel != null && !gc.axel.hasChild) {
+            gc.makeConnection = setSocketClosestToAxel;
+        } else if (other.GetComponent<Gear>() != null) {
+            gc.other = other;
+            gc.makeConnection = beDrivenBy;
         }
-        if (isConnectedTo(other.transform)) {
-            print("is connected to " + other.name + " already");
-            return false;
-        }
+        return gc;
+    }
 
-        // If this is an axel, get driven by it
-        Axel axel = getAxel(other);
-        if (axel != null && !axel.hasChild) {
-            print("axel not null");
-            setSocketClosestToAxel(axel);
-            return true;
-        }
-        if (!isInConnectionRange(other)) {
-            print("connection not in range");
-            return false;
-        }
+    protected class GearConnection : DrivableConnection
+    {
+        public Axel axel;
+        public GearConnection(Gear _gear) : base(_gear) { }
+    }
 
-        // Otherwise, if this is a gear, get driven by it
-        Gear gear = other.GetComponent<Gear>(); 
-        if (gear != null && gear is Drivable) {
-            Bug.bugError(name + " conn to gear: " + gear.name);
+    //protected override bool vConnectTo(Collider other) {
+    //    print("gear connect");
+    //    if (isDriven()) {
+    //        print("is driven already");
+    //        return false;
+    //    }
+    //    if (isConnectedTo(other.transform)) {
+    //        print("is connected to " + other.name + " already");
+    //        return false;
+    //    }
+    //    // If this is an axel, get driven by it
+    //    Axel axel = getAxel(other);
+    //    if (axel != null && !axel.hasChild) {
+    //        print("axel not null");
+    //        setSocketClosestToAxel(axel);
+    //        return true;
+    //    }
+    //    if (!isInConnectionRange(other)) {
+    //        print("connection not in range");
+    //        return false;
+    //    }
+
+    //    // Otherwise, if this is a gear, get driven by it
+    //    Gear gear = other.GetComponent<Gear>(); 
+    //    if (gear != null) {
+    //        Bug.bugError(name + " conn to gear: " + gear.name);
+    //        beDrivenBy(gear);
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    protected virtual bool setSocketClosestToAxel(DrivableConnection dc) {
+        setSocketClosestToAxel(((GearConnection) dc).axel);
+        return true;
+    }
+
+    protected virtual bool beDrivenBy(DrivableConnection dc) {
+        Gear gear = dc.other.GetComponent<Gear>();
+        if (gear != null) {
             beDrivenBy(gear);
             return true;
         }
-        print("gear wasn't drivabe??");
         return false;
     }
-
     public void beDrivenBy(Gear gear) {
         gear.addDrivable(this);
         _driver = gear;

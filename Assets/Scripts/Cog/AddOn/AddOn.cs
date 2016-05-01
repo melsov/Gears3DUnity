@@ -9,6 +9,9 @@ public abstract class AddOn : Cog , ICursorAgentClient
     protected RotationHandle rotationHandle;
 
     #region ICursorAgentClient
+    public void handleTriggerEnter(Collider other) {
+
+    }
     public bool connectTo(Collider other) { return vConnectTo(other); }
 
     protected virtual bool vConnectTo(Collider other) {
@@ -100,6 +103,8 @@ public abstract class AddOn : Cog , ICursorAgentClient
 
     public void onDragEnd() {
     }
+
+    
 }
 
 public interface IAddOnClient

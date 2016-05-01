@@ -52,20 +52,41 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
         }
     }
 
-    protected override bool vConnectTo(Collider other) {
-        if (isDriven()) { 
-            return false;
-        }
-        if (isConnectedTo(other.transform)) { return false; }
 
-        Gear gear = other.GetComponent<Gear>(); 
-        if (gear != null && gear is Drivable) {
+    //protected override bool vConnectTo(Collider other) {
+    //    if (isDriven()) { 
+    //        return false;
+    //    }
+    //    if (isConnectedTo(other.transform)) { return false; }
+
+    //    Gear gear = other.GetComponent<Gear>();
+    //    if (gear != null && gear is Drivable) {
+    //        _driver = gear;
+    //        gear.addDrivable(this);
+    //        positionRelativeTo(gear);
+    //        return true;
+    //    }
+    //    return false;
+    //}
+
+    protected bool makeConveryBeltConnection(DrivableConnection dc) {
+        Gear gear = dc.other.GetComponent<Gear>();
+        if (gear != null) {
             _driver = gear;
             gear.addDrivable(this);
             positionRelativeTo(gear);
             return true;
         }
         return false;
+    }
+    protected override DrivableConnection getDrivableConnection(Collider other) {
+        DrivableConnection dc = new DrivableConnection(this);
+        if (isDriven() || isConnectedTo(other.transform)) { return dc; }
+        if (other.GetComponent<Gear>() != null) {
+            dc.other = other;
+            dc.makeConnection = makeConveryBeltConnection;
+        }
+        return dc;
     }
 
     public override void positionRelativeTo(Drivable _driver) {

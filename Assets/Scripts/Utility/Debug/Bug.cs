@@ -54,7 +54,7 @@ public class Bug : MonoBehaviour {
     }
 
     public static void assertNotNullPause(MonoBehaviour m) {
-        assertPause(m != null, " " + m.name + ", is actually null");
+        assertPause(m != null, "something is null is actually null");
     }
 
     public static void printComponents(MonoBehaviour mb) {

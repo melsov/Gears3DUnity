@@ -22,7 +22,7 @@ public class ColliderDropper : MonoBehaviour {
     void OnTriggerEnter(Collider other) {
         if (client.isCursorInteracting()) {
             if (!colliders.Contains(other)) {
-                highlight(other, true);
+                client.handleTriggerEnter(other);
                 colliders.Add(other);
             }
         }
@@ -31,12 +31,6 @@ public class ColliderDropper : MonoBehaviour {
 //TODO: with linear actuator, there are a whole bunch of 
 // unintended behaviors surrounding droppers, cursor agents
     void OnTriggerExit(Collider other) {
-        try {
-            highlight(other, false);
-        } catch(System.Exception e) {
-            print(other.name + " didnt have mat [o]?");
-            Bug.bugAndPause(e.ToString());
-        }
         colliders.Remove(other);
         try {
             if (client.isCursorInteracting()) {
@@ -51,20 +45,13 @@ public class ColliderDropper : MonoBehaviour {
         colliders.RemoveRange(0, colliders.Count);
     }
     
-    private void highlight(Collider other, bool wantHighlight) {
-        Highlighter h = other.GetComponent<Highlighter>();
-        if (h == null) return;
-        if (wantHighlight) {
-            h.highlight();
-        } else {
-            h.unhighlight();
-        }
-    }
+    
 
 }
 
 public interface IColliderDropperClient
 {
     bool isCursorInteracting();
+    void handleTriggerEnter(Collider other);
     void handleTriggerExit(Collider other);
 }

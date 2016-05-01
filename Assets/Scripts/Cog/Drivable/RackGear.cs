@@ -68,26 +68,76 @@ public class RackGear : Gear {
         transform.RotateAround(pivot.position, Vector3.up, Quaternion.FromToRotation(direction.vector3(), dir.vector3()).eulerAngles.y); // .SetLookRotation(dir.vector3());
     }
 
-    protected override bool vConnectTo(Collider other) {
-        print("Rack gear vConnect");
-        if(base.vConnectTo(other)) {
-            print("base connect");
-            return true;
-        }
+    //protected override bool couldConnectTo(Collider other, out Socket aSocket, out Peg peg, out Socket otherSocket) {
+    //    aSocket = null; peg = null; otherSocket = null;
+    //    if (couldConnectTo(other)) {
+    //        return true;
+    //    }
 
-        Socket aSocket;
-        Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
-        if (peg != null) {
-            if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
-                LinearActuator la = findConnectedLinearActuator(other);
-                if (la == null) { print("la null"); return false; }
-                rotateInDirection(la.direction, peg.transform);
-                setSocketToPeg(aSocket, peg);
-                return true;
+    //    peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
+    //    if (peg != null) {
+    //        if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
+    //            LinearActuator la = findConnectedLinearActuator(other);
+    //            if (la == null) { print("la null"); return false; }
+    //            //rotateInDirection(la.direction, peg.transform);
+    //            //setSocketToPeg(aSocket, peg);
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
+
+    protected override DrivableConnection getDrivableConnection(Collider other) {
+        DrivableConnection dc = base.getDrivableConnection(other);
+        if (dc.viable) return dc;
+        RackGearConnection rgc = new RackGearConnection(this);
+        rgc.peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out rgc.socket);
+        if (rgc.peg != null) {
+            if (RotationModeHelper.CompatibleModes(rgc.peg.pegIsParentRotationMode, rgc.socket.socketIsChildRotationMode)) {
+                rgc.linearActuator = findConnectedLinearActuator(other);
+                rgc.makeConnection = makeConnectionWithLinearActuator;
             }
         }
+        return rgc;
+    }
 
-        return false;
+    protected class RackGearConnection : DrivableConnection
+    {
+        public LinearActuator linearActuator;
+        public RackGearConnection(Drivable _drivable) : base(_drivable) { }
+    }
+
+    protected override bool vConnectTo(Collider other) {
+        DrivableConnection dc = getDrivableConnection(other);
+        return dc.connect();
+    }
+    //protected override bool vvConnectTo(Collider other) {
+    //    print("Rack gear vConnect");
+    //    if(base.vConnectTo(other)) {
+    //        print("base connect");
+    //        return true;
+    //    }
+
+    //    Socket aSocket;
+    //    Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
+    //    if (peg != null) {
+    //        if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
+    //            LinearActuator la = findConnectedLinearActuator(other);
+    //            if (la == null) { print("la null"); return false; }
+
+    //            rotateInDirection(la.direction, peg.transform);
+    //            setSocketToPeg(aSocket, peg);
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
+
+    protected bool makeConnectionWithLinearActuator(DrivableConnection dc) {
+        RackGearConnection rgc = (RackGearConnection)dc;
+        rotateInDirection(rgc.linearActuator.direction, rgc.peg.transform);
+        setSocketToPeg(rgc);
+        return true;
     }
 
     protected override void onSocketToParentPeg(Socket socket) {

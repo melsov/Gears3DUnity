@@ -28,6 +28,10 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
         handleRotator.endDragOverride(cursorGlobal);
     }
 
+    public void handleTriggerEnter(Collider other) {
+
+    }
+
     public Collider mainCollider() {
         return _mainCollider;
     }

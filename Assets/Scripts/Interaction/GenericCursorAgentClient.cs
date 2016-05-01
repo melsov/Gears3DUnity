@@ -47,4 +47,7 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
     public void triggerExitDuringDrag(Collider other) {
     }
 
+    public void handleTriggerEnter(Collider other) {
+        //TODO: highlight other? is this used by things that connect?
+    }
 }

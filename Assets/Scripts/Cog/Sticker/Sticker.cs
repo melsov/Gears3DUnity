@@ -74,4 +74,7 @@ public class Sticker : Cog, ICursorAgentClient
     public void suspendConnection() {
     }
 
+    public void handleTriggerEnter(Collider other) {
+        //TODO: highlights other if sticker can connect
+    }
 }

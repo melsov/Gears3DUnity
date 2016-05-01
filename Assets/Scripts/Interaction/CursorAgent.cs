@@ -64,7 +64,10 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             client.dragOverride(cursorGlobal);
         }
     }
-
+    
+    public void handleTriggerEnter(Collider other) {
+        client.handleTriggerEnter(other);
+    }
     public void handleTriggerExit(Collider other) {
         if (client == null) { return; }
         client.triggerExitDuringDrag(other);
@@ -112,6 +115,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
 
 public interface ICursorAgentClient
 {
+    void handleTriggerEnter(Collider other);
     void suspendConnection();
     Collider shouldPreserveConnection();
     void disconnect();
