@@ -14,12 +14,12 @@ public class Highlighter : MonoBehaviour {
 
     private void setupHighlightables() {
         List<Highlightable> result = new List<Highlightable>();
-        Manifest manifest = GetComponent<Manifest>();
-        Bug.assertNotNullPause(manifest);
-        foreach(MonoBehaviour mb in manifest.componentsOfType<Renderer>()) {
-            Highlightable h = mb.GetComponent<Highlightable>();
+        
+        foreach(Renderer r in GetComponentsInChildren<Renderer>()) {// manifest.componentsOfType<Renderer>()) {
+            print("hi");
+            Highlightable h = r.GetComponent<Highlightable>();
             if (h == null) {
-                h = mb.gameObject.AddComponent<Highlightable>();
+                h = r.gameObject.AddComponent<Highlightable>();
             }
             result.Add(h);
         }

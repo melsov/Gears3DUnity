@@ -12,15 +12,22 @@ public class Manifest : MonoBehaviour {
 
     private MonoBehaviour[] _components;
     public MonoBehaviour[] prefabComponents {
-        get { return _components; }
+        get { return getComponents(); }
     }
     void Awake() {
         _components = GetComponentsInChildren<MonoBehaviour>();
     }
 
+    protected MonoBehaviour[] getComponents() {
+        if (_components == null) {
+            _components = GetComponentsInChildren<MonoBehaviour>();
+        }
+        return _components;
+    }
+
     public MonoBehaviour[] componentsOfType<T>() {
         List<MonoBehaviour> result = new List<MonoBehaviour>();
-        foreach (MonoBehaviour mb in _components) {
+        foreach (MonoBehaviour mb in getComponents()) {
             if (mb is T) {
                 result.Add(mb);
             }

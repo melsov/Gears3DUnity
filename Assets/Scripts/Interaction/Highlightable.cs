@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Highlightable : MonoBehaviour {
     [SerializeField]
@@ -9,6 +9,7 @@ public class Highlightable : MonoBehaviour {
     protected Material highlightMaterial;
     private GameObject highlightMesh;
     public Color highlightColor = Color.red;
+    protected Color defaultColor;
 
 	void Awake () {
         if (highlightMaterial == null) {
@@ -30,31 +31,49 @@ public class Highlightable : MonoBehaviour {
         if (_renderer == null) {
             _renderer = GetComponent<Renderer>();
         }
-        
         Bug.assertPause(_renderer.materials[0] != null, "_renderer [0] is null?");
         defaultMaterial = _renderer.material;
+        defaultColor = defaultMaterial.color;
 	}
     
     public void highlight() {
-        highlight(true, highlightColor);
+        highlight(true, new NullableColor(highlightColor));
     }
 
     public void unhighlight() {
-        highlight(false, highlightColor);
+        highlight(false, null);
     }
 
     public void highlight(Color color) {
-        highlight(true, color);
+        highlight(true, new NullableColor(color));
     }
 
-    private void highlight(bool doHighlight, Color color) {
+    private void highlight(bool doHighlight, NullableColor color) {
         if (highlightMesh != null) {
             highlightMesh.SetActive(doHighlight);
             return;
         }
-        if (doHighlight) {
-            highlightMaterial.color = highlightColor;
+        if (_renderer == null) {
+            return;
         }
-        _renderer.material = doHighlight ? highlightMaterial : defaultMaterial;
+        if (doHighlight) {
+            if (color != null) {
+                _renderer.material = defaultMaterial;
+                _renderer.material.color = color.color;
+            } else {
+                _renderer.material = highlightMaterial;
+            }
+        } else {
+            _renderer.material = defaultMaterial;
+            _renderer.material.color = defaultColor;
+        }
+    }
+    protected class NullableColor
+    {
+        public Color color;
+        public NullableColor(Color color) {
+            this.color = color;
+        }
     }
 }
+

@@ -33,6 +33,8 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void save() {
+        Bug.bugError("save not implemented");
+        return;
         blockCursorInput(true);
         string doesntmatter = Application.dataPath + "/TempSaveFile";
         print(Application.persistentDataPath);
@@ -45,6 +47,8 @@ public class SaveLoad : Singleton<SaveLoad> {
     }
 
     public void load() {
+        Bug.bugError("load not implmnt");
+        return;
         Browser.Instance.OpenFile(Application.persistentDataPath, handleLoadFile); //WANT
     }
 
@@ -56,6 +60,8 @@ public class SaveLoad : Singleton<SaveLoad> {
     
 
     public void newScene() {
+        Bug.bugError("TODO: warning bfr hand");
+        return;
         foreach(Cog cog in allCogsInScene()) {
             Destroy(cog.gameObject);
         }

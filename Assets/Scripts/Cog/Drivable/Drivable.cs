@@ -513,7 +513,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 //THIS DOESN'T GET TRIGGERED ?
     protected virtual void vTriggerExit(Collider other) {
         unhighlight(other);
-        return; // TODO: refine cases where we should disconnect when moving handles
+        //return; // TODO: refine cases where we should disconnect when moving handles
         ISocketSetContainer ssc = other.GetComponent<ISocketSetContainer>();
         if (ssc == null) {
             print("vTriggerExit: ssc null");
