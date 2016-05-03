@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Diagnostics;
 using System.Collections;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -24,7 +25,7 @@ public class Bug : MonoBehaviour {
 
     public static void assertPause(bool v, string msg) {
         if (!v) {
-            Debug.LogError(msg);
+            print(msg);
 #if UNITY_EDITOR
             EditorApplication.isPaused = true;
 #endif
@@ -47,14 +48,37 @@ public class Bug : MonoBehaviour {
             print(msg);
         }
     }
+    public static void printCallerMethod() {
+        print(callerMethod(1));
+    }
 
+    public static string getStackTrace() {
+        StackTrace st = new StackTrace();
+        string result = "";
+        foreach(StackFrame sf in st.GetFrames()) {
+            var method = sf.GetMethod();
+            result = string.Format("{0} \n {1} : {2}", result,  method.DeclaringType, method.Name);
+        }
+        return result;
+    }
+    public static void stackTrace() {
+        print(getStackTrace());
+    }
 
+    public static string callerMethod() {
+        return callerMethod(1);
+    }
+    private static string callerMethod(int i) {
+        System.Diagnostics.StackFrame frame = new System.Diagnostics.StackFrame(i + 1);
+        var method = frame.GetMethod();
+        return method.DeclaringType.ToString() + " : " + method.Name;
+    }
     public static void assertNotNullPause(System.Object m) {
-        assertPause(m != null, " this object " + m.ToString() + ", is actually null");
+        assertPause(m != null, " this object, is actually null. "  + callerMethod(1));
     }
 
     public static void assertNotNullPause(MonoBehaviour m) {
-        assertPause(m != null, "something is null is actually null");
+        assertPause(m != null, "something is null is actually null " + callerMethod(1));
     }
 
     public static void printComponents(MonoBehaviour mb) {
@@ -82,7 +106,7 @@ public class Bug : MonoBehaviour {
     }
 
     public static void bugAndPause(string s) {
-        Debug.LogError(s);
+        UnityEngine.Debug.LogError(s);
 #if UNITY_EDITOR
         EditorApplication.isPaused = true;
 #endif
@@ -104,7 +128,11 @@ public class Bug : MonoBehaviour {
             print(msg);
         }
     }
-
+    public static void bugIfNull(System.Object[] interactables, MonoBehaviour mb) {
+        if (interactables == null) {
+            print("null thing in: " + mb.name + " script: " + mb.ToString());
+        }
+    }
     public static void bugIfNull(System.Object[] interactables, string v) {
         if (interactables == null) {
             print(v);
@@ -116,6 +144,6 @@ public class Bug : MonoBehaviour {
     }
 
     public static void bugError(string v) {
-        Debug.LogError(v);
+        UnityEngine.Debug.LogError(v);
     }
 }

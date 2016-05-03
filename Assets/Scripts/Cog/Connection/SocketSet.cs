@@ -333,8 +333,13 @@ public class SocketSet
         return connectedCog<T>() != null;
     }
 
-    protected ISocketSetContainer findSocketSetContainer(Transform other) {
+    public static ISocketSetContainer findISocketSetContainer(Transform other) { return findSocketSetContainer(other); }
+
+    protected static ISocketSetContainer findSocketSetContainer(Transform other) {
         Cog cog = other.GetComponentInParent<Cog>();
+        if (cog is IPegProxy) {
+            if (((IPegProxy)cog).getPegboard() != null) { return ((IPegProxy)cog).getPegboard(); }
+        }
         if (cog == null) { Debug.LogError("no cog ??"); return null; }
         return cog.GetComponentInChildren<ISocketSetContainer>();
     }

@@ -16,7 +16,6 @@ public class Highlighter : MonoBehaviour {
         List<Highlightable> result = new List<Highlightable>();
         
         foreach(Renderer r in GetComponentsInChildren<Renderer>()) {// manifest.componentsOfType<Renderer>()) {
-            print("hi");
             Highlightable h = r.GetComponent<Highlightable>();
             if (h == null) {
                 h = r.gameObject.AddComponent<Highlightable>();
