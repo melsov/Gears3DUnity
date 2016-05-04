@@ -75,12 +75,24 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = false;
+        unhighlight();
         if (client == null) { return; }
         if (overridingDrag) {
             client.endDragOverride(cursorGlobal);
         } 
         connectToColliders(colliderDropper);
         client.onDragEnd();
+    }
+
+    private void unhighlight() {
+        if (colliderDropper == null || colliderDropper.colliders == null) { return; }
+        foreach(Collider c in colliderDropper.colliders) {
+            Cog cog = c.GetComponentInParent<Cog>();
+            if (cog == null) { continue; }
+            Highlighter h = cog.GetComponentInChildren<Highlighter>();
+            if (h == null) { continue; }
+            h.unhighlight();
+        }
     }
 
     public bool isCursorInteracting() {
