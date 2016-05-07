@@ -66,9 +66,9 @@ public class Gear : Drivable  {
 
     public override Drive receiveDrive(Drive drive) {
         if (_driver is RackGear) {
-            transform.eulerAngles += new Vector3(0f, -Mathf.Rad2Deg * drive.amount / innerRadius, 0f);
+            gearTransform.eulerAngles += new Vector3(0f, -Mathf.Rad2Deg * drive.amount / innerRadius, 0f);
         } else {
-            transform.eulerAngles += new Vector3(0f, drive.amount * -1f * toothOffsetAngleRadians, 0f);
+            gearTransform.eulerAngles += new Vector3(0f, drive.amount * -1f * toothOffsetAngleRadians, 0f);
         }
         return drive;
     }
@@ -120,19 +120,27 @@ public class Gear : Drivable  {
             Gear gear = (Gear)_driver;
 
             setDistanceFrom(gear);
-
-            //set rotation
-            Vector3 euler = transform.rotation.eulerAngles;
-            VectorXZ relXZ = new VectorXZ(transform.position - _driver.transform.position);
-            if (gear is RackGear) {
-                relXZ = xzPosition - ((RackGear)gear).closestPointOnLine(xzPosition);
-            }
-            //float normalizedOther = gear.proportionalCWToothOffsetFrom(relXZ);
-            float normalizedOther = gear.proportionalCWToothOffsetFromAbsPosition(xzPosition);
-            float closestOffset = cwToothOffsetFrom(relXZ * -1f);
-            euler.y = euler.y + closestOffset + toothOffsetAngleDegrees * (normalizedOther + .5f);
-            transform.eulerAngles = euler; 
+            gearTransform.eulerAngles = eulersRelativeToGear(gear);
         }
+    }
+
+    protected virtual Vector3 startEulerAnglesForAligningTeeth {
+        get { return transform.rotation.eulerAngles; }
+    }
+    protected virtual Transform gearTransform {
+        get { return transform; }
+    }
+
+    protected Vector3 eulersRelativeToGear(Gear gear) {
+        Vector3 euler = startEulerAnglesForAligningTeeth;
+        VectorXZ relXZ = new VectorXZ(transform.position - gear.transform.position);
+        if (gear is RackGear) {
+            relXZ = xzPosition - ((RackGear)gear).closestPointOnLine(xzPosition);
+        }
+        float normalizedOther = gear.proportionalCWToothOffsetFromAbsPosition(xzPosition);
+        float closestOffset = cwToothOffsetFrom(relXZ * -1f);
+        euler.y = euler.y + closestOffset + toothOffsetAngleDegrees * (normalizedOther + .5f);
+        return euler; 
     }
 
     protected virtual void setDistanceFrom(Gear gear) {

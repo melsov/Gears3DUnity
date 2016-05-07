@@ -127,6 +127,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\LinearActuator.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Piston.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pole.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\RackGear.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Rope\ChainLink.cs" />

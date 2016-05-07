@@ -455,7 +455,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 
     protected virtual void updateCursorRotationPivot(Collider dragOverrideCollider) {
         if (_cursorRotationPivot == null) {
-            _cursorRotationPivot = this.transform;
+            _cursorRotationPivot = transform;
 
             //doomed? since maybe we disconnect before this?
             if (_pegboard.getBackendSocketSet().hasUniqueParentPeg()) {
@@ -496,7 +496,10 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         // rotate around the pivot
         Vector3 current = _cursorRotationHandle.position - _cursorRotationPivot.position;
         Vector3 target = cursorGlobal.vector3(_cursorRotationPivot.position.y) - _cursorRotationPivot.position;
-        transform.RotateAround(_cursorRotationPivot.position, EnvironmentSettings.towardsCameraDirection, Quaternion.FromToRotation(current, target).eulerAngles.y);
+        dragOverrideTarget.RotateAround(_cursorRotationPivot.position, EnvironmentSettings.towardsCameraDirection, Quaternion.FromToRotation(current, target).eulerAngles.y);
+    }
+    protected virtual Transform dragOverrideTarget {
+        get { return transform; }
     }
 
     protected virtual void vEndDragOverride(VectorXZ cursorGlobal) {
@@ -590,7 +593,6 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             Vector3 relPos = transform.position - _driver.transform.position;
             relPos = relPos.normalized * (radius + _driver.radius - .01f); // fudge a little to keep gear inside
             transform.position = _driver.transform.position + relPos;
-            return;
         }
     }
 
