@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//TODO: rack gear connect to piston head
 public class Piston : Gear {
 
     protected Transform gearMesh;
@@ -46,14 +47,16 @@ public class Piston : Gear {
         return startToHeadSquared / lineSegment.distance.magnitudeSquared;
     }
 
-    protected override Vector3 startEulerAnglesForAligningTeeth {
-        get {
-            return gearMesh.rotation.eulerAngles;
+    protected override DrivableConnection getDrivableConnection(Collider other) {
+        if (FindInCog<Gear>(other.transform) != null) {
+            return base.getDrivableConnection(other);
         }
+        return new DrivableConnection(this);
     }
+
     protected override Transform gearTransform {
         get {
-            return gearMesh.transform;
+            return gearMesh;
         }
     }
 

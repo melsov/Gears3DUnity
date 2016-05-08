@@ -10,7 +10,7 @@ public class Highlighter : MonoBehaviour {
     //private GameObject highlightMesh;
     //private string ColorProperty = "_Color";
     private Highlightable[] highlightables;
-    public Color defaultColor = Color.red;
+    public Color defaultColor = new Color(.2f, 1f, .7f);
 
     private void setupHighlightables() {
         List<Highlightable> result = new List<Highlightable>();

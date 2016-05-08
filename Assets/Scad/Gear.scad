@@ -6,18 +6,24 @@ TOOTH_MODE_SQUARE = 2;
 tMode = 0; // TOOTH_MODE_HULL;
 scale_ = 1;
 toothWidth = .25;
-toothCount = 24;
+toothCount = 12;
 height = .5;
 toothDepth = .25;
-
+_wantHoles = false;
 //peg();
 //Example
 //sawTooth(toothCount, toothWidth, height, toothDepth, toothDepth * 2.7, tMode, scale_);
-gearT(toothCount, toothWidth, height, toothDepth, tMode, scale_);
+gearT(toothCount, toothWidth, height, toothDepth, tMode, scale_, _wantHoles);
 
 //Generates a gear mesh
 //Radius scales with tooth width (twidth) and toothCount
-module gearT(toothCount, twidth, height, tdepth, toothMode = TOOTH_MODE_HULL, _scale = 1) 
+module gearT(toothCount, 
+    twidth, 
+    height, 
+    tdepth, 
+    toothMode = TOOTH_MODE_HULL, 
+    _scale = 1, 
+    wantHoles = true) 
 {
 t = toothCount;
 twidth = twidth * _scale;
@@ -52,6 +58,7 @@ union(){
         }
     }
 }
+if (wantHoles) { 
 //holes
 color([0,.7,1,1]) {
    translate([0,0,-hi]) {
@@ -67,6 +74,7 @@ color([0,.7,1,1]) {
            socketHoles(radius=holeR, distanceFromCenter=innerR * .65);
        }
    }
+}
 }
 }
 }

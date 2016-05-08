@@ -31,19 +31,6 @@ public class Gear : Drivable  {
         cc.radius =  innerRadius; // + ToothDepth;
     }
 
-    
-    private void testOffset() {
-        int end = 12;
-        int howMany = toothCount * end;
-        int i = 0;
-        foreach(VectorXZ dir in Angles.UnitVectors(0f, Mathf.PI * 2f , howMany)) {
-            float n = proportionalCWToothOffsetFrom(dir);
-            VectorXZ v = Angles.UnitVectorAt(n * toothOffsetAngleRadians +  Mathf.Floor(i/((float)end)) * toothOffsetAngleRadians );
-            BugLine.Instance.drawFromTo(transform.position + Vector3.up, transform.position + Vector3.up + (v * (innerRadius + ToothDepth * n)).vector3());
-            i++;
-        }
-    }
-
     public virtual float driveRadius {
         get {
             return innerRadius + ToothDepth / 2f;
@@ -51,7 +38,6 @@ public class Gear : Drivable  {
     }
     protected override float radius {
         get {
-            //return base.radius; // + ToothDepth /2f;
             return innerRadius * Mathf.Sin(toothOffsetAngleRadians);
         }
     }
@@ -73,7 +59,7 @@ public class Gear : Drivable  {
         return drive;
     }
 
-    public float rot { get { return transform.rotation.eulerAngles.y; } }
+    public float rot { get { return gearTransform.rotation.eulerAngles.y; } }
 
     protected float toothRotationOffsetDegrees { get { return Angles.FloatModSigned(rot, toothOffsetAngleDegrees); } }
 
@@ -124,8 +110,8 @@ public class Gear : Drivable  {
         }
     }
 
-    protected virtual Vector3 startEulerAnglesForAligningTeeth {
-        get { return transform.rotation.eulerAngles; }
+    protected Vector3 startEulerAnglesForAligningTeeth {
+        get { return gearTransform.eulerAngles; }
     }
     protected virtual Transform gearTransform {
         get { return transform; }
@@ -139,12 +125,12 @@ public class Gear : Drivable  {
         }
         float normalizedOther = gear.proportionalCWToothOffsetFromAbsPosition(xzPosition);
         float closestOffset = cwToothOffsetFrom(relXZ * -1f);
-        euler.y = euler.y + closestOffset + toothOffsetAngleDegrees * (normalizedOther + .5f);
+        euler.y += closestOffset + toothOffsetAngleDegrees * (normalizedOther + .5f);
         return euler; 
     }
 
     protected virtual void setDistanceFrom(Gear gear) {
-        Vector3 refPoint = _driver.transform.position;
+        Vector3 refPoint = gear.transform.position;
         if (gear is RackGear) {
             RackGear rackGear = (RackGear)gear;
             refPoint = rackGear.closestPointOnLine(new VectorXZ(transform.position)).vector3(rackGear.transform.position.y);
@@ -158,6 +144,7 @@ public class Gear : Drivable  {
         GearConnection gc = new GearConnection(this);
         if (isDriven() || isConnectedTo(other.transform) || !isInConnectionRange(other)) { return gc; }
         gc.axel = getAxel(other);
+        if (gc.axel != null && gc.axel.hasChild) { Debug.LogError("already has child"); } // DEBUG
         if (gc.axel != null && !gc.axel.hasChild) {
             gc.makeConnection = setSocketClosestToAxel;
         } else if (other.GetComponent<Gear>() != null) {

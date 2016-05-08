@@ -184,6 +184,7 @@
     <Compile Include="Assets\Scripts\Score\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Tests\TestAngleMath.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadController.cs" />
+    <Compile Include="Assets\Scripts\UI\View\BinaryStateButton.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\Category.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\InstantiateButton.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\Inventory.cs" />

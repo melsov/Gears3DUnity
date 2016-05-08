@@ -8,7 +8,7 @@ public class Highlightable : MonoBehaviour {
     [SerializeField]
     protected Material highlightMaterial;
     private GameObject highlightMesh;
-    public Color highlightColor = Color.red;
+    public Color highlightColor = new Color(.1f, 1f, 1f, 1f);
     protected Color defaultColor;
 
 	void Awake () {

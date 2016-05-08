@@ -3,11 +3,22 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-public class AudioManager : Singleton<AudioManager> {
+public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
     // TODO: know which (note) sounds are playing when (not nec. in AudioManager?)
 
     public uint maxAllowedAudioSources = 16; //a guess
     List<Cog> sources = new List<Cog>();
+
+    private bool muted;
+
+    public void mute() {
+        muted = !muted;
+        foreach(Cog source in sources) {
+            AudioEntity ae = source.GetComponentInChildren<AudioEntity>();
+            if (ae == null) { continue; }
+            ae.getAudioSource().mute = muted;
+        }
+    }
 
     public void play(Cog cog, string soundName) {
         getAudioEntityFor(cog, soundName).getAudioSource().Play();
@@ -42,6 +53,7 @@ public class AudioManager : Singleton<AudioManager> {
     private AudioEntity attachAudioEntity(Cog cog, string soundName) {
         cullIfLimit();
         AudioEntity ae = Instantiate(AudioLibrary.Instance.getAudioEntity(soundName));
+        ae.getAudioSource().mute = muted;
         ae.transform.position = cog.transform.position;
         ae.transform.parent = cog.transform;
         
@@ -77,6 +89,15 @@ public class AudioManager : Singleton<AudioManager> {
         
     }
 
+    #region BSB client
+    public bool getState() {
+        return !muted;
+    }
+
+    public BinaryStateButton.PressAction getPressAction() {
+        return mute;
+    }
+    #endregion
 }
 
 
