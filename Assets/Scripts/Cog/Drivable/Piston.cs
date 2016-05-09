@@ -33,6 +33,10 @@ public class Piston : Gear {
         return baseDrive;
     }
     private float progressor = 0f;
+    public VectorXZ direction {
+        get { return lineSegment.distance.normalized; }
+    }
+
     protected void updatePistonHead(Drive drive) {
         progressor += drive.amount * headSpeed;
         if (float.MaxValue - progressor < 100f) { progressor = 0f; }

@@ -68,36 +68,22 @@ public class RackGear : Gear {
         transform.RotateAround(pivot.position, Vector3.up, Quaternion.FromToRotation(direction.vector3(), dir.vector3()).eulerAngles.y); // .SetLookRotation(dir.vector3());
     }
 
-    //protected override bool couldConnectTo(Collider other, out Socket aSocket, out Peg peg, out Socket otherSocket) {
-    //    aSocket = null; peg = null; otherSocket = null;
-    //    if (couldConnectTo(other)) {
-    //        return true;
-    //    }
-
-    //    peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
-    //    if (peg != null) {
-    //        if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
-    //            LinearActuator la = findConnectedLinearActuator(other);
-    //            if (la == null) { print("la null"); return false; }
-    //            //rotateInDirection(la.direction, peg.transform);
-    //            //setSocketToPeg(aSocket, peg);
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
-
     protected override DrivableConnection getDrivableConnection(Collider other) {
         DrivableConnection dc = base.getDrivableConnection(other);
         if (dc.viable) return dc;
         RackGearConnection rgc = new RackGearConnection(this);
-        rgc.linearActuator = findConnectedLinearActuator(other);
-        if (rgc.linearActuator == null) { return dc; }
+        rgc.linearMotionDrivable = findConnectedLinearActuator(other);
+        if (rgc.linearMotionDrivable == null) {
+            rgc.linearMotionDrivable = FindInCog<Piston>(other.transform);
+            if (rgc.linearMotionDrivable == null) {
+                return dc;
+            }
+        }
         rgc.peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out rgc.socket);
         if (rgc.peg != null || (autoGeneratePegOnConnect && hasFrontEndSockets(other))) {
             //if (RotationModeHelper.CompatibleModes(rgc.peg.pegIsParentRotationMode, rgc.socket.socketIsChildRotationMode)) {
             rgc.other = other;
-            rgc.makeConnection = makeConnectionWithLinearActuator;
+            rgc.makeConnection = makeConnectionWithLinearMotionDrivable;
             //}
             print("made conn delegate");
         }
@@ -106,7 +92,7 @@ public class RackGear : Gear {
 
     protected class RackGearConnection : DrivableConnection
     {
-        public LinearActuator linearActuator;
+        public Drivable linearMotionDrivable;
         public RackGearConnection(Drivable _drivable) : base(_drivable) { }
     }
 
@@ -114,34 +100,21 @@ public class RackGear : Gear {
         DrivableConnection dc = getDrivableConnection(other);
         return dc.connect();
     }
-    //protected override bool vvConnectTo(Collider other) {
-    //    print("Rack gear vConnect");
-    //    if(base.vConnectTo(other)) {
-    //        print("base connect");
-    //        return true;
-    //    }
 
-    //    Socket aSocket;
-    //    Peg peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
-    //    if (peg != null) {
-    //        if (RotationModeHelper.CompatibleModes(peg.pegIsParentRotationMode, aSocket.socketIsChildRotationMode)) {
-    //            LinearActuator la = findConnectedLinearActuator(other);
-    //            if (la == null) { print("la null"); return false; }
-
-    //            rotateInDirection(la.direction, peg.transform);
-    //            setSocketToPeg(aSocket, peg);
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
-
-    protected bool makeConnectionWithLinearActuator(DrivableConnection dc) {
+    protected bool makeConnectionWithLinearMotionDrivable(DrivableConnection dc) {
         RackGearConnection rgc = (RackGearConnection)dc;
         if (rgc.peg == null) {
             if (!instantiatePegAndConnect(rgc)) { return false; }
         }
-        rotateInDirection(rgc.linearActuator.direction, rgc.peg.transform);
+        VectorXZ dir;
+        if (rgc.linearMotionDrivable is LinearActuator) {
+            dir = ((LinearActuator)rgc.linearMotionDrivable).direction;
+        } else if (rgc.linearMotionDrivable is Piston) {
+            dir = ((Piston)rgc.linearMotionDrivable).direction;
+        } else {
+            return false;
+        }
+        rotateInDirection(dir, rgc.peg.transform);
         setSocketToPeg(rgc);
         return true;
     }
