@@ -160,38 +160,6 @@ public class Gear : Drivable  {
         public GearConnection(Gear _gear) : base(_gear) { }
     }
 
-    //protected override bool vConnectTo(Collider other) {
-    //    print("gear connect");
-    //    if (isDriven()) {
-    //        print("is driven already");
-    //        return false;
-    //    }
-    //    if (isConnectedTo(other.transform)) {
-    //        print("is connected to " + other.name + " already");
-    //        return false;
-    //    }
-    //    // If this is an axel, get driven by it
-    //    Axel axel = getAxel(other);
-    //    if (axel != null && !axel.hasChild) {
-    //        print("axel not null");
-    //        setSocketClosestToAxel(axel);
-    //        return true;
-    //    }
-    //    if (!isInConnectionRange(other)) {
-    //        print("connection not in range");
-    //        return false;
-    //    }
-
-    //    // Otherwise, if this is a gear, get driven by it
-    //    Gear gear = other.GetComponent<Gear>(); 
-    //    if (gear != null) {
-    //        Bug.bugError(name + " conn to gear: " + gear.name);
-    //        beDrivenBy(gear);
-    //        return true;
-    //    }
-    //    return false;
-    //}
-
     protected virtual bool setSocketClosestToAxel(DrivableConnection dc) {
         setSocketClosestToAxel(((GearConnection) dc).axel);
         return true;
@@ -209,7 +177,6 @@ public class Gear : Drivable  {
         gear.addDrivable(this);
         _driver = gear;
         positionRelativeTo(gear);
-        AudioManager.Instance.play(this, AudioLibrary.GearSoundName);
     }
 
     protected override bool connectToControllerAddOn(ControllerAddOn cao) {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 //TODO: save / restore combiner
-//TODO: score keeper: items created adds points
+
 public class Combiner : Drivable {
 
     public Transform outTube;
@@ -40,6 +40,7 @@ public class Combiner : Drivable {
     protected void combine(Transform combined) {
         Transform result = Instantiate<Transform>(combined);
         result.position = outTube.position;
+        AudioManager.Instance.play(this, AudioLibrary.CombinerSoundName);
     }
 
     protected void destroyIngredients() {
@@ -55,7 +56,7 @@ public class Combiner : Drivable {
     }
 
     public void evaluate() {
-        if (isBaking) { print("already baking"); return; }
+        if (isBaking) { return; }
         Recipe recipe = new Recipe();
         foreach(CombinerSlot slot in slots) {
             recipe.add(slot.typeAmount);
@@ -63,12 +64,10 @@ public class Combiner : Drivable {
         Transform result = null;
         RecipeState state = RecipeLookup.Instance.lookup(recipe, ref result);
         switch (state) {
-            case RecipeState.POTENTIALLY_vALID:
+            case RecipeState.POTENTIALLY_VALID:
             default:
                 break;
             case RecipeState.VALID:
-                //combine(result);
-                //destroyIngredients();
                 StartCoroutine(bake(recipe, result));
                 break;
             case RecipeState.INVALID:

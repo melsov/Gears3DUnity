@@ -38,13 +38,17 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
         return attachAudioEntity(cog, soundName);
     }
 
+    private string removeClone(string n) {
+        const string clone = "(Clone)";
+        if (n.EndsWith(clone)) {
+            n = n.Substring(0, n.Length - clone.Length);
+        }
+        return n;
+    }
+
     public AudioEntity lookupAudioEntityFor(Cog cog, string soundName) {
         foreach (AudioEntity ae in cog.GetComponentsInChildren<AudioEntity>()) {
-            string n = ae.name;
-            string clone = "(Clone)";
-            if (ae.name.EndsWith(clone)) {
-                n = n.Substring(0, n.Length - clone.Length);
-            }
+            string n = removeClone(ae.name);
             if (n.Equals(soundName)) { return ae; }
         }
         return null;

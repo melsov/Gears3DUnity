@@ -191,6 +191,7 @@
     <Compile Include="Assets\Scripts\UI\View\Inventory\ItemID.cs" />
     <Compile Include="Assets\Scripts\UI\View\Pause.cs" />
     <Compile Include="Assets\Scripts\UI\View\ProjectName.cs" />
+    <Compile Include="Assets\Scripts\UI\View\RecipeGuide\RecipeGuide.cs" />
     <Compile Include="Assets\Scripts\Utility\Angles.cs" />
     <Compile Include="Assets\Scripts\Utility\Color\ColorRange.cs" />
     <Compile Include="Assets\Scripts\Utility\Color\HSBColor.cs" />

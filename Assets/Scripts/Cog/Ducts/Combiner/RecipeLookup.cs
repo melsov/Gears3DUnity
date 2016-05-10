@@ -29,12 +29,12 @@ public class RecipeLookup : Singleton<RecipeLookup> {
                 result = r.resultPrefab;
                 return RecipeState.VALID;
             }
-            if (rs == RecipeState.POTENTIALLY_vALID) {
+            if (rs == RecipeState.POTENTIALLY_VALID) {
                 allInvalid = false;
             }
         }
         if (allInvalid) { return RecipeState.INVALID; }
-        return RecipeState.POTENTIALLY_vALID;
+        return RecipeState.POTENTIALLY_VALID;
     }
 
     public GameObject instantiateType(Type type) {
@@ -61,21 +61,21 @@ public class Recipe
             if (rs == RecipeState.INVALID) {
                 return RecipeState.INVALID;
             }
-            if (rs == RecipeState.POTENTIALLY_vALID) {
+            if (rs == RecipeState.POTENTIALLY_VALID) {
                 allValid = false;
             }
         }
         if (allValid) { return RecipeState.VALID; }
         
-        return RecipeState.POTENTIALLY_vALID;
+        return RecipeState.POTENTIALLY_VALID;
     }
     private RecipeState findIngredient(TypeAmount typeAmount) {
         foreach(TypeAmount ta in ingredients) {
             if (ta.compare(typeAmount) == RecipeState.VALID) {
                 return RecipeState.VALID;
             }
-            if (ta.compare(typeAmount) == RecipeState.POTENTIALLY_vALID) {
-                return RecipeState.POTENTIALLY_vALID;
+            if (ta.compare(typeAmount) == RecipeState.POTENTIALLY_VALID) {
+                return RecipeState.POTENTIALLY_VALID;
             }
         }
         return RecipeState.INVALID;
@@ -84,7 +84,7 @@ public class Recipe
 
 public enum RecipeState
 {
-    POTENTIALLY_vALID, VALID, INVALID
+    POTENTIALLY_VALID, VALID, INVALID
 };
 
 [Serializable]
@@ -120,14 +120,14 @@ public struct TypeAmount
     }
 
     public RecipeState compare(TypeAmount other) {
-        if (other.type == null) { return RecipeState.POTENTIALLY_vALID; }
+        if (other.type == null) { return RecipeState.POTENTIALLY_VALID; }
         if (!other.type.Equals(type) || other.amount > amount) {
             return RecipeState.INVALID;
         }
         if (other.amount == amount) {
             return RecipeState.VALID;
         }
-        return RecipeState.POTENTIALLY_vALID;
+        return RecipeState.POTENTIALLY_VALID;
 
     }
 }

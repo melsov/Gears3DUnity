@@ -15,8 +15,17 @@ public class Motor : Drivable
     protected float _power = 1f;
     public virtual float power {
         get { return _power * _isPaused * leverMultiplier; }
-        set { _power = Mathf.Clamp(value, -1f, 1f); }
+        set {
+            _power = Mathf.Clamp(value, -1f, 1f);
+            updateAudio();
+        }
     }
+
+    protected void updateAudio() {
+        if (Angles.VerySmall(power)) { AudioManager.Instance.stop(this, AudioLibrary.GearSoundName); }
+        else { print("play"); AudioManager.Instance.play(this, AudioLibrary.GearSoundName); }
+    }
+
     protected float _isPaused = 1f;
     protected override void pause(bool isPaused) {
         base.pause(isPaused);
@@ -29,7 +38,8 @@ public class Motor : Drivable
     }
 
     protected float angle;
-    
+
+    #region save
     [System.Serializable]
     class SerializeStorage
     {
@@ -56,8 +66,9 @@ public class Motor : Drivable
             setLeverPositon();
         }
     }
+    #endregion
 
-	protected override void awake () {
+    protected override void awake () {
         base.awake();
         _axel = GetComponentInChildren<Axel>();
         UnityEngine.Assertions.Assert.IsTrue(_pegboard.getFrontendSocketSet().sockets.Length == 1);
@@ -106,5 +117,6 @@ public class Motor : Drivable
 
     protected void setMultiplier() {
         leverMultiplier = Mathf.Floor((leverMax + .5f) * (lever.transform.position.z - leverLimits.min.z) / leverLimits.distance);
+        updateAudio();
     }
 }
