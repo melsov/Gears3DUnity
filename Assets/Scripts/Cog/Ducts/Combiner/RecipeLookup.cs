@@ -4,9 +4,16 @@ using System.Collections.Generic;
 
 public class RecipeLookup : Singleton<RecipeLookup> {
 
-    public PrefabRecipe[] prefabRecipes;
+    [SerializeField]
+    protected PrefabRecipe[] prefabRecipes;
     protected Recipe[] recipes;
     
+    public IEnumerable<PrefabRecipe> getPrefabRecipes() {
+        foreach(PrefabRecipe pr in prefabRecipes) {
+            yield return pr;
+        }
+    }
+
     void Awake() {
         recipes = new Recipe[prefabRecipes.Length];
         int index = 0;
