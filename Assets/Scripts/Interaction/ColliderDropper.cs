@@ -15,7 +15,6 @@ public class ColliderDropper : MonoBehaviour {
             client = GetComponentInParent<IColliderDropperClient>();
             Assert.IsTrue(client != null, "no collider dropper client?");
         }
-
         knowYourCog = GetComponent<Cog>();
     }
 

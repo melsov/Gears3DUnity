@@ -17,6 +17,9 @@ public class ToggleButton : Switch , ICollisionProxyClient {
     public bool isPulseButton = false;
     private float pulseTimer;
 
+    private float discreteCollisionTimer;
+    public float discreteCollisionInterval = .4f;
+
     protected Rigidbody buttonRB;
     protected float restDistance;
     protected bool shouldTrackPress = true;
@@ -52,12 +55,14 @@ public class ToggleButton : Switch , ICollisionProxyClient {
 	}
 
     public void proxyCollisionEnter(Collision collision) {
+        if (Time.fixedTime - discreteCollisionTimer < discreteCollisionInterval) { return; }
         if (shouldTrackPress) {
             float travelScale =  Vector3.Dot(collision.impulse.normalized, buttonTravel.normalized);
             travelScale = Mathf.Abs(travelScale); // travelScale insists on being negative in duplicates of toggle button (the game object) but not the original
             // this is pretty mysterious. luckily this duct tape does the trick with no downside.
             if (travelScale > sensitivity) {
                 shouldTrackPress = false;
+                discreteCollisionTimer = Time.fixedTime;
                 toggleOn();
             }
         }
@@ -67,6 +72,10 @@ public class ToggleButton : Switch , ICollisionProxyClient {
     }
 
     public void proxyCollisionExit(Collision collision) {
+    }
+
+    protected bool completedPulse() {
+        return Time.fixedTime - pulseTimer > .4f;
     }
 
 	// Update is called once per frame
@@ -79,15 +88,21 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         }
 
         if (isPulseButton) {
-            if (Time.fixedTime - pulseTimer > .4f) {
+            if (completedPulse()) {
                 onOffIndicator.state = SwitchState.OFF;
             }
         }
     }
 
+    protected VectorXZ distanceFromHome {
+        get { return new VectorXZ(lineSegment.end.position - buttonRB.position); }
+    }
+
     void FixedUpdate() {
         buttonRB.angularVelocity = Vector3.zero;
-        buttonRB.AddForce(lineSegment.normalized.vector3(0f) * buttonRB.mass * 120f); // TODO: indicator light // TODO: scale the pushback to distance (or is this not needed)?
+        //buttonRB.MovePosition(Vector3.Lerp(buttonRB.position, anchor.position, .1f));
+        buttonRB.AddForce(distanceFromHome.vector3(0f) * buttonRB.mass * 120f);
+        //buttonRB.AddForce(lineSegment.normalized.vector3(0f) * buttonRB.mass * 1200f); // TODO: indicator light // TODO: scale the pushback to distance (or is this not needed)?
     }
 
 }

@@ -9,13 +9,17 @@ public class RecipeGuide : MonoBehaviour {
     private RectTransform mainPanel;
     [SerializeField]
     private RecipeEntryPanel recipeEntryPrefab;
+    [SerializeField]
+    private ShowHide showHide;
 
-    public void Start() {
-        showRecipes();
+    public void Awake() {
+        showHide.onShow = showRecipes;
+        //showRecipes();
     }
     
 	public void showRecipes() {
-        float lastHeight = -50f; // recipeEntryPrefab.GetComponent<RectTransform>().rect.position.y;
+        if (GetComponentsInChildren<RecipeEntryPanel>().Length > 1) { return; }
+        float lastHeight = -50f; 
         print(recipeEntryPrefab.GetComponent<RectTransform>().rect.position.y);
         float heightIncrement = recipeEntryPrefab.GetComponent<RectTransform>().rect.height;
         foreach(PrefabRecipe pr in RecipeLookup.Instance.getPrefabRecipes()) {
@@ -39,9 +43,5 @@ public class RecipeGuide : MonoBehaviour {
         anch.y = lastHeight;
         anch.x = 0f;
         rt.anchoredPosition = anch;
-        //Vector3 pos = recipeEntryPrefab.GetComponent<RectTransform>().rect.position;
-        //pos.y = lastHeight;
-        //pos.x = 0f;
-        //rep.GetComponent<RectTransform>().position = pos;
     }
 }

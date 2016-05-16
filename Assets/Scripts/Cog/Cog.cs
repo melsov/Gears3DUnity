@@ -20,4 +20,16 @@ public class Cog : MonoBehaviour {
         if (cog == null) { return default(T); }
         return cog.GetComponentInChildren<T>();
     }
+
+    protected void highlight(Transform other) {
+        Highlighter h = FindInCog<Highlighter>(other);
+        if (h == null) { return; }
+        h.highlight();
+    }
+
+    protected void unhighlight(Transform other) {
+        Highlighter h = FindInCog<Highlighter>(other);
+        if (h == null) { return; }
+        h.unhighlight();
+    }
 }

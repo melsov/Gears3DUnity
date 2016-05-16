@@ -2,7 +2,10 @@
 using System;
 using System.Collections;
 
-public class HingeChainLink : MonoBehaviour {
+//TODO: arrange to that chain link pegboard meshes are fixed to last links but still are children of pulley (fixed joint)
+// <--causes hinge joint wiggles. find another way
+
+public class HingeChainLink : MonoBehaviour , ICogProxy {
 
     HingeJoint hj;
     protected WeakReference _rope = new WeakReference(null);
@@ -15,35 +18,29 @@ public class HingeChainLink : MonoBehaviour {
             _rope = new WeakReference(value);
         }
     }
-    //protected Gear guide;
-    //public bool isGuided {
-    //    get { return guide != null; }
-    //}
-    //private VectorXZ push = VectorXZ.fakeNull;
 
-    //private WeakReference _downNeighbor = new WeakReference(null);
-    //public ChainLink downNeighbor {
-    //    get {
-    //        if (_downNeighbor.Target == null) return null;
-    //        return (ChainLink)_downNeighbor.Target; }
-    //    set { _downNeighbor = new WeakReference(value); }
-    //}
-    //private WeakReference _upNeighbor = new WeakReference(null);
+    public Collider getCollider() { return GetComponentInChildren<Collider>(); }
+
+    private WeakReference _downNeighbor = new WeakReference(null);
+    public HingeChainLink downNeighbor {
+        get {
+            if (_downNeighbor.Target == null) return null;
+            return (HingeChainLink)_downNeighbor.Target;
+        }
+        set { _downNeighbor = new WeakReference(value); }
+    }
     public HingeChainLink upNeighbor {
         get {
             if (connectedRigidbody == null) return null;
             return connectedRigidbody.GetComponent<HingeChainLink>();
-            //if (_upNeighbor.Target == null) return null;
-            //return (ChainLink)_upNeighbor.Target;
         }
-        //set { _upNeighbor = new WeakReference(value); }
     }
 
     protected Rigidbody rb;
 
     protected CapsuleCollider _capsuleCollider;
 
-	void Awake() {
+	public virtual void Awake() {
         hj = GetComponent<HingeJoint>();
         rb = GetComponent<Rigidbody>();
         _capsuleCollider = GetComponentInChildren<CapsuleCollider>();
@@ -70,21 +67,7 @@ public class HingeChainLink : MonoBehaviour {
 
     public VectorXZ direction { get { return new VectorXZ(transform.rotation * Vector3.forward); } }
 
-    //void OnCollisionStay(Collision collision) {
-    //       Gear gear = findGear(collision);
-    //       if (gear == null) { return; }
-    //       VectorXZ fromCenter = new VectorXZ(transform.position - gear.transform.position);
-    //       if (upNeighbor != null && downNeighbor != null) {
-    //           float upDot = fromCenter.dot(upNeighbor.direction);
-    //           float downDot = fromCenter.dot(downNeighbor.direction);
-    //           if (Mathf.Sign(upDot) != Mathf.Sign(downDot)) {
-    //               //get pushed by gear
-    //               push = direction * gear.driveScalar(); // fromCenter.normal * gear.driveScalar() * -1f;
-    //               pushFalloff = 1f;
-    //           }
-    //       }
-    //   }
-    //protected float pushFalloff = 0f;
+    
     void FixedUpdate() {
         if (upNeighbor != null) {
             Vector3 dif = upNeighbor.transform.position - transform.position;
@@ -101,4 +84,8 @@ public class HingeChainLink : MonoBehaviour {
 	void Update () {
 
 	}
+
+    public Cog getCog() {
+        return rope.GetComponentInParent<Cog>();
+    }
 }

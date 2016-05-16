@@ -74,7 +74,7 @@ public class RackGear : Gear {
         RackGearConnection rgc = new RackGearConnection(this);
         rgc.linearMotionDrivable = findConnectedLinearActuator(other);
         if (rgc.linearMotionDrivable == null) {
-            rgc.linearMotionDrivable = FindInCog<Piston>(other.transform);
+            rgc.linearMotionDrivable = FindInCog<GearDrivenMechanism>(other.transform);
             if (rgc.linearMotionDrivable == null) {
                 return dc;
             }

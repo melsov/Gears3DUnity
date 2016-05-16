@@ -94,7 +94,7 @@ public class Bug : MonoBehaviour {
     }
 
     public static void debugIfHas<T>(GameObject go, string s) {
-        if (go.GetComponent<AddOn>() != null) {
+        if (go.GetComponentInParent<T>() != null) {
             print(s);
         }
     }

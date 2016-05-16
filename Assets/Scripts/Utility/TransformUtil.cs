@@ -9,6 +9,16 @@ public class TransformUtil : MonoBehaviour
         child.transform.SetParent(parent, true);
     }
 
+    public static void FixedJointAndAlignXZ(Rigidbody child, Rigidbody parent) {
+        AlignXZ(child.transform, parent.transform, null);
+
+        FixedJoint fj = child.GetComponent<FixedJoint>();
+        if (fj == null) {
+            fj = child.gameObject.AddComponent<FixedJoint>();
+        }
+        fj.connectedBody = parent;
+    }
+
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
         Vector3 localOffset = Vector3.zero;
         if (localOffsetObject != null) {

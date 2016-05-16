@@ -23,7 +23,7 @@ public class Motor : Drivable
 
     protected void updateAudio() {
         if (Angles.VerySmall(power)) { AudioManager.Instance.stop(this, AudioLibrary.GearSoundName); }
-        else { print("play"); AudioManager.Instance.play(this, AudioLibrary.GearSoundName); }
+        else { AudioManager.Instance.play(this, AudioLibrary.GearSoundName); }
     }
 
     protected float _isPaused = 1f;
@@ -95,6 +95,7 @@ public class Motor : Drivable
     }
 
     protected override void handleAddOnScalar(float scalar) {
+        print("handle add on scalar: " + scalar);
         power = scalar;
     }
 

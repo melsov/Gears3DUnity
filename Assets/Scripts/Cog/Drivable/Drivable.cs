@@ -40,19 +40,18 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         awake();
 	}
     protected virtual void awake() {
-        _pegboard = GetComponent<Pegboard>();
-        if (_pegboard== null) {
-            _pegboard = GetComponentInChildren<Pegboard>();
-            if (_pegboard == null) {
-                _pegboard = gameObject.AddComponent<Pegboard>();
-            }
+        _pegboard = GetComponentInChildren<Pegboard>();
+        if (_pegboard == null) {
+            _pegboard = gameObject.AddComponent<Pegboard>();
         }
+
         TransformUtil.PositionOnYLayer(transform);
         if (GetComponent<Highlighter>() == null) {
             gameObject.AddComponent<Highlighter>();
         }
         Pause.Instance.onPause += pause;
         setupSocketDelegates();
+        getEnabledColliders();
         setupPrefabPegs();
     }
 
@@ -128,6 +127,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
 
     protected bool setSocketToPeg(DrivableConnection dc) {
+        print("soc 2 peg");
         setSocketToPeg(dc.socket, dc.peg);
         return true;
     }
@@ -163,21 +163,21 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         Socket otherSocket = null;
         Peg peg = null;
         if (couldConnectTo(other)) { 
-            highlight(other, peg, otherSocket);
+            highlight(other.transform);
         } 
     }
 
-    protected void highlight(Collider other, Peg peg, Socket socket) {
-        Highlighter h = FindInCog<Highlighter>(other.transform); // other.GetComponent<Highlighter>();
-        if (h == null) { return; }
-        h.highlight();
-    }
+    //protected void highlight(Collider other, Peg peg, Socket socket) {
+    //    Highlighter h = FindInCog<Highlighter>(other.transform); // other.GetComponent<Highlighter>();
+    //    if (h == null) { return; }
+    //    h.highlight();
+    //}
 
-    protected void unhighlight(Collider other) {
-        Highlighter h = FindInCog<Highlighter>(other.transform); // other.GetComponent<Highlighter>();
-        if (h == null) { return; }
-        h.unhighlight();
-    }
+    //protected void unhighlight(Collider other) {
+    //    Highlighter h = FindInCog<Highlighter>(other.transform); // other.GetComponent<Highlighter>();
+    //    if (h == null) { return; }
+    //    h.unhighlight();
+    //}
 
     public void disconnect() {
         vDisconnect();
@@ -239,6 +239,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     
     protected virtual DrivableConnection getDrivableConnection(Collider other) {
         DrivableConnection dc = new DrivableConnection(this);
+
         if (isConnectedTo(other.transform)) return dc;
 
         dc.peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out dc.socket);
@@ -267,6 +268,9 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         public virtual bool connect() {
             if (viable) {
                 if(makeConnection(this)) {
+                    if(other)
+                        print("other: " + other.name + " parent: " + (other.transform.parent != null? other.transform.parent.name : ""));
+
                     drivable.disableColliders(true);
                     return true;
                 }
@@ -313,7 +317,9 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         }
         return enabledColliders;
     }
+    //Reenable mechanism can fail: look into how
     protected virtual void disableColliders(bool disable) {
+        print(name + "disable colls " + disable);
         foreach(Collider c in getEnabledColliders().Keys) {
             c.enabled = disable ? false : enabledColliders[c];
         }
@@ -333,10 +339,11 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 
     protected virtual bool instantiatePegAndConnect(DrivableConnection dc) {
         dc.otherSocket = getSocketRegardlessOfPeg(dc.other, out dc.socket);
+        print("inst peg and conn");
         if (dc.otherSocket == null) {
             return false;
         }
-        print("got front soc in instant p and c");
+        print("got front soc in instantiate peg and connct");
         dc.peg = autoGeneratePeg(dc.other);
         dc.peg.beChildOf(dc.otherSocket);
         setSocketToPeg(dc.socket, dc.peg);
@@ -510,9 +517,9 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
 //THIS DOESN'T GET TRIGGERED ?
     protected virtual void vTriggerExit(Collider other) {
-        unhighlight(other);
+        unhighlight(other.transform);
         //return; // TODO: refine cases where we should disconnect when moving handles
-        ISocketSetContainer ssc = SocketSet.findISocketSetContainer(other.transform); // other.GetComponent<ISocketSetContainer>();
+        ISocketSetContainer ssc = SocketSet.findISocketSetContainer(other.transform); 
         if (ssc == null) {
             return;
         }

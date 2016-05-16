@@ -3,18 +3,29 @@
 public class ShowHide : MonoBehaviour {
 
     public bool hideOnAwake = true;
+    public delegate void OnShow();
+    public OnShow onShow;
+    [SerializeField]
+    private GameObject target;
 
     public void Awake() {
+        if (target == null) {
+            target = gameObject;
+        }
         if (hideOnAwake) {
             hide();
         }
     }
 
 	public void hide() {
-        this.gameObject.SetActive(false);
+        target.SetActive(false);
     }
 
     public void show() {
-        this.gameObject.SetActive(true);
+        target.SetActive(true);
+        if (onShow != null)
+            onShow();
+        else
+            print("on show null");
     }
 }

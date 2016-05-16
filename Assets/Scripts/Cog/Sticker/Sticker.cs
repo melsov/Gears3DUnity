@@ -19,12 +19,21 @@ public class Sticker : Cog, ICursorAgentClient
         bc.size = TransformUtil.SetY(bc.size, transform.position.y * 2f + 1f);
     }
 
+    protected Transform unscaledParent(Transform t) {
+        while (!t.localScale.Equals(new Vector3(1,1,1))) {
+            if (t.parent == null) { return t; }
+            t = t.parent;
+        }
+        return t;
+    }
+
     public bool connectTo(Collider other) {
         Cog cog = other.GetComponentInParent<Cog>();
-        if (cog == null) { return false; }
-        transform.parent = cog.transform;
+        if (cog == null) { print("no cog in sticker"); return false; }
+        Transform target = unscaledParent(other.transform);
+        transform.parent = target; // cog.transform;
 // TODO: ensure that camera isn't below the bow collider
-        transform.position = TransformUtil.SetY(transform.position, Mathf.Max(YLayer.Layer(typeof(Sticker)), cog.transform.position.y + 1f));
+        transform.position = TransformUtil.SetY(transform.position, Mathf.Max(YLayer.Layer(typeof(Sticker)), target.transform.position.y + 1f));
         return true;
     }
 
@@ -50,7 +59,7 @@ public class Sticker : Cog, ICursorAgentClient
     }
 
     public void triggerExitDuringDrag(Collider other) {
-        
+        unhighlight(other.transform);
     }
 
     public Collider mainCollider() {
@@ -75,6 +84,7 @@ public class Sticker : Cog, ICursorAgentClient
     }
 
     public void handleTriggerEnter(Collider other) {
-        //TODO: highlights other if sticker can connect
+        highlight(other.transform);
+
     }
 }

@@ -50,12 +50,17 @@ public class Gear : Drivable  {
         return _angleStep.deltaAngle / toothOffsetAngleRadians;
     }
 
-    public override Drive receiveDrive(Drive drive) {
+    protected float rotationDeltaY(Drive drive) {
         if (_driver is RackGear) {
-            gearTransform.eulerAngles += new Vector3(0f, -Mathf.Rad2Deg * drive.amount / innerRadius, 0f);
+            return -Mathf.Rad2Deg * drive.amount / innerRadius;
         } else {
-            gearTransform.eulerAngles += new Vector3(0f, drive.amount * -1f * toothOffsetAngleRadians, 0f);
+            return drive.amount * -1f * toothOffsetAngleRadians;
         }
+    }
+
+    public override Drive receiveDrive(Drive drive) {
+        gearTransform.eulerAngles += new Vector3(0f, rotationDeltaY(drive), 0f);
+
         return drive;
     }
 

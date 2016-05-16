@@ -337,14 +337,25 @@ public class SocketSet
 
     protected static ISocketSetContainer findSocketSetContainer(Transform other) {
         Cog cog = other.GetComponentInParent<Cog>();
+        if (cog == null) {
+            ICogProxy icp = other.GetComponentInParent<ICogProxy>();
+            if (icp != null) {
+                cog = icp.getCog();
+            }
+        }
+        if (cog == null) { Debug.LogError("no cog ??"); return null; }
         if (cog is IPegProxy) {
             if (((IPegProxy)cog).getPegboard() != null) { return ((IPegProxy)cog).getPegboard(); }
         }
-        if (cog == null) { Debug.LogError("no cog ??"); return null; }
         return cog.GetComponentInChildren<ISocketSetContainer>();
     }
 
     protected ISocketSetContainer findSocketSetContainer(Collider other) {
         return findSocketSetContainer(other.transform);
     }
+}
+
+public interface ICogProxy
+{
+    Cog getCog();
 }

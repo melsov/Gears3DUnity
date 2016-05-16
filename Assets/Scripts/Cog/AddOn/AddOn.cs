@@ -16,12 +16,16 @@ public abstract class AddOn : Cog , ICursorAgentClient
 
     protected virtual bool vConnectTo(Collider other) {
         IAddOnClient aoc = other.GetComponent<IAddOnClient>();
+        print("add on vconn");
         if (aoc != null) {
+            print("not null");
             if (aoc.connectToAddOn(this)) {
+                print("did conn");
                 client = aoc;
                 return true;
             }
         }
+        print("null");
         return false;
     }
 
