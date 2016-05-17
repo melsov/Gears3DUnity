@@ -107,7 +107,8 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 
     protected virtual void update() {
         if(needReenableColliders) {
-            disableColliders(false);
+            print("will reenable");
+            //disableColliders(false);
         }
         updateAngleStep();
 
@@ -241,11 +242,12 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         DrivableConnection dc = new DrivableConnection(this);
 
         if (isConnectedTo(other.transform)) return dc;
-
+        print(" not connected to other: " + other.name + " of " + other.GetComponentInParent<Cog>().name);
         dc.peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out dc.socket);
         if (dc.peg != null) {
             dc.makeConnection = setSocketToPeg;
         } else if (autoGeneratePegOnConnect && hasFrontEndSockets(other)) {
+            print(" will auto gen peg etc. ");
             dc.other = other;
             dc.makeConnection = instantiatePegAndConnect;
         }
@@ -269,7 +271,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             if (viable) {
                 if(makeConnection(this)) {
                     if(other)
-                        print("other: " + other.name + " parent: " + (other.transform.parent != null? other.transform.parent.name : ""));
+                        print(drivable.name + "made conn with other: " + other.name + " parent: " + (other.transform.parent != null? other.transform.parent.name : ""));
 
                     drivable.disableColliders(true);
                     return true;
@@ -281,6 +283,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
 
     protected virtual bool vConnectTo(Collider other) {
         DrivableConnection dc = getDrivableConnection(other);
+        print(name + " vConnect ");
         return dc.connect();
     }
 
@@ -319,12 +322,22 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     }
     //Reenable mechanism can fail: look into how
     protected virtual void disableColliders(bool disable) {
-        print(name + "disable colls " + disable);
         foreach(Collider c in getEnabledColliders().Keys) {
             c.enabled = disable ? false : enabledColliders[c];
         }
         GetComponentInChildren<Rigidbody>().Sleep();
         needReenableColliders = disable;
+        print(name + ": disable colliders re-en: " + needReenableColliders);
+        if (disable) {
+            StartCoroutine(reenableCollidersAfterFixedFrame()); 
+        }
+    }
+
+    protected System.Collections.IEnumerator reenableCollidersAfterFixedFrame() {
+        yield return new WaitForFixedUpdate();
+        Assert.IsTrue(needReenableColliders, " wha???? need reenable colliders false? (doing it anyway)");
+        disableColliders(false);
+        
     }
 
     protected Socket getSocketRegardlessOfPeg(Collider other, out Socket aSocket) {
