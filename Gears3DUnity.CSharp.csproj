@@ -189,6 +189,7 @@
     <Compile Include="Assets\Scripts\Score\Scorable.cs" />
     <Compile Include="Assets\Scripts\Score\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Tests\TestAngleMath.cs" />
+    <Compile Include="Assets\Scripts\UI\CameraOrbit.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadController.cs" />
     <Compile Include="Assets\Scripts\UI\View\BinaryStateButton.cs" />
     <Compile Include="Assets\Scripts\UI\View\Inventory\Category.cs" />
