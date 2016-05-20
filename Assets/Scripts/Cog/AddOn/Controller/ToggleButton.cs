@@ -49,26 +49,43 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         Assert.IsTrue(button.GetComponent<CollisionProxy>() != null);
         buttonRB = button.GetComponent<Rigidbody>();
         Assert.IsTrue(buttonRB.constraints == (RigidbodyConstraints.FreezeAll ^ RigidbodyConstraints.FreezePositionX ^ RigidbodyConstraints.FreezePositionZ)); // only x, z pos is not constrained
-        restDistance = buttonTravel.magnitude;
         lineSegment = GetComponentInChildren<LineSegment>();
         button.GetComponent<LinearConstraint>().lineSegment = lineSegment;
+        anchor = lineSegment.start; // TEST: replace anchor with start of LS
+        restDistance = lineSegment.distance.magnitude; // buttonTravel.magnitude;
 	}
 
+    protected bool pressed(Collision collision) {
+        float travelScale = Vector3.Dot(collision.impulse.normalized, buttonTravel.normalized);
+        travelScale = Mathf.Abs(travelScale); // travelScale insists on being negative in duplicates of toggle button (the game object) but not the original
+                                              // this is pretty mysterious. luckily this duct tape does the trick with no downside.
+        return travelScale > sensitivity;
+    }
+
     public void proxyCollisionEnter(Collision collision) {
+        handleCollision(collision);
+    }
+
+    protected void handleCollision(Collision collision) {
         if (Time.fixedTime - discreteCollisionTimer < discreteCollisionInterval) { return; }
         if (shouldTrackPress) {
-            float travelScale =  Vector3.Dot(collision.impulse.normalized, buttonTravel.normalized);
-            travelScale = Mathf.Abs(travelScale); // travelScale insists on being negative in duplicates of toggle button (the game object) but not the original
-            // this is pretty mysterious. luckily this duct tape does the trick with no downside.
-            if (travelScale > sensitivity) {
+            if (pressed(collision)) {
                 shouldTrackPress = false;
                 discreteCollisionTimer = Time.fixedTime;
                 toggleOn();
+                StartCoroutine(watch());
             }
         }
     }
+    protected IEnumerator watch() {
+        while(buttonTravel.magnitude < restDistance * .9f) {
+            yield return new WaitForFixedUpdate();
+        }
+        shouldTrackPress = true;
+    }
 
     public void proxyCollisionStay(Collision collision) {
+        handleCollision(collision);
     }
 
     public void proxyCollisionExit(Collision collision) {
@@ -78,14 +95,13 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         return Time.fixedTime - pulseTimer > .4f;
     }
 
-	// Update is called once per frame
 	void LateUpdate () {
-        if (!shouldTrackPress) {
-            // relatively close to rest position?
-            if(buttonTravel.magnitude > restDistance * .9f) {
-                shouldTrackPress = true;
-            }
-        }
+        //if (!shouldTrackPress) {
+        //    // relatively close to rest position?
+        //    if(buttonTravel.magnitude > restDistance * .9f) {
+        //        shouldTrackPress = true;
+        //    }
+        //}
 
         if (isPulseButton) {
             if (completedPulse()) {

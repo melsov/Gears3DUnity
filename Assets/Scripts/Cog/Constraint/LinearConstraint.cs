@@ -5,15 +5,17 @@ public class LinearConstraint : Constraint {
 
     public LineSegment lineSegment;
 	
+    protected Vector3 targetPosition {
+        get {
+            if (constraintTarget.target == null) {
+                return transform.position;
+            } else {
+                return constraintTarget.target.position;
+            }
+        }
+    }
 	// Called from fixed update
 	protected override void constrain () {
-        Vector3 position;
-        if (constraintTarget.target == null) {
-            position = transform.position;
-        } else {
-            position = constraintTarget.target.position;
-        }
-        VectorXZ closestPoint = lineSegment.closestPointOnSegment(new VectorXZ(position));
-        rb.MovePosition(closestPoint.vector3(transform.position.y));
+        rb.MovePosition(lineSegment.closestPointOnSegment(new VectorXZ(targetPosition)).vector3(transform.position.y));
     }
 }

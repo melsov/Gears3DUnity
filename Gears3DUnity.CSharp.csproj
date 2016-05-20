@@ -110,6 +110,7 @@
     <Compile Include="Assets\Scripts\Cog\Constraint\LineSegment.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearActuatorConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearConstraint.cs" />
+    <Compile Include="Assets\Scripts\Cog\Constraint\LinearSpringConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Anvil.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Combinable.cs" />
