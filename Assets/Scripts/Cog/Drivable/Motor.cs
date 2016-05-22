@@ -98,6 +98,9 @@ public class Motor : Drivable
         print("handle add on scalar: " + scalar);
         power = scalar;
     }
+    protected override void resetAddOnScalar() {
+        power = 1f;
+    }
 
     protected override void vDragOverride(VectorXZ cursorGlobal) {
         //TODO: set a (separate?) scalar that influences motor power

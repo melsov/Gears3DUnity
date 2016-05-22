@@ -27,7 +27,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             colliderDropper = GetComponentInChildren<ColliderDropper>();
         }
         client = GetComponent<ICursorAgentClient>();
-        Assert.IsTrue(client != null);
+        Assert.IsTrue(client != null, "null cursor agent client: " + name);
         dragOverrideLayer = LayerMask.GetMask("DragOverride");
     }
 
@@ -109,10 +109,17 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             unhighlight(c);
             bool done = !overridingDrag ? client.connectTo(c) : client.makeConnectionWithAfterCursorOverride(c);
             if (done) { 
-                dropper.removeAll();
-                return;
+                break;
             }
         }
+        if (client is ICursorAgentClientExtended) {
+            while (dropper.escapedFromColliders.Count > 0) {
+                Collider c = dropper.escapedFromColliders[0];
+                dropper.escapedFromColliders.RemoveAt(0);
+                ((ICursorAgentClientExtended)client).handleEscapedFromCollider(c);
+            }
+        }
+        dropper.removeAll();
     }
 
     // CONSIDER: the need for this function shows problems with the collider dropper / cursor agent system : for now: 'oh well'
@@ -139,4 +146,9 @@ public interface ICursorAgentClient
     void endDragOverride(VectorXZ cursorGlobal);
     Collider mainCollider();
     void triggerExitDuringDrag(Collider other);
+}
+
+public interface ICursorAgentClientExtended : ICursorAgentClient
+{
+    void handleEscapedFromCollider(Collider other);
 }

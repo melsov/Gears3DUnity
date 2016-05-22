@@ -74,4 +74,11 @@ public class TransformUtil : MonoBehaviour
         return v;
     }
 
+    public static bool IsDescendent(Transform descendant, Transform ancestor) {
+        while(descendant != null) {
+            if (descendant.parent == ancestor) { return true; }
+            descendant = descendant.parent;
+        }
+        return false;
+    }
 }

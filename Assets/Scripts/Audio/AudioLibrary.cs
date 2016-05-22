@@ -5,6 +5,7 @@ public class AudioLibrary : Singleton<AudioLibrary>
 {
 
     public static string GearSoundName = "GearAudioEntity";
+    public static string ButtonSoundName = "ButtonAudioEntity";
     public static string CombinerSoundName = "CombinerAudioEntity";
     public static string TubeEnterSoundName = "TubeAudioEntity";
     public static string WhooshSoundName = "WhooshAudioEntity";

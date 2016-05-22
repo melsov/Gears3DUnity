@@ -36,12 +36,7 @@ public struct AngleStep
 {
     public float deltaAngle {
         get {
-            float delta = angle - lastAngle;
-            if (Mathf.Abs(delta) < 180f) { // CONSIDER: limits angVelocity to < 180. Is this OK?
-                return delta;
-            }
-            // Correct deltas where angle has jumped over 360 limit
-            return delta + -1f * Mathf.Sign(delta) * 360f;
+            return Angles.adjustedDeltaAngleDegrees(angle - lastAngle);
         }
     }
     public float deltaTime {

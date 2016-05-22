@@ -4,7 +4,12 @@ using System;
 
 public abstract class AddOn : Cog , ICursorAgentClient
 {
-    protected IAddOnClient client;
+    public bool shouldPositionOnConnect = true;
+    public bool shouldFollowClient = true;
+    public IAddOnClient client;
+    public bool hasClient {
+        get { return client != null; }
+    }
     protected Collider currentOverrideCollider;
     protected RotationHandle rotationHandle;
 
@@ -14,25 +19,60 @@ public abstract class AddOn : Cog , ICursorAgentClient
     }
     public bool connectTo(Collider other) { return vConnectTo(other); }
 
-    protected virtual bool vConnectTo(Collider other) {
-        IAddOnClient aoc = other.GetComponent<IAddOnClient>();
-        print("add on vconn");
+    protected bool vConnectTo(Collider other) {
+        Cog cog = other.GetComponentInParent<Cog>();
+        if (connectToClient(cog)) {
+            return true;
+        }
+        return false;
+    }
+
+    protected Follower _follower;
+    protected Follower follower {
+        get {
+            if (_follower == null) {
+                _follower = gameObject.AddComponent<Follower>();
+            }
+            return _follower;
+        }
+    }
+
+    public virtual bool connectToClient(Cog cog) {
+        IAddOnClient aoc = cog.GetComponentInParent<IAddOnClient>();
         if (aoc != null) {
-            print("not null");
             if (aoc.connectToAddOn(this)) {
-                print("did conn");
+                if (!TransformUtil.IsDescendent(transform, cog.transform)) {
+                    if (shouldPositionOnConnect) {
+                        positionOnConnect(cog);                        
+                    } else {
+                        cog.positionRelative(this);
+                    }
+                    if (shouldFollowClient) {
+                        follower.offset = transform.position - cog.transform.position;
+                        follower.target = cog.transform;
+                    }
+                }
                 client = aoc;
                 return true;
             }
         }
-        print("null");
         return false;
+    }
+    protected virtual void positionOnConnect(Cog cog) {
+        Vector3 pos = transform.position;
+        pos.x = cog.transform.position.x;
+        Collider other = cog.GetComponentInChildren<Collider>();
+        pos.z = other != null ? Vector3.Lerp(other.bounds.center, other.bounds.max, .85f).z : pos.z;
+        transform.position = pos;
     }
 
     public void disconnect() { vDisconnect(); }
     protected virtual void vDisconnect() {
         if (client != null) {
             client.disconnectAddOn(this);
+            if (_follower != null) {
+                _follower.target = null;
+            }
             client = null;
         }
     }
@@ -95,6 +135,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
 	}
     protected virtual void awake() {
         rotationHandle = GetComponentInChildren<RotationHandle>();
+        _follower = GetComponent<Follower>();
     }
 	
 	// Update is called once per frame

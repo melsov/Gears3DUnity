@@ -84,7 +84,9 @@
     <Compile Include="Assets\Scripts\Audio\WhiteKeysScale.cs" />
     <Compile Include="Assets\Scripts\Camera\ViewControls.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\AddOn.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\AddOnConnector.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ProxySwitch.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Switch.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ToggleButton.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\Indicator.cs" />
@@ -127,8 +129,10 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\EmitterDevice.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Gear.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\GearDriven\GearDrivenMechanism.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\GearDriven\GearSwitch.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\GearDriven\Piston.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\GearDriven\Pulley.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\GearDriven\RotationObserver.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\HandCrank.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\LinearActuator.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Motor.cs" />

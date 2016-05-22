@@ -4,10 +4,14 @@ using System.Collections;
 public class Follower : MonoBehaviour {
 
     public Transform target;
+    public Vector3 offset = Vector3.zero;
     protected Rigidbody rb;
+    public bool ignoreRigidBody;
 
     public void Awake() {
-        rb = GetComponentInChildren<Rigidbody>();
+        if (!ignoreRigidBody) {
+            rb = GetComponentInChildren<Rigidbody>();
+        }
     }
 
 	public void FixedUpdate () {
@@ -16,10 +20,10 @@ public class Follower : MonoBehaviour {
             rb.MovePosition(xzPosition());
             return;
         }
-        transform.position = xzPosition();
+        transform.position = target.position + offset; // xzPosition();
 	}
 
     protected Vector3 xzPosition() {
-        return Vector3.Lerp(transform.position, new Vector3(target.position.x, transform.position.y, target.position.z), .7f);
+        return Vector3.Lerp(transform.position, new Vector3(target.position.x, transform.position.y, target.position.z), .7f) + offset;
     }
 }

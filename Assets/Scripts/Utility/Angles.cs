@@ -57,4 +57,12 @@ public class Angles {
         a = Mathf.Abs(a); mod = Mathf.Abs(mod);
         return (a - Mathf.Floor(a / mod) * mod) * s;
     }
+
+    public static float adjustedDeltaAngleDegrees(float delta) {
+        if (Mathf.Abs(delta) < 180f) { // CONSIDER: limits angVelocity to < 180. Is this OK?
+            return delta;
+        }
+        // Correct deltas where angle has jumped over 360 limit
+        return delta + -1f * Mathf.Sign(delta) * 360f;
+    }
 }

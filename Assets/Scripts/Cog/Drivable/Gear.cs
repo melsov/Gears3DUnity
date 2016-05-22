@@ -4,6 +4,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
+//TODO: generally convert tranform operations to (kinematic) rigidbody operations
 public class Gear : Drivable  {
 
 //TODO: plan out caps colider radius and assign programmatically
@@ -60,7 +61,6 @@ public class Gear : Drivable  {
 
     public override Drive receiveDrive(Drive drive) {
         gearTransform.eulerAngles += new Vector3(0f, rotationDeltaY(drive), 0f);
-
         return drive;
     }
 

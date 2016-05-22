@@ -6,7 +6,7 @@ using System;
 //TODO: new drivable: 'rack' (pole with gear teeth)
 
 [System.Serializable]
-public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGameSerializable, IRestoreConnection
+public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient , IGameSerializable, IRestoreConnection
 {
     public bool autoGeneratePegOnConnect = true;
 
@@ -240,21 +240,24 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     
     protected virtual DrivableConnection getDrivableConnection(Collider other) {
         DrivableConnection dc = new DrivableConnection(this);
-
+        if (GetComponent<AddOnConnector>() != null) {
+            dc = GetComponent<AddOnConnector>().getDrivableConnection(other);
+            if (dc.viable) {
+                return dc;
+            }
+        }
         if (isConnectedTo(other.transform)) return dc;
-        print(" not connected to other: " + other.name + " of " + other.GetComponentInParent<Cog>().name);
         dc.peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out dc.socket);
         if (dc.peg != null) {
             dc.makeConnection = setSocketToPeg;
         } else if (autoGeneratePegOnConnect && hasFrontEndSockets(other)) {
-            print(" will auto gen peg etc. ");
             dc.other = other;
             dc.makeConnection = instantiatePegAndConnect;
         }
         return dc;
     }
 
-    protected class DrivableConnection
+    public class DrivableConnection
     {
         public Peg peg;
         public Socket socket;
@@ -327,7 +330,6 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         }
         GetComponentInChildren<Rigidbody>().Sleep();
         needReenableColliders = disable;
-        print(name + ": disable colliders re-en: " + needReenableColliders);
         if (disable) {
             StartCoroutine(reenableCollidersAfterFixedFrame()); 
         }
@@ -525,6 +527,13 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
     protected virtual void vEndDragOverride(VectorXZ cursorGlobal) {
     }
 
+    public void handleEscapedFromCollider(Collider other) {
+        AddOn addOn = other.GetComponent<AddOn>();
+        if (addOn != null) {
+            disconnectAddOn(addOn);
+        }
+    }
+
     public void triggerExitDuringDrag(Collider other) {
         vTriggerExit(other);
     }
@@ -542,7 +551,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
             print("vTriggerExit: parent peg null");
             shouldDisconnect = true;
         }
-        // did we disconnect from out driver?
+        // did we disconnect from our driver?
         if (!shouldDisconnect) {
             Drivable d = other.GetComponent<Drivable>();
             if (d == _driver) {
@@ -656,6 +665,7 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         return true;
     }
 
+    /* Override to respond to add-on input */
     protected virtual void handleAddOnScalar(float scalar) { }
 
     protected virtual void updateRecieverAddOns(float scalar) {
@@ -664,9 +674,13 @@ public abstract class Drivable : Cog , ICursorAgentClient , IAddOnClient , IGame
         }
     }
 
+    protected virtual void resetAddOnScalar() { }
+
     public void disconnectAddOn(AddOn addOn_) {
+        print("disconnecting add on");
         if (addOn_ == controllerAddOn) {
             controllerAddOn = null;
+            resetAddOnScalar();
         } else if (addOn_ is ReceiverAddOn) {
             receiverAddOns.Remove((ReceiverAddOn)addOn_);
         }

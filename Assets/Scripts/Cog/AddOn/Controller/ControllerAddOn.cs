@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class ControllerAddOn : AddOn {
 
@@ -10,4 +11,11 @@ public class ControllerAddOn : AddOn {
         base.awake();
     }
 }
+
+public interface IControllerAddOnProvider
+{
+    ControllerAddOn getControllerAddOn();
+}
+
+
 

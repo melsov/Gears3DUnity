@@ -3,11 +3,13 @@ using UnityEngine.Assertions;
 using System.Collections;
 using System;
 
-public class ToggleButton : Switch , ICollisionProxyClient {
+public class ToggleButton : Switch , ICollisionProxyClient, ITriggerProxyClient {
 
     [Tooltip("button with spring joint component")]
     public Transform button;
-    public Transform anchor;
+    protected Transform anchor {
+        get { return lineSegment.start; }
+    }
 
     public float resetSeconds = .2f;
     public float sensitivity = .2f;
@@ -26,6 +28,7 @@ public class ToggleButton : Switch , ICollisionProxyClient {
     protected bool trackingPress;
 
     protected LineSegment lineSegment;
+    protected LinearSpringConstraint linearSpringConstraint;
 
     protected override void toggleOn() {
         if (isPulseButton) {
@@ -48,10 +51,11 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         base.awake();
         Assert.IsTrue(button.GetComponent<CollisionProxy>() != null);
         buttonRB = button.GetComponent<Rigidbody>();
+        buttonRB.isKinematic = true; // TESTWANT
         Assert.IsTrue(buttonRB.constraints == (RigidbodyConstraints.FreezeAll ^ RigidbodyConstraints.FreezePositionX ^ RigidbodyConstraints.FreezePositionZ)); // only x, z pos is not constrained
         lineSegment = GetComponentInChildren<LineSegment>();
         button.GetComponent<LinearConstraint>().lineSegment = lineSegment;
-        anchor = lineSegment.start; // TEST: replace anchor with start of LS
+        linearSpringConstraint = button.GetComponent<LinearSpringConstraint>();
         restDistance = lineSegment.distance.magnitude; // buttonTravel.magnitude;
 	}
 
@@ -62,21 +66,48 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         return travelScale > sensitivity;
     }
 
+
+    public void proxyTriggerEnter(Collider other) {
+        if (!allowedToPress()) { return; }
+        press();
+    }
+
+    public void proxyTriggerStay(Collider other) {
+    }
+
+    public void proxyTriggerExit(Collider other) {
+    }
+
     public void proxyCollisionEnter(Collision collision) {
         handleCollision(collision);
     }
 
+    protected bool allowedToPress() {
+        return shouldTrackPress && Time.fixedTime - discreteCollisionTimer > discreteCollisionInterval;
+    }
+
     protected void handleCollision(Collision collision) {
-        if (Time.fixedTime - discreteCollisionTimer < discreteCollisionInterval) { return; }
-        if (shouldTrackPress) {
-            if (pressed(collision)) {
-                shouldTrackPress = false;
-                discreteCollisionTimer = Time.fixedTime;
-                toggleOn();
-                StartCoroutine(watch());
-            }
+        return; // ********
+        print("got collision");
+        if (!allowedToPress()) { return; }
+        //if (Time.fixedTime - discreteCollisionTimer < discreteCollisionInterval) { return; }
+        //if (shouldTrackPress) {
+        //}
+        if (pressed(collision)) {
+            press();
         }
     }
+
+    protected void press() {
+        AudioManager.Instance.play(this, AudioLibrary.ButtonSoundName);
+        linearSpringConstraint.pulse();
+        shouldTrackPress = false;
+        discreteCollisionTimer = Time.fixedTime;
+        toggleOn();
+        StartCoroutine(watch());
+
+    }
+
     protected IEnumerator watch() {
         while(buttonTravel.magnitude < restDistance * .9f) {
             yield return new WaitForFixedUpdate();
@@ -110,15 +141,14 @@ public class ToggleButton : Switch , ICollisionProxyClient {
         }
     }
 
+
     protected VectorXZ distanceFromHome {
         get { return new VectorXZ(lineSegment.end.position - buttonRB.position); }
     }
 
-    void FixedUpdate() {
-        buttonRB.angularVelocity = Vector3.zero;
-        //buttonRB.MovePosition(Vector3.Lerp(buttonRB.position, anchor.position, .1f));
-        buttonRB.AddForce(distanceFromHome.vector3(0f) * buttonRB.mass * 120f);
-        //buttonRB.AddForce(lineSegment.normalized.vector3(0f) * buttonRB.mass * 1200f); // TODO: indicator light // TODO: scale the pushback to distance (or is this not needed)?
-    }
+    //void FixedUpdate() {
+    //    buttonRB.angularVelocity = Vector3.zero;
+    //    //buttonRB.AddForce(distanceFromHome.vector3(0f) * buttonRB.mass * 120f);
+    //}
 
 }

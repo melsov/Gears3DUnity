@@ -24,15 +24,16 @@ public class Switch : ControllerAddOn  {
         if (onOffIndicator != null) onOffIndicator.gameObject.layer = LayerLookup.DragOverride;
     }
 
-    protected override bool vConnectTo(Collider other) {
-        if (base.vConnectTo(other)) {
+
+    public override bool connectToClient(Cog cog) {
+        if (base.connectToClient(cog)) {
             updateClient();
             return true;
         }
         return false;
     }
 
-// to do: make this independant of indicator?
+    // to do: make this independant of indicator?
     protected override void vEndDragOverride(VectorXZ cursorGlobal) {
         // cursor still over indicator?
         Collider underCursor = RayCastUtil.getColliderUnderCursor(out rch);

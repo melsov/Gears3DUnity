@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class ColliderDropper : MonoBehaviour {
     
     public List<Collider> colliders = new List<Collider>();
+    public List<Collider> escapedFromColliders = new List<Collider>();
     private IColliderDropperClient client;
 
     private Cog knowYourCog;
@@ -30,7 +31,13 @@ public class ColliderDropper : MonoBehaviour {
 //TODO: with linear actuator, there are a whole bunch of 
 // unintended behaviors surrounding droppers, cursor agents
     void OnTriggerExit(Collider other) {
-        colliders.Remove(other);
+        if (colliders.Contains(other)) {
+            colliders.Remove(other);
+        } else if (client.isCursorInteracting()) {
+            if (!escapedFromColliders.Contains(other)) {
+                escapedFromColliders.Add(other);
+            }
+        }
         try {
             if (client.isCursorInteracting()) {
                 client.handleTriggerExit(other);
@@ -42,6 +49,7 @@ public class ColliderDropper : MonoBehaviour {
 
     public void removeAll() {
         colliders.RemoveRange(0, colliders.Count);
+        escapedFromColliders.RemoveRange(0, escapedFromColliders.Count);
     }
     
     

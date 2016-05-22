@@ -3,14 +3,19 @@ using System.Collections;
  
 public class LinearSpringConstraint : LinearConstraint {
 
-    public bool endIsHome = true;
+    protected int pulseIncrements;
+    protected int increments = 5;
 
-    protected Vector3 home {
-        get { return endIsHome ? lineSegment.end.position : lineSegment.start.position; }
+    public void pulse() {
+        pulseIncrements = increments;
     }
 
     protected override void constrain() {
         base.constrain();
+        if (pulseIncrements-- > 0) {
+            rb.MovePosition(Vector3.Lerp(rb.position, extent, .5f));
+            return;
+        }
         rb.MovePosition(Vector3.Lerp(rb.position, home, .5f));
     }
 }
