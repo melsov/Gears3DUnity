@@ -10,6 +10,7 @@ public class Motor : Drivable
     protected float leverMultiplier;
     protected float leverMax = 16f;
     protected Handle lever { get { return handleSet.handles[0]; } }
+    protected OnOffIndicator onOffIndicator;
 
     public float maxAngularVelocity = 10f;
     protected float _power = 1f;
@@ -17,6 +18,9 @@ public class Motor : Drivable
         get { return _power * _isPaused * leverMultiplier; }
         set {
             _power = Mathf.Clamp(value, -1f, 1f);
+            if(onOffIndicator != null) {
+                onOffIndicator.state = SwitchStateHelper.stateFor(_power);
+            }
             updateAudio();
         }
     }
@@ -75,6 +79,7 @@ public class Motor : Drivable
         axel.beChildOf(_pegboard.getFrontendSocketSet().sockets[0]);
         handleSet = GetComponentInChildren<HandleSet>();
         leverLimits = GetComponentInChildren<LeverLimits>();
+        onOffIndicator = GetComponentInChildren<OnOffIndicator>();
 	}
 
 	protected override void update () {

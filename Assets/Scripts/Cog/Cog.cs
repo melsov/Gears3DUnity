@@ -47,7 +47,7 @@ public class Cog : MonoBehaviour {
         }
         Collider other = FindInCog<Collider>(target);
         Vector3 extents = GetComponentInParent<Collider>().bounds.extents;
-        pos.z = other != null ? Vector3.Lerp(other.bounds.min, other.bounds.min - extents, .85f).z : pos.z;
+        pos.z = other != null ? (other.bounds.min - extents).z : pos.z;
         transform.position = pos;
     }
 }

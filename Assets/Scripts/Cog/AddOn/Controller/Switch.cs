@@ -21,7 +21,6 @@ public class Switch : ControllerAddOn  {
         }
         UnityEngine.Assertions.Assert.IsTrue(on != null, "wait on (switch state toggle) is null?");
         onOffIndicator = GetComponentInChildren<OnOffIndicator>();
-        if (onOffIndicator != null) onOffIndicator.gameObject.layer = LayerLookup.DragOverride;
     }
 
 
@@ -95,6 +94,23 @@ public class Switch : ControllerAddOn  {
     }
 */
     #endregion
+}
+
+public class SwitchStateHelper
+{
+    public static SwitchState stateFor(float f) {
+        if (f > 0f) {
+            return SwitchState.ON;
+        } else if (f < 0f) {
+            return SwitchState.REVERSE;
+        } else {
+            return SwitchState.OFF;
+        }
+    }
+
+    public static SwitchState stateFor(bool b) {
+        return b ? SwitchState.ON : SwitchState.OFF;
+    }
 }
 
 public enum SwitchState
