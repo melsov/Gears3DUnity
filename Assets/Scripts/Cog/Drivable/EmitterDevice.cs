@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class EmitterDevice : Dispenser {
 
@@ -8,28 +9,53 @@ public class EmitterDevice : Dispenser {
     [SerializeField]
     protected string soundName = AudioLibrary.WhooshSoundName;
     public bool toggleOnOff = false;
+    OpenCloseAnimationHandler openCloseAnimationHandler;
 
     protected override void awake() {
         base.awake();
         emitter.gameObject.SetActive(false);
+        openCloseAnimationHandler = GetComponentInChildren<OpenCloseAnimationHandler>();
+        if (openCloseAnimationHandler != null) {
+            openCloseAnimationHandler.stateChangedTo = animatorCallback;
+        }
     }
     protected override void dispense() {
         if (toggleOnOff) {
-            emitter.gameObject.SetActive(!emitter.gameObject.activeSelf);
-            if (emitter.gameObject.activeSelf) {
-                AudioManager.Instance.play(this, soundName);
-            } else {
-                AudioManager.Instance.stop(this, soundName);
-            }
+            emit(!emitter.gameObject.activeSelf);
+            
             return;
         }
-        StartCoroutine(emit());
+        StartCoroutine(pulseEmit());
     }
 
-    private IEnumerator emit() {
-        emitter.gameObject.SetActive(true);
-        AudioManager.Instance.play(this, soundName);
+    private IEnumerator pulseEmit() {
+        emit(true);
+        //AudioManager.Instance.play(this, soundName);
         yield return new WaitForSeconds(emissionTimeSeconds);
-        emitter.gameObject.SetActive(false);
+        emit(false);
     }
+
+    private void emit(bool _emit) {
+        if (openCloseAnimationHandler != null) {
+            openCloseAnimationHandler.open(_emit);
+            return;
+        }
+        activate(_emit);
+    }
+
+    private void animatorCallback(bool state) {
+        print("call back: " + state);
+        activate(state);
+    }
+
+    private void activate(bool state) {
+        emitter.gameObject.SetActive(state);
+        if (emitter.gameObject.activeSelf) {
+            AudioManager.Instance.play(this, soundName);
+        } else if (toggleOnOff) {
+            AudioManager.Instance.stop(this, soundName);
+        }
+    }
+
+  
 }

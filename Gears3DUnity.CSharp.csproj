@@ -78,6 +78,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Animation\OpenCloseAnimationHandler.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioEntity.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioLibrary.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioManager.cs" />

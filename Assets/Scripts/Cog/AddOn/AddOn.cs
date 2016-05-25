@@ -45,7 +45,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
                     if (shouldPositionOnConnect) {
                         positionOnConnect(cog);                        
                     } else {
-                        cog.positionRelative(this);
+                        cog.positionRelativeToAddOn(this);
                     }
                     if (shouldFollowClient) {
                         follower.offset = transform.position - cog.transform.position;

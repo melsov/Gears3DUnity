@@ -620,7 +620,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     public virtual void positionRelativeTo(Drivable _driver) {
         if (_driver != null) {
             Vector3 relPos = transform.position - _driver.transform.position;
-            relPos = relPos.normalized * (radius + _driver.radius - .01f); // fudge a little to keep gear inside
+            relPos = relPos.normalized * (radius + _driver.radius - .01f); // fudge a little to keep gear inside <--CONSIDER: need this?
             transform.position = _driver.transform.position + relPos;
         }
     }

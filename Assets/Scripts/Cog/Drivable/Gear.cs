@@ -109,10 +109,19 @@ public class Gear : Drivable  {
         if (_driver != null) {
             if (!(_driver is Gear)) { base.positionRelativeTo(_driver); return; }
             Gear gear = (Gear)_driver;
-
+            moveToYPosOf(gear.gearTransform);
             setDistanceFrom(gear);
             gearTransform.eulerAngles = eulersRelativeToGear(gear);
         }
+    }
+
+    protected override void vDisconnect() {
+        base.vDisconnect();
+        gearTransform.position = TransformUtil.SetY(gearTransform.position, YLayer.Layer(typeof(Gear)));
+    }
+
+    protected void moveToYPosOf(Transform other) {
+        gearTransform.position = TransformUtil.SetY(gearTransform.position, other.transform.position.y);
     }
 
     protected Vector3 startEulerAnglesForAligningTeeth {

@@ -37,8 +37,7 @@ public class Cog : MonoBehaviour {
         h.unhighlight();
     }
 
-    public void positionRelative(AddOn addOn) {
-        print("pos rel to");
+    public void positionRelativeToAddOn(AddOn addOn) {
         Vector3 pos = transform.position;
         pos.x = addOn.transform.position.x;
         Transform target = addOn.transform;
@@ -50,4 +49,5 @@ public class Cog : MonoBehaviour {
         pos.z = other != null ? (other.bounds.min - extents).z : pos.z;
         transform.position = pos;
     }
+
 }
