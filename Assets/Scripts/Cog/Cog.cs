@@ -50,4 +50,8 @@ public class Cog : MonoBehaviour {
         transform.position = pos;
     }
 
+    public static implicit operator bool(Cog exists) {
+        return exists != null;
+    }
+
 }

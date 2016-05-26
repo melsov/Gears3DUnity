@@ -83,6 +83,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         } else {
             TransformUtil.ParentToAndAlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
         }
+        socket.getParentDrivable().transform.position = TransformUtil.SetY(socket.getParentDrivable().transform.position, transform.position.y + YLayer.LayerHeight);
         _childSocket = new WeakReference(socket);
     } 
     private void forceUnparentConnectedBody(Rigidbody rb) {
@@ -93,6 +94,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     public void releaseChild(Socket socket) {
+        socket.getParentDrivable().transform.position = TransformUtil.SetY(socket.getParentDrivable().transform.position, YLayer.Layer(socket.getParentDrivable().GetType()));
         if (hinge != null) {
             hinge.disconnectObject();
         }

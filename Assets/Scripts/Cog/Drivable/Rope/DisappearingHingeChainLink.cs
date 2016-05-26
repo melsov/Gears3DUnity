@@ -15,7 +15,12 @@ public class DisappearingHingeChainLink : HingeChainLink , ITriggerProxyClient {
         renderr = GetComponentInChildren<Renderer>();
     }
     public void FixedUpdate() {
-        hide(transform.position.z < disappearEntrance.transform.position.z);
+        // Missing Reference Exception here:
+        try {
+            hide(transform.position.z < disappearEntrance.transform.position.z);
+        } catch (Exception e) {
+            Destroy(gameObject);
+        }
     }
 
     protected void disappear(Collider other, bool entering) {

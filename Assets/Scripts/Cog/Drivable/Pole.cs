@@ -51,8 +51,8 @@ public class Pole : Drivable
     }
 
     // POLE CONNECT CASES:
-    //  A: NEITHER BACKEND CONNECTED: try to set a backend socket
-    //  B: ONE BACKEND CONNECTED: try to set a frontend socket
+    // A: NEITHER BACKEND CONNECTED: try to set a backend socket
+    // B: ONE BACKEND CONNECTED: try to set a frontend socket
     protected override bool vMakeConnectionWithAfterCursorOverride(Collider other) {
         if (isConnectedTo(other.transform)) {
             return false;

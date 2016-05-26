@@ -51,7 +51,6 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         set {
             if (value != null) {
                 _drivingPeg = value;
-                print("driving peg: " + _drivingPeg.name);
                 _drivingPeg.receiveChild(this);
                 if (socketToParentPeg != null) { socketToParentPeg(this); }
             } else {

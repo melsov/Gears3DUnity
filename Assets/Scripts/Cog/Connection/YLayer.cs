@@ -5,9 +5,9 @@ using System.Collections.Generic;
 codify y positions for all cog types
 */
 public class YLayer {
-    private static float increment = .5f;
+    public const float LayerHeight = .5f;
     private static float wall = -.5f;
-    private static float cogLayer = wall + increment;
+    private static float cogLayer = wall + LayerHeight;
     private static float cogLayerRope = -3f;
     private static float stickerLayer = 4.5f;
     private static Dictionary<System.Type, float> lookup = new Dictionary<System.Type, float>() {

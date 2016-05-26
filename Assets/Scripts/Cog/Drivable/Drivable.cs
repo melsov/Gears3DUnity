@@ -128,7 +128,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     }
 
     protected bool setSocketToPeg(DrivableConnection dc) {
-        print("soc 2 peg");
         setSocketToPeg(dc.socket, dc.peg);
         return true;
     }
