@@ -9,7 +9,9 @@ public class AudioLibrary : Singleton<AudioLibrary>
     public static string CombinerSoundName = "CombinerAudioEntity";
     public static string TubeEnterSoundName = "TubeAudioEntity";
     public static string WhooshSoundName = "WhooshAudioEntity";
+    public static string SparkleSoundName = "SparkleAudioEntity";    
     public static string WaterfallSoundName = "WaterfallAudioEntity";
+    public static string TwangSoundName = "TwangAudioEntity";
 
     private WhiteKeysScale whiteKeyScale;
 

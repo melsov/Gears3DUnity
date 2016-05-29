@@ -54,7 +54,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                 _drivingPeg.receiveChild(this);
                 if (socketToParentPeg != null) { socketToParentPeg(this); }
             } else {
-                if (_drivingPeg != null) {
+                if (_drivingPeg) {
                     _drivingPeg.releaseChild(this);
                     _drivingPeg = value;
                     parentContainer.getTransform().SetParent(null);
@@ -73,7 +73,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
     }
 
     void Start() {
-        if (autoconnectPeg != null) {
+        if (autoconnectPeg) {
             drivingPeg = autoconnectPeg;
         }
     }
@@ -148,10 +148,10 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
         } else {
             return null;
         }
-        if (peg.owner != null) {
+        if (peg.owner) {
             return peg.owner;
         }
-        if (otherSocket == null) { return null; }
+        if (!otherSocket) { return null; }
         return otherSocket.getParentDrivable();
     }
 
@@ -197,12 +197,12 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                         return;
                     }
                     Peg peg = connectedGO.GetComponent<Peg>();
-                    if (peg == null) {
+                    if (!peg) {
                         if (connectedGO.GetComponent<IPegProxy>() != null) {
                             peg = connectedGO.GetComponent<IPegProxy>().getPeg();
                         }
                     }
-                    if (peg != null) {
+                    if (peg) {
                         print("restore soc " + Bug.GetCogParentName(transform) + " got peg: " + Bug.GetCogParentName(peg.transform));
                         peg.beChildOf(this, true);
                     }
@@ -212,6 +212,8 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
             Debug.LogError("caught invalid cast exception for sock w parent " + transform.parent.parent.name);
         }
     }
+
+    public static implicit operator bool (Socket exists) { return exists != null; }
 
 }
 

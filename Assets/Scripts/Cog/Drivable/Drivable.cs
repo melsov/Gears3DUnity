@@ -3,7 +3,16 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using System;
 
-//TODO: new drivable: 'rack' (pole with gear teeth)
+//TODOs
+//--Pegs sometimes are hard to grab from gears??? Try to reproduce
+//--Create: system for 
+//   a: universal connecting / disconnecting across all cogs
+//   b: distinguish between parented-style connections and component-style connections? (where if the parent in a parent-style move (motor with gear)
+//        the gear moves with it
+//   c: way for nearby but unconnected gears to be at different y levels (and then return to their default layers at the right time)
+//--Highlighting during cursor hover
+//--Motors with gears being dragged can try to let gears connect to (but in the reverse way if the connectee has no driver)
+
 
 [System.Serializable]
 public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient , IGameSerializable, IRestoreConnection
@@ -35,11 +44,9 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     }
 
     protected VectorXZ xzPosition { get { return new VectorXZ(transform.position); } }
-
-    void Awake () {
-        awake();
-	}
-    protected virtual void awake() {
+    
+    protected override void awake() {
+        base.awake();
         _pegboard = GetComponentInChildren<Pegboard>();
         if (_pegboard == null) {
             _pegboard = gameObject.AddComponent<Pegboard>();
@@ -51,7 +58,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         }
         Pause.Instance.onPause += pause;
         setupSocketDelegates();
-        getEnabledColliders();
         setupPrefabPegs();
     }
 
@@ -101,15 +107,8 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         update();
 	}
 
-    protected void debugY() {
-        print("this " + GetType() + " has Y: " + transform.position.y);
-    }
-
     protected virtual void update() {
-        if(needReenableColliders) {
-            print("will reenable");
-            //disableColliders(false);
-        }
+        
         updateAngleStep();
 
         for (int i=0; i < drivables.Count; ++i) {
@@ -167,18 +166,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         } 
     }
 
-    //protected void highlight(Collider other, Peg peg, Socket socket) {
-    //    Highlighter h = FindInCog<Highlighter>(other.transform); // other.GetComponent<Highlighter>();
-    //    if (h == null) { return; }
-    //    h.highlight();
-    //}
-
-    //protected void unhighlight(Collider other) {
-    //    Highlighter h = FindInCog<Highlighter>(other.transform); // other.GetComponent<Highlighter>();
-    //    if (h == null) { return; }
-    //    h.unhighlight();
-    //}
-
     public void disconnect() {
         vDisconnect();
     }
@@ -188,14 +175,12 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         if (rb != null) {
             rb.velocity = Vector3.zero;
         }
-        Bug.debugIfIs<LinearActuator>(this, "linear actuator vDisconnect");
-        Bug.debugIfIs<Pole>(this, "pole vDisconnect");
         detachFromAxel();
         if (_driver != null)
             _driver.removeDrivable(this);
         disconnectFromDriver();
         disconnectSockets();
-        //disconnectDrivens(); //WANT <--wait should we re-add this?
+        disconnectDrivens(); //WANT <--wait should we re-add this?
         transform.SetParent(null);
     }
 
@@ -262,20 +247,23 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         public Socket socket;
         public Socket otherSocket;
         public Collider other;
+        protected Drivable drivable;
+
         public delegate bool MakeConnection(DrivableConnection dc);
         public MakeConnection makeConnection;
         public virtual bool viable { get { return makeConnection != null; } }
-        protected Drivable drivable;
+
         public DrivableConnection(Drivable _drivable) {
             drivable = _drivable;
         }
+
         public virtual bool connect() {
             if (viable) {
                 if(makeConnection(this)) {
                     if(other)
                         print(drivable.name + "made conn with other: " + other.name + " parent: " + (other.transform.parent != null? other.transform.parent.name : ""));
 
-                    drivable.disableColliders(true);
+                    drivable.disableColliders();
                     return true;
                 }
             }
@@ -289,57 +277,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         return dc.connect();
     }
 
-    //protected virtual bool vvConnectTo(Collider other) {
-    //    Peg peg;
-    //    Socket aSocket;
-    //    bool result = false;
-    //    if (isConnectedTo(other.transform)) return false;
-
-    //    // Connect to any peg or axel
-    //    peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out aSocket);
-    //    if (aSocket == null) {
-    //        result = false;
-    //    } else if (peg != null) {
-    //        setSocketToPeg(aSocket, peg);
-    //        result = true;
-    //    } else {
-    //        result = connectWithAutoGeneratedPeg(other);
-    //    }
-
-    //    if (result) {
-    //        disableColliders(true);
-    //    }
-    //    return result;
-    //}
-    protected Dictionary<Collider, bool> enabledColliders;
-    protected bool needReenableColliders;
-    protected Dictionary<Collider, bool> getEnabledColliders() {
-        if (enabledColliders == null) {
-            enabledColliders = new Dictionary<Collider, bool>();
-            foreach(Collider c in GetComponentsInChildren<Collider>()) {
-                enabledColliders.Add(c, c.enabled);
-            }
-        }
-        return enabledColliders;
-    }
-    //Reenable mechanism can fail: look into how
-    protected virtual void disableColliders(bool disable) {
-        foreach(Collider c in getEnabledColliders().Keys) {
-            c.enabled = disable ? false : enabledColliders[c];
-        }
-        GetComponentInChildren<Rigidbody>().Sleep();
-        needReenableColliders = disable;
-        if (disable) {
-            StartCoroutine(reenableCollidersAfterFixedFrame()); 
-        }
-    }
-
-    protected System.Collections.IEnumerator reenableCollidersAfterFixedFrame() {
-        yield return new WaitForFixedUpdate();
-        Assert.IsTrue(needReenableColliders, " wha???? need reenable colliders false? (doing it anyway)");
-        disableColliders(false);
-        
-    }
 
     protected Socket getSocketRegardlessOfPeg(Collider other, out Socket aSocket) {
         return _pegboard.getBackendSocketSet().closestSocketOnFrontendOfRegardlessOfPeg(other, out aSocket);
@@ -527,10 +464,24 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     }
 
     public void handleEscapedFromCollider(Collider other) {
+        print("welcome to escaped");
         AddOn addOn = other.GetComponent<AddOn>();
-        if (addOn != null) {
+        if (addOn) {
+            print("dis conn from add on: " + addOn.name);
             disconnectAddOn(addOn);
+            return;
         }
+        //Or I'm an addOn proxy?
+        if (this is IControllerAddOnProvider) {
+            print("is cao proxy");
+            addOn = ((IControllerAddOnProvider)this).getControllerAddOn();
+            Drivable drivableOther = FindInCog<Drivable>(other.transform);
+            if (addOn && drivableOther) {
+                print("other disconn");
+                drivableOther.disconnectAddOn(addOn);
+            }
+        }
+
     }
 
     public void triggerExitDuringDrag(Collider other) {
@@ -653,6 +604,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     }
     protected virtual bool connectToControllerAddOn(ControllerAddOn cao) {
         if (controllerAddOn == null) {
+            print("controller add on connect " + cao.name + " parent cog: " + FindCog(cao.transform).name);
             controllerAddOn = cao;
             controllerAddOn.setScalar = handleAddOnScalar;
             return true;

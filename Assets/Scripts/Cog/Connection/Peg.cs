@@ -177,7 +177,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
 
     public void disconnect() {
         Socket socket = GetComponentInParent<Socket>();
-        if (socket != null) {
+        if (socket) {
             socket.childPeg = null;
         }
         if (_owner == null) {
@@ -191,7 +191,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     public void disconnectFromParent() {
-        print("peg disconnect froom parent");
+        //print("peg disconnect froom parent");
         //removeIsChildConstraintAndItsParentConstraint();
     }
 
@@ -208,7 +208,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
 
     public bool connectTo(Collider other) {
-        if (other == null) return false;
+        if (!other) return false;
         Pegboard pegboard = other.GetComponent<Pegboard>();
         if (pegboard == null) {
             IPegProxy ipp = other.GetComponent<IPegProxy>();
@@ -334,6 +334,9 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     public void onDragEnd() {
     }
 
+    public static implicit operator bool(Peg exists) {
+        return exists != null;
+    }
 }
 
 public enum RotationMode

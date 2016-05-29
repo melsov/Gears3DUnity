@@ -92,9 +92,11 @@
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ToggleButton.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\Indicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\LightSwitchIndicator.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffFlag.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffIndicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RotationIndicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Receiver\ReceiverAddOn.cs" />
+    <Compile Include="Assets\Scripts\Cog\Adjuncts\ColliderSet.cs" />
     <Compile Include="Assets\Scripts\Cog\Cog.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
@@ -106,6 +108,7 @@
     <Compile Include="Assets\Scripts\Cog\Connection\Socket.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\SocketSet.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\YLayer.cs" />
+    <Compile Include="Assets\Scripts\Cog\Constraint\Arc.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\Constraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\ConstratintTargetSet.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\Follower.cs" />
