@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System;
 
-/*
+/* HI HI
 Base class for all mechanisms
 */
 [System.Serializable]
 public class Cog : MonoBehaviour {
-
+    
     protected ColliderSet colliderSet;
 
     public void Awake() {

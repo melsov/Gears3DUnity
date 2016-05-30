@@ -277,7 +277,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         return dc.connect();
     }
 
-
     protected Socket getSocketRegardlessOfPeg(Collider other, out Socket aSocket) {
         return _pegboard.getBackendSocketSet().closestSocketOnFrontendOfRegardlessOfPeg(other, out aSocket);
     }
