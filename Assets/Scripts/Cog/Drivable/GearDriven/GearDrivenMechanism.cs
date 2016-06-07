@@ -5,12 +5,12 @@ public abstract class GearDrivenMechanism : Gear {
     protected Transform gearMesh;
 
     protected override void awake() {
-        base.awake();
         foreach(Transform t in GetComponentsInChildren<Transform>()) {
             if (t.name.Equals("GearMesh")) {
                 gearMesh = t;
             }
         }
+        base.awake();
     }
 
     public override Drive receiveDrive(Drive drive) {

@@ -30,6 +30,15 @@ public class Gear : Drivable  {
         base.awake();
         CapsuleCollider cc = GetComponent<CapsuleCollider>();
         cc.radius =  innerRadius; // + ToothDepth;
+        lengthenCollider(cc);
+        if (gearTransform != null) {
+            gearTransform.gameObject.layer = LayerLookup.GearMesh;
+        }
+    }
+
+    protected virtual void lengthenCollider(CapsuleCollider cc) {
+        cc.height = 10f;
+        cc.center = TransformUtil.SetY(cc.center, -3.3f);
     }
 
     public virtual float driveRadius {
@@ -176,6 +185,7 @@ public class Gear : Drivable  {
 
     protected virtual bool setSocketClosestToAxel(DrivableConnection dc) {
         setSocketClosestToAxel(((GearConnection) dc).axel);
+        adjustForCrowding();
         return true;
     }
 
@@ -191,6 +201,22 @@ public class Gear : Drivable  {
         gear.addDrivable(this);
         _driver = gear;
         positionRelativeTo(gear);
+        adjustForCrowding();
+    }
+
+    protected void adjustForCrowding() {
+        foreach(Collider c in NearbyColliders.nearbyColliders(GetComponent<CapsuleCollider>(), 12, LayerMask.GetMask("GearMesh"))) {
+            Gear neighbor = c.GetComponent<Gear>();
+            if (neighbor == this) { continue; }
+            if (!neighbor || neighbor == _driver || drivables.Contains(neighbor)) { continue; }
+            if (Mathf.Abs(gearTransform.position.y - neighbor.gearTransform.position.y) < YLayer.LayerHeight) {
+                yHeightOneLayerUpFrom(neighbor.gearTransform);
+            }
+            break; // TEST
+        }
+    }
+    protected void yHeightOneLayerUpFrom(Transform other) {
+        gearTransform.position = TransformUtil.SetY(gearTransform.position, other.position.y + YLayer.LayerHeight);
     }
 
     protected override bool connectToControllerAddOn(ControllerAddOn cao) {

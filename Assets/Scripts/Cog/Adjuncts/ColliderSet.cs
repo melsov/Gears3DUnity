@@ -7,6 +7,10 @@ public class ColliderSet : MonoBehaviour {
         getEnabledColliders();
     }
 
+    public bool contains(Collider c) {
+        return enabledColliders.ContainsKey(c);
+    }
+
     protected Dictionary<Collider, bool> enabledColliders;
     protected bool needReenableColliders;
     protected Dictionary<Collider, bool> getEnabledColliders() {

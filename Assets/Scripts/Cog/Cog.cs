@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System;
 
-/* HI HI
+/*
 Base class for all mechanisms
 */
 [System.Serializable]
 public class Cog : MonoBehaviour {
     
     protected ColliderSet colliderSet;
+    protected NeighborColliderLookup neighborColliderLookup;
 
     public void Awake() {
         awake();
@@ -18,6 +19,9 @@ public class Cog : MonoBehaviour {
         if (!colliderSet) {
             colliderSet = gameObject.AddComponent<ColliderSet>();
         }
+        //if (!neighborColliderLookup) {
+        //    neighborColliderLookup = gameObject.AddComponent<NeighborColliderLookup>();
+        //}
     }
 
     public void disableColliders() {

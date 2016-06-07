@@ -5,7 +5,7 @@ using System.Collections.Generic;
 codify y positions for all cog types
 */
 public class YLayer {
-    public const float LayerHeight = .5f;
+    public const float LayerHeight = .75f;
     private static float wall = -.5f;
     private static float cogLayer = wall + LayerHeight;
     private static float cogLayerRope = -3f;

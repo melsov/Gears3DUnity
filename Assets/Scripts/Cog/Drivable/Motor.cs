@@ -100,7 +100,6 @@ public class Motor : Drivable
     }
 
     protected override void handleAddOnScalar(float scalar) {
-        print("handle add on scalar: " + scalar);
         power = scalar;
     }
     protected override void resetAddOnScalar() {

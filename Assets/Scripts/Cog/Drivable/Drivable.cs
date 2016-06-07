@@ -182,6 +182,15 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         disconnectSockets();
         disconnectDrivens(); //WANT <--wait should we re-add this?
         transform.SetParent(null);
+        //Do we disconnect add ons?
+        disconnectAddOns();
+    }
+   protected virtual void disconnectAddOns() {
+        disconnectAddOn(controllerAddOn);
+        if (this is IControllerAddOnProvider) {
+            AddOn ao = ((IControllerAddOnProvider)this).getControllerAddOn();
+            ao.disconnect();
+        }
     }
 
     protected virtual void disconnectDrivens() {

@@ -101,5 +101,9 @@ public struct VectorXZ  {
     public override int GetHashCode() {
         return v.GetHashCode();
     }
-    
+
+    public override string ToString() {
+        return string.Format("VecXZ {0} , {1}", x, z);
+    }
+
 }
