@@ -95,7 +95,10 @@ public struct VectorXZ  {
         return new VectorXZ(a.v * b);
     }
 
-    public override bool Equals(object obj) {
+    public static implicit operator VectorXZ (Vector3 v) { return new VectorXZ(v); }
+    //public static implicit operator Vector3 (VectorXZ v) { return v.vector3(); }
+
+        public override bool Equals(object obj) {
         return v.Equals(obj);
     }
     public override int GetHashCode() {

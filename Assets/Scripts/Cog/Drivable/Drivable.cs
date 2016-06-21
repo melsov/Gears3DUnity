@@ -636,7 +636,8 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     protected virtual void resetAddOnScalar() { }
 
     public void disconnectAddOn(AddOn addOn_) {
-        print("disconnecting add on");
+        if (addOn_ == null) { return; }
+        print("disconnecting add on: " + addOn_.name);
         if (addOn_ == controllerAddOn) {
             controllerAddOn = null;
             resetAddOnScalar();

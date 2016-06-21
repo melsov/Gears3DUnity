@@ -9,5 +9,5 @@ public class LayerLookup : MonoBehaviour {
     public static int CogComponent = LayerMask.NameToLayer("CogComponent");
     public static int GearMesh = LayerMask.NameToLayer("GearMesh");
 
-    public static int MaskAll = ~0;
+    public static int AllLayers = ~0;
 }

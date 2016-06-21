@@ -75,6 +75,11 @@ public class Bug : MonoBehaviour {
     }
     public static void assertNotNullPause(System.Object m) {
         assertPause(m != null, " this object, is actually null. "  + callerMethod(1));
+#if UNITY_EDITOR
+        EditorApplication.isPaused = m == null;
+#else
+        print("no editor");
+#endif
     }
 
     public static void assertNotNullPause(MonoBehaviour m) {

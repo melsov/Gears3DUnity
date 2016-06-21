@@ -21,10 +21,15 @@ public class BugLine : Singleton<BugLine> {
     void Awake() {
         colors = new Color[] {
             Color.red,
+            new Color(.9f, .5f, .3f),
+            Color.yellow, 
             Color.green,
             Color.blue,
+            new Color(.3f, 0f, 5f),
+            Color.magenta,
             Color.cyan,
-            Color.yellow
+            Color.gray,
+            Color.black,
         };
         lines = new Dictionary<VecPair, GameObject>();
         lineRenderer = GetComponent<LineRenderer>();
@@ -57,6 +62,10 @@ public class BugLine : Singleton<BugLine> {
             drawOnKeyPress = false;
             drawFrom(position, direction);
         }
+    }
+
+    public void markPoint(Vector3 point, int pointIndex) {
+        markPoint(new VectorXZ(point), pointIndex);
     }
 
     public void markPoint(VectorXZ point, int pointIndex) {

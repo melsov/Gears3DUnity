@@ -205,14 +205,13 @@ public class Gear : Drivable  {
     }
 
     protected void adjustForCrowding() {
-        foreach(Collider c in NearbyColliders.nearbyColliders(GetComponent<CapsuleCollider>(), 12, LayerMask.GetMask("GearMesh"))) {
+        foreach(Collider c in NearbyColliders.nearbyColliders(GetComponent<CapsuleCollider>(), .5f, LayerMask.GetMask("GearMesh"), 1.3f)) {
             Gear neighbor = c.GetComponent<Gear>();
             if (neighbor == this) { continue; }
             if (!neighbor || neighbor == _driver || drivables.Contains(neighbor)) { continue; }
             if (Mathf.Abs(gearTransform.position.y - neighbor.gearTransform.position.y) < YLayer.LayerHeight) {
                 yHeightOneLayerUpFrom(neighbor.gearTransform);
             }
-            break; // TEST
         }
     }
     protected void yHeightOneLayerUpFrom(Transform other) {

@@ -8,9 +8,10 @@ public class Motor : Drivable
     protected HandleSet handleSet;
     protected LeverLimits leverLimits;
     protected float leverMultiplier;
-    protected float leverMax = 16f;
+    protected float leverMax = 10f;
     protected Handle lever { get { return handleSet.handles[0]; } }
     protected OnOffIndicator onOffIndicator;
+    protected Counter counter;
 
     public float maxAngularVelocity = 10f;
     protected float _power = 1f;
@@ -67,7 +68,7 @@ public class Motor : Drivable
             maxAngularVelocity = stor.maxAngularVelocity;
             _power = stor._power;
             leverMultiplier = stor._leverMultiplier;
-            setLeverPositon();
+            setLeverPositon((int)leverMultiplier);
         }
     }
     #endregion
@@ -79,7 +80,10 @@ public class Motor : Drivable
         axel.beChildOf(_pegboard.getFrontendSocketSet().sockets[0]);
         handleSet = GetComponentInChildren<HandleSet>();
         leverLimits = GetComponentInChildren<LeverLimits>();
+        leverLimits.increments = 9;
         onOffIndicator = GetComponentInChildren<OnOffIndicator>();
+        counter = GetComponentInChildren<Counter>();
+        setLeverPositon((int)leverMultiplier);
 	}
 
 	protected override void update () {
@@ -107,24 +111,23 @@ public class Motor : Drivable
     }
 
     protected override void vDragOverride(VectorXZ cursorGlobal) {
-        //TODO: set a (separate?) scalar that influences motor power
-        // and raise and lower the lever
+        Bug.assertNotNullPause(leverLimits.min);
         float z = Mathf.Clamp(cursorGlobal.z, leverLimits.min.z, leverLimits.max.z);
-        Vector3 pos = lever.transform.position;
-        pos.z = z;
-        lever.transform.position = pos;
-        setMultiplier();
-        setLeverPositon();
+        float gradient = leverLimits.gradientPosition(cursorGlobal.z);
+        int lev = leverLimits.closestLevel(gradient);
+        setMultiplier(lev);
+        counter.turnTo(lev);
+        setLeverPositon(lev);
     }
 
-    protected void setLeverPositon() {
+    protected void setLeverPositon(int lev) {
         Vector3 pos = lever.transform.position;
-        pos.z = leverLimits.min.z + leverLimits.distance * (leverMultiplier / leverMax);
+        pos.z = leverLimits.globalZPositionForLevel(lev);
         lever.transform.position = pos;
     }
 
-    protected void setMultiplier() {
-        leverMultiplier = Mathf.Floor((leverMax + .5f) * (lever.transform.position.z - leverLimits.min.z) / leverLimits.distance);
+    protected void setMultiplier(int lev) {
+        leverMultiplier = lev;
         updateAudio();
     }
 }
