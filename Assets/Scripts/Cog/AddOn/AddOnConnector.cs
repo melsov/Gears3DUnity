@@ -22,6 +22,9 @@ public class AddOnConnector : MonoBehaviour {
     public Drivable.DrivableConnection getDrivableConnection(Collider other) {
         AddOnDrivableConnection aodc = new AddOnDrivableConnection(drivable);
         AddOn addOn = findAddOn(other);
+        if (addOn) {
+            print(" already client? " + addOn.hasClient);
+        }
         if (addOn != null && !addOn.hasClient) {
             aodc.addOn = addOn;
             aodc.makeConnection = makeConnection;

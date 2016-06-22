@@ -186,8 +186,12 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         disconnectAddOns();
     }
    protected virtual void disconnectAddOns() {
-        disconnectAddOn(controllerAddOn);
+        Debug.LogError("DRIVEBL dissconn Add ons");
+        if (controllerAddOn) {
+            controllerAddOn.disconnect();
+        }
         if (this is IControllerAddOnProvider) {
+            print("this is IController add on Provider");
             AddOn ao = ((IControllerAddOnProvider)this).getControllerAddOn();
             ao.disconnect();
         }
@@ -230,14 +234,19 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     protected virtual bool couldConnectTo(Collider other) {
         return getDrivableConnection(other).viable;
     }
+
+    protected DrivableConnection getAddOnDrivableConnection(Collider other, DrivableConnection dc) {
+        if (GetComponent<AddOnConnector>() != null) {
+            dc = GetComponent<AddOnConnector>().getDrivableConnection(other);
+        }
+        return dc;
+    }
     
     protected virtual DrivableConnection getDrivableConnection(Collider other) {
         DrivableConnection dc = new DrivableConnection(this);
-        if (GetComponent<AddOnConnector>() != null) {
-            dc = GetComponent<AddOnConnector>().getDrivableConnection(other);
-            if (dc.viable) {
-                return dc;
-            }
+        dc = getAddOnDrivableConnection(other, dc);
+        if (dc.viable) {
+            return dc;
         }
         if (isConnectedTo(other.transform)) return dc;
         dc.peg = _pegboard.getBackendSocketSet().closestOpenPegOnFrontendOf(other, out dc.socket);
@@ -473,10 +482,11 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
 
     public void handleEscapedFromCollider(Collider other) {
         print("welcome to escaped");
-        AddOn addOn = other.GetComponent<AddOn>();
-        if (addOn) {
+        AddOn addOn = FindInCog<AddOn>(other.transform); // other.GetComponent<AddOn>();
+        if (addOn && addOn.isClient(this)) {
             print("dis conn from add on: " + addOn.name);
-            disconnectAddOn(addOn);
+            addOn.disconnect();
+            //disconnectAddOn(addOn);
             return;
         }
         //Or I'm an addOn proxy?
@@ -484,9 +494,10 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
             print("is cao proxy");
             addOn = ((IControllerAddOnProvider)this).getControllerAddOn();
             Drivable drivableOther = FindInCog<Drivable>(other.transform);
-            if (addOn && drivableOther) {
+            if (addOn && drivableOther && addOn.isClient(drivableOther)) {
                 print("other disconn");
-                drivableOther.disconnectAddOn(addOn);
+                addOn.disconnect();
+                //drivableOther.disconnectAddOn(addOn);
             }
         }
 
@@ -516,6 +527,11 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
                 shouldDisconnect = true;
             }
         }
+        // find add on
+        if (!shouldDisconnect) {
+            shouldDisconnect = FindInCog<ControllerAddOn>(other.transform);
+        }
+
         print("should disconnect: " + shouldDisconnect);
         if (shouldDisconnect) {
             print("vTrigger Exit: got should disconnect");
@@ -635,15 +651,23 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
 
     protected virtual void resetAddOnScalar() { }
 
-    public void disconnectAddOn(AddOn addOn_) {
-        if (addOn_ == null) { return; }
-        print("disconnecting add on: " + addOn_.name);
+    //IAddOnClient
+    //public void disconnectAddOn(AddOn addOn_) { 
+    //    print("disconn add ons. addOn_ null? " + (addOn_ == null));
+    //    if (addOn_ == null) { return; }
+    //    print("disconnecting add on: " + addOn_.name);
+    //}
+
+    //IAddOnClient
+    public void forgetAbout(AddOn addOn_) {
         if (addOn_ == controllerAddOn) {
+            //controllerAddOn.disconnect();
             controllerAddOn = null;
             resetAddOnScalar();
         } else if (addOn_ is ReceiverAddOn) {
             receiverAddOns.Remove((ReceiverAddOn)addOn_);
         }
+
     }
 
     public void disconnectFromParentHinge() {

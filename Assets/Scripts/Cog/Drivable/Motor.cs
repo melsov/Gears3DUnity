@@ -26,6 +26,14 @@ public class Motor : Drivable
         }
     }
 
+//TODO: add on connections (on off gear switch) can't be reconnected?
+    protected override DrivableConnection getDrivableConnection(Collider other) {
+        DrivableConnection dc = new DrivableConnection(this);
+        dc = getAddOnDrivableConnection(other, dc);
+        print("conn was viable ? " + dc.viable);
+        return dc;
+    }
+
     protected void updateAudio() {
         if (Angles.VerySmall(power)) { AudioManager.Instance.stop(this, AudioLibrary.GearSoundName); }
         else { AudioManager.Instance.play(this, AudioLibrary.GearSoundName); }

@@ -10,6 +10,9 @@ public abstract class AddOn : Cog , ICursorAgentClient
     public bool hasClient {
         get { return client != null; }
     }
+
+    public bool isClient(IAddOnClient aoc) { return hasClient && aoc == client; }
+
     protected Collider currentOverrideCollider;
     protected RotationHandle rotationHandle;
 
@@ -58,6 +61,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
         }
         return false;
     }
+
     protected virtual void positionOnConnect(Cog cog) {
         Vector3 pos = transform.position;
         pos.x = cog.transform.position.x;
@@ -68,8 +72,10 @@ public abstract class AddOn : Cog , ICursorAgentClient
 
     public void disconnect() { vDisconnect(); }
     protected virtual void vDisconnect() {
+        Debug.LogError("vDisconn in AddOn: client null? " + (client == null));
         if (client != null) {
-            client.disconnectAddOn(this);
+            client.forgetAbout(this);
+            //client.disconnectAddOn(this);
             if (_follower != null) {
                 _follower.target = null;
             }
@@ -155,5 +161,6 @@ public abstract class AddOn : Cog , ICursorAgentClient
 public interface IAddOnClient
 {
     bool connectToAddOn(AddOn addOn_);
-    void disconnectAddOn(AddOn addOn_);
+    //void disconnectAddOn(AddOn addOn_);
+    void forgetAbout(AddOn addOn_);
 }

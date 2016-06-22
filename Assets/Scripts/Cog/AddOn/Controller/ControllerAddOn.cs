@@ -10,6 +10,7 @@ public class ControllerAddOn : AddOn {
     protected override void awake() {
         base.awake();
     }
+
 }
 
 public interface IControllerAddOnProvider
