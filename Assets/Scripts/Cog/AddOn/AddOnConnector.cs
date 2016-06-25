@@ -8,20 +8,9 @@ public class AddOnConnector : MonoBehaviour {
         drivable = GetComponent<Drivable>();
     }
 
-    private AddOn findAddOn(Collider other) {
-        AddOn addOn = other.GetComponentInParent<AddOn>();
-        if (addOn == null) {
-            IControllerAddOnProvider icaop = other.GetComponentInParent<IControllerAddOnProvider>();
-            if (icaop != null) {
-                addOn = icaop.getControllerAddOn();
-            }
-        }
-        return addOn;
-    }
-
     public Drivable.DrivableConnection getDrivableConnection(Collider other) {
         AddOnDrivableConnection aodc = new AddOnDrivableConnection(drivable);
-        AddOn addOn = findAddOn(other);
+        AddOn addOn = Cog.findAddOn(other);
         if (addOn) {
             print(" already client? " + addOn.hasClient);
         }

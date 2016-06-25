@@ -26,7 +26,55 @@ public class Motor : Drivable
         }
     }
 
-//TODO: add on connections (on off gear switch) can't be reconnected?
+    #region contract
+
+    protected override ContractNegotiator getContractNegotiator() {
+        return new MotorContractNegotiator(this);
+    }
+
+    public class MotorContractNegotiator : ContractNegotiator
+    {
+        public MotorContractNegotiator(Cog cog_) : base(cog_) {
+        }
+
+        protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
+            //TODO: motors offer to AddOn and those AddOn/Drivable hybrid things: gear switches
+            return base.orderedContractPreferencesAsOfferer(cogForTypeWorkaround);
+        }
+    }
+
+    protected override ViableContractLookup getViableContractLookup() {
+        return new ViableMotorContractLookup(this);
+    }
+
+    public class ViableMotorContractLookup : ViableContractLookup
+    {
+        protected Motor motor { get { return (Motor)cog; } }
+
+        public ViableMotorContractLookup(Cog cog_) : base(cog_) {
+        }
+
+        protected override void setupLookups() {
+            asProducerLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                return !motor.axel.hasChild && ((Drivable)other).hasOpenBackendSocket();
+            });
+        }
+    }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        if (specification.contractType == CogContractType.PARENT_CHILD) {
+            ProducerActions pas = new ProducerActions();
+            pas.initiate = delegate (Cog _client) { };
+            pas.dissolve = delegate (Cog _client) { };
+            pas.fulfill = delegate (Cog _client) { };
+            return pas;
+        }
+        return ProducerActions.getDoNothingActions();
+    }
+
+    #endregion
+
+    //TODO: add on connections (on off gear switch) can't be reconnected?
     protected override DrivableConnection getDrivableConnection(Collider other) {
         DrivableConnection dc = new DrivableConnection(this);
         dc = getAddOnDrivableConnection(other, dc);

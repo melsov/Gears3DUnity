@@ -6,6 +6,13 @@ using System.Collections.Generic;
 
 public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnection, IConstrainable
 {
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
     //public Material freeRotationMaterial;
     //public Material fixedRotationMaterial;
     [SerializeField]

@@ -39,6 +39,18 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     protected Peg fixedPegPrefab;
     protected FreeRotationPeg freeRotationPegPrefab;
 
+    protected ProducerActions.ProducerAction _conveyDrive;
+    protected ProducerActions.ProducerAction conveyDrive {
+        get {
+            if (_conveyDrive == null) {
+                _conveyDrive = delegate (Cog cog) {
+                    ((Drivable)cog).receiveDrive(new Drive(driveScalar()));
+                };
+            }
+            return _conveyDrive;
+        }
+    }
+
     protected virtual float radius {
         get { return  GetComponent<CapsuleCollider>().radius * transform.localScale.x; }
     }
@@ -61,6 +73,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         setupPrefabPegs();
     }
 
+
     private void setupPrefabPegs() {
         foreach(Peg p in Resources.LoadAll<Peg>("Prefabs/Cog")) {
             if (p is FreeRotationPeg) {
@@ -74,6 +87,41 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     private void setupSocketDelegates() {
         foreach(Socket s in _pegboard.getBackendSocketSet().sockets) {
             s.socketToParentPeg = onSocketToParentPeg;
+        }
+    }
+
+    #region contract
+    public class DrivableContractNegotiator : ContractNegotiator
+    {
+        protected Drivable drivable {
+            get { return (Drivable)cog; }
+        }
+
+        public DrivableContractNegotiator(Cog cog_) : base(cog_) {
+        }
+
+        //public override List<ContractSpecification> contractPreferencesAsOffererWith(Cog cog) {
+        //    List<ContractSpecification> prefs = new List<ContractSpecification>();
+        //    if (drivable.hasAddOnConnector) {
+        //        prefs.Add(new ContractSpecification(CogContractType.CONTROLLER_ADDON_DRIVABLE, RoleType.CLIENT));
+        //    }
+        //    return prefs;
+        //}
+
+    }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    public class ViableDrivableContractLookup : ViableContractLookup
+    {
+        public ViableDrivableContractLookup(Cog cog_) : base(cog_) {
         }
     }
 
@@ -108,7 +156,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
 	}
 
     protected virtual void update() {
-        
         updateAngleStep();
 
         for (int i=0; i < drivables.Count; ++i) {
@@ -170,6 +217,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         vDisconnect();
     }
 
+/* * Rest in pepperonis
     protected virtual void vDisconnect() {
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null) {
@@ -184,7 +232,9 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         transform.SetParent(null);
         //Do we disconnect add ons?
         disconnectAddOns();
-    }
+   }
+*/
+
    protected virtual void disconnectAddOns() {
         Debug.LogError("DRIVEBL dissconn Add ons");
         if (controllerAddOn) {
@@ -205,9 +255,17 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
     }
 
     protected virtual void disconnectSockets() {
+        disconnectFrontendSockets();
+        disconnectBackendSockets();
+    }
+
+    protected void disconnectFrontendSockets() {
         foreach(Socket soc in _pegboard.getFrontendSocketSet().sockets) {
             soc.breakChildConnections();
         }
+    }
+
+    protected void disconnectBackendSockets() {
         foreach (Socket soc in _pegboard.getBackendSocketSet().sockets) {
             if (soc.hasDrivingPeg()) {
                 if (soc.drivingPeg.owner != this) { 
@@ -235,13 +293,23 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         return getDrivableConnection(other).viable;
     }
 
+    protected bool hasAddOnConnector {  get { return GetComponent<AddOnConnector>(); } }
+
+    public bool hasOpenBackendSocket() {
+        return openBackendSockets().Count > 0;
+    }
+
+    public List<Socket> openBackendSockets() {
+        return _pegboard.getBackendSocketSet().openChildableSockets();
+    }
+
     protected DrivableConnection getAddOnDrivableConnection(Collider other, DrivableConnection dc) {
         if (GetComponent<AddOnConnector>() != null) {
             dc = GetComponent<AddOnConnector>().getDrivableConnection(other);
         }
         return dc;
     }
-    
+        
     protected virtual DrivableConnection getDrivableConnection(Collider other) {
         DrivableConnection dc = new DrivableConnection(this);
         dc = getAddOnDrivableConnection(other, dc);
@@ -288,12 +356,13 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
             return false;
         }
     }
-
-    protected virtual bool vConnectTo(Collider other) {
+    /* **** TEST CONTRACTS INSTEAD *******
+    protected override bool vConnectTo(Collider other) {
         DrivableConnection dc = getDrivableConnection(other);
         print(name + " vConnect ");
         return dc.connect();
     }
+*/
 
     protected Socket getSocketRegardlessOfPeg(Collider other, out Socket aSocket) {
         return _pegboard.getBackendSocketSet().closestSocketOnFrontendOfRegardlessOfPeg(other, out aSocket);
@@ -599,8 +668,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         }
     }
 
-
-    protected Axel getAxel(Collider other) {
+    protected Axel getAxel(Cog other) {
         Axel anAxel = other.gameObject.GetComponent<Axel>();
         if (anAxel == null) {
             anAxel = other.gameObject.GetComponentInParent<Axel>();
@@ -612,6 +680,10 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
             if (anAxel.occupiedByChild) return null;
         }
         return anAxel;
+    }
+
+    protected Axel getAxel(Collider other) {
+        return getAxel(FindCog(other.transform));
     }
 
     public virtual Constraint parentConstraintFor(Constraint childConstraint, Transform childTransform) {

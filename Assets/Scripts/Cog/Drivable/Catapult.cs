@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Catapult : Cog {
     public void Awake() {
@@ -8,5 +9,13 @@ public class Catapult : Cog {
         js.targetPosition = 15f;
         js.spring = 80f;
         hj.spring = js;
+    }
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        throw new NotImplementedException();
     }
 }

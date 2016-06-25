@@ -28,7 +28,10 @@ public class TriggerProxy : MonoBehaviour {
 
     private void relay(Collider other, int state) {
         if (client == null) {
-            print("null client in Trigger Proxy?? for: " + name);
+            if (Cog.FindCog(transform)) {
+                print(Cog.FindCog(transform).name + " has a trigger proxy w/o client");
+            }
+            Bug.bugAndPause("null client in Trigger Proxy?? for: " + name);
             return;
         }
         switch (state) {

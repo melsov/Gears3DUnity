@@ -22,6 +22,7 @@ public class CursorInput : MonoBehaviour {
 
     // Use this for initialization
     void Awake () {
+        print(System.Environment.Version);
         layerMask = ~(LayerMask.GetMask("DragOverride") | LayerMask.GetMask("CogComponent"));
         dragOverrideMask = LayerMask.GetMask("DragOverride");
         itemProxyImage.raycastTarget = false;

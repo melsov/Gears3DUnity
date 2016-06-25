@@ -29,6 +29,16 @@ public abstract class Instrument : Cog , ICollisionProxyClient {
     }
 
     public void proxyCollisionStay(Collision collision) {
-    } 
+    }
+
+    #region contract
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        return null;
+    }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        return null;
+    }
+    #endregion
 
 }

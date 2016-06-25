@@ -11,6 +11,13 @@ public class ControllerAddOn : AddOn {
         base.awake();
     }
 
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }
 
 public interface IControllerAddOnProvider

@@ -36,6 +36,98 @@ public class Gear : Drivable  {
         }
     }
 
+    #region contract
+
+    protected override ContractNegotiator getContractNegotiator() {
+        return new GearContractNegotiator(this);
+    }
+
+    public class GearContractNegotiator : ContractNegotiator
+    {
+        public GearContractNegotiator(Cog cog_) : base(cog_) {
+        }
+
+        protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
+            List<ContractSpecification> result = new List<ContractSpecification>();
+            if (cogForTypeWorkaround is Gear) {
+                result.Add(new ContractSpecification(CogContractType.DRIVER_DRIVEN, RoleType.CLIENT));
+            } else if (cogForTypeWorkaround is Motor) {
+                print("pref for motor");
+                result.Add(new ContractSpecification(CogContractType.PARENT_CHILD, RoleType.CLIENT));
+            }
+            return result;
+        }
+    }
+
+    protected override ViableContractLookup getViableContractLookup() {
+        return new ViableGearContractLookup(this);
+    }
+
+    public class ViableGearContractLookup : ViableDrivableContractLookup
+    {
+        protected Gear gear {
+            get { return (Gear)cog; }
+        }
+
+        public ViableGearContractLookup(Cog cog_) : base(cog_) {}
+
+        protected override void setupLookups() {
+            asClientLookup.Add(CogContractType.DRIVER_DRIVEN, delegate (Cog other) {
+                return other.GetComponent<Gear>();
+            });
+            asClientLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                Axel axel = gear.getAxel(other);
+                return axel && !axel.hasChild;
+            });
+
+            asProducerLookup.Add(CogContractType.DRIVER_DRIVEN, delegate (Cog other) {
+                return other.GetComponent<Gear>();
+            });
+        }
+    }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        ProducerActions actions = ProducerActions.getDoNothingActions();
+        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+            actions.initiate = delegate (Cog cog) {
+                addDrivable((Drivable)cog);
+            };
+            actions.dissolve = delegate (Cog cog) {
+                while(drivables.Contains((Drivable)cog)) {
+                    drivables.Remove((Drivable)cog);
+                }
+            };
+            actions.fulfill = conveyDrive;
+        }
+        return actions;
+    }
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        ClientActions actions = ClientActions.getDoNothingActions();
+        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+            actions.receive = delegate (Cog cog) {
+                _driver = (Drivable)cog;
+                positionRelativeTo(_driver);
+                adjustForCrowding();
+            };
+            actions.beAbsolvedOf = delegate (Cog cog) {
+                print(name + " get absovled from contract");
+                disconnectFromDriver();
+            };
+        } else if (specification.contractType == CogContractType.PARENT_CHILD) {
+            actions.receive = delegate (Cog _producer) {
+                print("gear ParentChild receive action with: " + _producer.name);
+                setSocketClosestToAxel(getAxel(_producer));
+            };
+            actions.beAbsolvedOf = delegate (Cog _producer) {
+                disconnectBackendSockets();
+            };
+        }
+        return actions;
+    }
+
+    #endregion
+
     protected virtual void lengthenCollider(CapsuleCollider cc) {
         cc.height = 10f;
         cc.center = TransformUtil.SetY(cc.center, -3.3f);
@@ -126,6 +218,10 @@ public class Gear : Drivable  {
 
     protected override void vDisconnect() {
         base.vDisconnect();
+        resetYPosition();
+    }
+
+    protected void resetYPosition() {
         gearTransform.position = TransformUtil.SetY(gearTransform.position, YLayer.Layer(typeof(Gear)));
     }
 
@@ -153,12 +249,14 @@ public class Gear : Drivable  {
     }
 
     protected virtual void setDistanceFrom(Gear gear) {
+        print("gear set dist from other " + gear.name);
         Vector3 refPoint = gear.transform.position;
         if (gear is RackGear) {
             RackGear rackGear = (RackGear)gear;
             refPoint = rackGear.closestPointOnLine(new VectorXZ(transform.position)).vector3(rackGear.transform.position.y);
         }
         Vector3 relPos = transform.position - refPoint;
+        print("setting position distance: " + relPos.magnitude);
         relPos = relPos.normalized * (innerRadius + gear.innerRadius + ToothDepth);
         transform.position = refPoint + relPos;
     }
