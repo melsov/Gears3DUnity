@@ -32,13 +32,13 @@ public class GearSwitch : GearDrivenMechanism, IControllerAddOnProvider  {
         
     }
 
-    protected override void vTriggerExit(Collider other) {
-        base.vTriggerExit(other);
-        IAddOnClient c = FindInCog<IAddOnClient>(other.transform);
-        if (c == proxySwitch.client) {
-            proxySwitch.disconnect();
-        }
-    }
+    //protected override void vTriggerExit(Collider other) {
+    //    base.vTriggerExit(other);
+    //    IAddOnClient c = FindInCog<IAddOnClient>(other.transform);
+    //    if (c == proxySwitch.client) {
+    //        proxySwitch.disconnect();
+    //    }
+    //}
 
 
 }

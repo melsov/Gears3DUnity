@@ -40,6 +40,15 @@ public class ColliderDropper : MonoBehaviour {
         }
         try {
             if (client.isCursorInteracting()) {
+
+                if (Cog.FindCog(other.transform)) {
+                    print("client handle trigger exit with cog: " + Cog.FindCog(other.transform).name);
+                }
+                if (other.transform.parent) {
+                    print("handle with coll parent: " + other.transform.parent.name);
+                }
+                print("calling client handle trigger exit w collider: " + other.name);
+
                 client.handleTriggerExit(other);
             }
         } catch(System.NullReferenceException nre) {

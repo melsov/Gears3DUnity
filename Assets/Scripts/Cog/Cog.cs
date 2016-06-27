@@ -246,15 +246,7 @@ public abstract class Cog : MonoBehaviour {
     protected virtual ContractNegotiator getContractNegotiator() {
         return new ContractNegotiator(this);
     }
-    //public class ContractActions
-    //{
-    //    public delegate void ContractAction(Cog other);
-    //    public ContractAction initiate;
-    //    public ContractAction receive;
-    //    public ContractAction fulfill;
-    //    public ContractAction dissolve;
-    //    public ContractAction beAbsolvedOf;
-    //}
+    
     public class ProducerActions
     {
         public delegate void ProducerAction(Cog other);
@@ -364,9 +356,14 @@ public abstract class Cog : MonoBehaviour {
     }
 
     public static AddOn findAddOn(Collider other) {
-        AddOn addOn = other.GetComponentInParent<AddOn>();
+        return findAddOn(FindCog(other.transform));
+    }
+
+    public static AddOn findAddOn(Cog cog) {
+        if (cog == null) { return null; }
+        AddOn addOn = cog.GetComponentInParent<AddOn>();
         if (addOn == null) {
-            IControllerAddOnProvider icaop = other.GetComponentInParent<IControllerAddOnProvider>();
+            IControllerAddOnProvider icaop = cog.GetComponentInParent<IControllerAddOnProvider>();
             if (icaop != null) {
                 addOn = icaop.getControllerAddOn();
             }

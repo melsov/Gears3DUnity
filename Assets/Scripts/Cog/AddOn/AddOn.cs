@@ -6,12 +6,12 @@ public abstract class AddOn : Cog , ICursorAgentClient
 {
     public bool shouldPositionOnConnect = true;
     public bool shouldFollowClient = true;
-    public IAddOnClient client;
-    public bool hasClient {
-        get { return client != null; }
-    }
+    //public IAddOnClient client; //TODO: purge client from add on? or make into a property at least...don't use where unneeded
+    //public bool hasClient {
+    //    get { return client != null; }
+    //}
 
-    public bool isClient(IAddOnClient aoc) { return hasClient && aoc == client; }
+    //public bool isClient(IAddOnClient aoc) { return hasClient && aoc == client; }
 
     protected Collider currentOverrideCollider;
     protected RotationHandle rotationHandle;
@@ -22,6 +22,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
     }
     public bool connectTo(Collider other) { return vConnectTo(other); }
 
+/* rest in peace
     protected bool vConnectTo(Collider other) {
         Cog cog = other.GetComponentInParent<Cog>();
         if (connectToClient(cog)) {
@@ -29,6 +30,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
         }
         return false;
     }
+*/
 
     protected Follower _follower;
     protected Follower follower {
@@ -55,7 +57,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
                         follower.target = cog.transform;
                     }
                 }
-                client = aoc;
+                //client = aoc;
                 return true;
             }
         }
@@ -71,6 +73,8 @@ public abstract class AddOn : Cog , ICursorAgentClient
     }
 
     public void disconnect() { vDisconnect(); }
+
+/* pepperoni
     protected virtual void vDisconnect() {
         Debug.LogError("vDisconn in AddOn: client null? " + (client == null));
         if (client != null) {
@@ -82,7 +86,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
             client = null;
         }
     }
-
+*/
     public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) { vStartDragOverride(cursorGlobal, dragOverrideCollider); }
     public void dragOverride(VectorXZ cursorGlobal) { vDragOverride(cursorGlobal); }
     public void endDragOverride(VectorXZ cursorGlobal) { vEndDragOverride(cursorGlobal); }
@@ -136,10 +140,8 @@ public abstract class AddOn : Cog , ICursorAgentClient
     }
     #endregion
 
-    void Awake () {
-        awake();
-	}
-    protected virtual void awake() {
+    protected override void awake() {
+        base.awake();
         rotationHandle = GetComponentInChildren<RotationHandle>();
         _follower = GetComponent<Follower>();
     }
@@ -161,6 +163,5 @@ public abstract class AddOn : Cog , ICursorAgentClient
 public interface IAddOnClient
 {
     bool connectToAddOn(AddOn addOn_);
-    //void disconnectAddOn(AddOn addOn_);
     void forgetAbout(AddOn addOn_);
 }

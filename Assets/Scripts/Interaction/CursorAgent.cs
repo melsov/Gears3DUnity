@@ -71,6 +71,8 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     public void handleTriggerExit(Collider other) {
         if (client == null) { return; }
         client.triggerExitDuringDrag(other);
+
+        //client.triggerExitDuringDrag(other);
     }
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {

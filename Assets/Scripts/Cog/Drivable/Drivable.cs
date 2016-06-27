@@ -15,7 +15,7 @@ using System;
 
 
 [System.Serializable]
-public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient , IGameSerializable, IRestoreConnection
+public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSerializable, IRestoreConnection
 {
     public bool autoGeneratePegOnConnect = true;
 
@@ -551,6 +551,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
 
     public void handleEscapedFromCollider(Collider other) {
         print("welcome to escaped");
+/* rest
         AddOn addOn = FindInCog<AddOn>(other.transform); // other.GetComponent<AddOn>();
         if (addOn && addOn.isClient(this)) {
             print("dis conn from add on: " + addOn.name);
@@ -569,7 +570,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
                 //drivableOther.disconnectAddOn(addOn);
             }
         }
-
+*/
     }
 
     public void triggerExitDuringDrag(Collider other) {
@@ -690,14 +691,14 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
         return null;
     }
 
-    public bool connectToAddOn(AddOn addOn_) {
-        if (addOn_ is ControllerAddOn) {
-            return connectToControllerAddOn((ControllerAddOn)addOn_);
-        } else if (addOn_ is ReceiverAddOn) {
-            return connectToReceiverAddOn((ReceiverAddOn)addOn_);
-        }
-        return false;
-    }
+    //public bool connectToAddOn(AddOn addOn_) {
+    //    if (addOn_ is ControllerAddOn) {
+    //        return connectToControllerAddOn((ControllerAddOn)addOn_);
+    //    } else if (addOn_ is ReceiverAddOn) {
+    //        return connectToReceiverAddOn((ReceiverAddOn)addOn_);
+    //    }
+    //    return false;
+    //}
     protected virtual bool connectToControllerAddOn(ControllerAddOn cao) {
         if (controllerAddOn == null) {
             print("controller add on connect " + cao.name + " parent cog: " + FindCog(cao.transform).name);
@@ -723,24 +724,20 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IAddOnClient
 
     protected virtual void resetAddOnScalar() { }
 
-    //IAddOnClient
-    //public void disconnectAddOn(AddOn addOn_) { 
-    //    print("disconn add ons. addOn_ null? " + (addOn_ == null));
-    //    if (addOn_ == null) { return; }
-    //    print("disconnecting add on: " + addOn_.name);
+   
+
+    /*
+     * IAddOnClient
+     * */
+    //public void forgetAbout(AddOn addOn_) {
+    //    if (addOn_ == controllerAddOn) {
+    //        //controllerAddOn.disconnect();
+    //        controllerAddOn = null;
+    //        resetAddOnScalar();
+    //    } else if (addOn_ is ReceiverAddOn) {
+    //        receiverAddOns.Remove((ReceiverAddOn)addOn_);
+    //    }
     //}
-
-    //IAddOnClient
-    public void forgetAbout(AddOn addOn_) {
-        if (addOn_ == controllerAddOn) {
-            //controllerAddOn.disconnect();
-            controllerAddOn = null;
-            resetAddOnScalar();
-        } else if (addOn_ is ReceiverAddOn) {
-            receiverAddOns.Remove((ReceiverAddOn)addOn_);
-        }
-
-    }
 
     public void disconnectFromParentHinge() {
         _pegboard.unsetRigidbodyWithGravity();

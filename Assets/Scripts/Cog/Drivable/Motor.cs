@@ -39,6 +39,14 @@ public class Motor : Drivable
 
         protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
             //TODO: motors offer to AddOn and those AddOn/Drivable hybrid things: gear switches
+            AddOn addOn = findAddOn(cogForTypeWorkaround);
+            if (addOn) {
+                if (addOn is ControllerAddOn) {
+                    List<ContractSpecification> specs = new List<ContractSpecification>();
+                    specs.Add(new ContractSpecification(CogContractType.CONTROLLER_ADDON_DRIVABLE, RoleType.CLIENT));
+                    return specs;
+                }
+            }
             return base.orderedContractPreferencesAsOfferer(cogForTypeWorkaround);
         }
     }
@@ -58,6 +66,9 @@ public class Motor : Drivable
             asProducerLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
                 return !motor.axel.hasChild && ((Drivable)other).hasOpenBackendSocket();
             });
+            asClientLookup.Add(CogContractType.CONTROLLER_ADDON_DRIVABLE, delegate (Cog other) {
+                return motor.controllerAddOn == null; 
+            });
         }
     }
 
@@ -72,6 +83,22 @@ public class Motor : Drivable
         return ProducerActions.getDoNothingActions();
     }
 
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        if(specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
+            ClientActions cas = new ClientActions();
+            cas.receive = delegate (Cog _producer) {
+                print("receiving addOn contract");
+                controllerAddOn = (ControllerAddOn) findAddOn(_producer);
+                controllerAddOn.setScalar = handleAddOnScalar;
+            };
+            cas.beAbsolvedOf = delegate (Cog _producer) {
+                controllerAddOn.setScalar = null;
+                controllerAddOn = null;
+            };
+            return cas;
+        }
+        return ClientActions.getDoNothingActions();
+    }
     #endregion
 
     //TODO: add on connections (on off gear switch) can't be reconnected?
@@ -160,6 +187,7 @@ public class Motor : Drivable
     }
 
     protected override void handleAddOnScalar(float scalar) {
+        print("new add on scalar: " + scalar);
         power = scalar;
     }
     protected override void resetAddOnScalar() {

@@ -54,9 +54,10 @@ public class Switch : ControllerAddOn  {
     }
 
     protected virtual void updateClient() {
-        if (client != null && setScalar != null && on != null) {
+        print("up client set Scalar null ? " + (setScalar == null));
+        if (/*client != null &&*/  setScalar != null && on != null) {
             setScalar((int)on.getState());
-        } 
+        }
     }
 
     #region proxy trigger disabled
