@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using System.Collections;
+using System;
 
 public class TransformUtil : MonoBehaviour
 {
@@ -78,6 +79,14 @@ public class TransformUtil : MonoBehaviour
         while(descendant != null) {
             if (descendant.parent == ancestor) { return true; }
             descendant = descendant.parent;
+        }
+        return false;
+    }
+
+    internal static bool IsChildOf(Transform parent, Transform other) {
+        if (parent == other) { return false; }
+        foreach(Transform t in parent.GetComponentsInChildren<Transform>()) {
+            if (t == other) { return true; }
         }
         return false;
     }

@@ -140,6 +140,14 @@ public class LinearActuator : Drivable , IPegProxy {
             lineSegment.MiniDeserialize(ref stor.lineSegmentData);
         }
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
     #endregion
 }
 

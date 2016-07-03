@@ -38,4 +38,11 @@ public class Chime : Instrument {
         return colorRange[note];
     }
 
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }

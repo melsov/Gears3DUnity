@@ -42,6 +42,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
         }
     }
 
+
     public virtual bool connectToClient(Cog cog) {
         IAddOnClient aoc = cog.GetComponentInParent<IAddOnClient>();
         if (aoc != null) {

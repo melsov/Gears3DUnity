@@ -218,4 +218,12 @@ public class Pole : Drivable
         print("%%%welcome to pole: restore connection data");
         base.restoreConnectionData(ref connectionData);
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }

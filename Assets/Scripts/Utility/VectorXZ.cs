@@ -96,9 +96,9 @@ public struct VectorXZ  {
     }
 
     public static implicit operator VectorXZ (Vector3 v) { return new VectorXZ(v); }
-    //public static implicit operator Vector3 (VectorXZ v) { return v.vector3(); }
+    public static implicit operator bool (VectorXZ v) { return !v.isFakeNull(); }
 
-        public override bool Equals(object obj) {
+    public override bool Equals(object obj) {
         return v.Equals(obj);
     }
     public override int GetHashCode() {

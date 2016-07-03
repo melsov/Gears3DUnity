@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System;
 
 public class Chainn : Drivable {
 
@@ -51,5 +52,12 @@ public class Chainn : Drivable {
         return drive;
     }
 
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }
 

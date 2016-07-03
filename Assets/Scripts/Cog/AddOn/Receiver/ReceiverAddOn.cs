@@ -17,5 +17,13 @@ public class ReceiverAddOn : AddOn {
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
         throw new NotImplementedException();
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }
 

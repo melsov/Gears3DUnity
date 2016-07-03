@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.5f1</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -127,6 +125,12 @@
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearSpringConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\CogContract.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\ConnectionSiteBoss.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\FiniteSet.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\LocatableCSBossSetup.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\SiteOrientation.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ContractEvent.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ContractPortfolio.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Anvil.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Combinable.cs" />
     <Compile Include="Assets\Scripts\Cog\Dispensable\Dispensable.cs" />
@@ -257,6 +261,5 @@
     <None Include="Assets\Temp\hi.txt" />
     <None Include="Assets\Textures\grids\readme.txt" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

@@ -54,8 +54,7 @@ public class Switch : ControllerAddOn  {
     }
 
     protected virtual void updateClient() {
-        print("up client set Scalar null ? " + (setScalar == null));
-        if (/*client != null &&*/  setScalar != null && on != null) {
+        if (setScalar != null && on != null) {
             setScalar((int)on.getState());
         }
     }

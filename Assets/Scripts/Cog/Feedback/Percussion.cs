@@ -9,8 +9,16 @@ public class Percussion : Instrument {
     [SerializeField]
     protected Color highlight = Color.green;
 
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
+
     protected override Color getColor() {
         return highlight;
+    }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
     }
 
     protected override string getNoteName() {

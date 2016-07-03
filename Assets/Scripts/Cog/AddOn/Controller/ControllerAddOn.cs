@@ -63,7 +63,6 @@ public class ControllerAddOn : AddOn {
                 follower.offset = transform.position - _client.transform.position;
                 follower.target = _client.transform;
             }
-
         };
         pas.dissolve = delegate (Cog _client) {
             print("dissoble CAO contract");
@@ -75,6 +74,17 @@ public class ControllerAddOn : AddOn {
 
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         return ClientActions.getDoNothingActions();
+    }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        return new ConnectionSiteBoss(LocatableSiteSetAndCTARSetSetup.connectionSiteBossFor(this));
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
+            return ConnectionSiteAgreement.alignTarget(transform);
+        }
+        return ConnectionSiteAgreement.doNothing;
     }
 
     #endregion

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class Dispenser : Drivable {
 
@@ -18,8 +19,97 @@ public class Dispenser : Drivable {
         if (cao != null) {
             cao.connectTo(GetComponent<Collider>());
             hasBuiltInButton = true;
+            //enterPermanentContractWith(cao);
         }
     }
+
+    #region contract
+
+    protected override ContractNegotiator getContractNegotiator() {
+        return new DispenserContractNegotiator(this);
+    }
+
+    public class DispenserContractNegotiator : ContractNegotiator
+    {
+        public DispenserContractNegotiator(Cog cog_) : base(cog_) {
+        }
+
+        protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
+            AddOn addOn = findAddOn(cogForTypeWorkaround);
+            if (addOn) {
+                if (addOn is ControllerAddOn) {
+                    print("dispenser found addOn: " + addOn.name + " of cog: " + FindCog(addOn.transform).name);
+                    List<ContractSpecification> specs = new List<ContractSpecification>();
+                    specs.Add(new ContractSpecification(CogContractType.CONTROLLER_ADDON_DRIVABLE, RoleType.CLIENT));
+                    return specs;
+                }
+            }
+            return base.orderedContractPreferencesAsOfferer(cogForTypeWorkaround);
+        }
+    }
+
+    protected override ViableContractLookup getViableContractLookup() {
+        return new ViableDispenserContractLookup(this);
+    }
+
+    public class ViableDispenserContractLookup : ViableContractLookup
+    {
+        public ViableDispenserContractLookup(Cog cog_) : base(cog_) {
+        }
+
+        protected Dispenser dispenser { get { return (Dispenser)cog; } }
+
+        protected override void setupLookups() {
+            asClientLookup.Add(CogContractType.CONTROLLER_ADDON_DRIVABLE, delegate (Cog other) {
+                return dispenser.controllerAddOn == null; 
+            });
+        }
+    }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        return ProducerActions.getDoNothingActions();
+    }
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        if(specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
+            ClientActions cas = new ClientActions();
+            cas.receive = delegate (Cog _producer) {
+                print("dispenser receiving addOn contract");
+                controllerAddOn = (ControllerAddOn) findAddOn(_producer);
+                controllerAddOn.setScalar += handleAddOnScalar;
+            };
+            cas.beAbsolvedOf = delegate (Cog _producer) {
+                controllerAddOn.setScalar -= handleAddOnScalar;
+                controllerAddOn = null;
+                resetAddOnScalar();
+            };
+            return cas;
+        }
+        return ClientActions.getDoNothingActions();
+    }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteBossFor(this);
+        return new ConnectionSiteBoss(lookup);
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
+            return ConnectionSiteAgreement.alignTarget(transform);
+        }
+        return ConnectionSiteAgreement.doNothing;
+    }
+
+    protected override bool contractShouldBeUnbreakable(CogContract cc) {
+        if (cc.type == CogContractType.CONTROLLER_ADDON_DRIVABLE &&
+            TransformUtil.IsChildOf(transform, cc.producer.cog.transform) &&
+            cc.client.cog == this) {
+            return true;
+        }
+        return base.contractShouldBeUnbreakable(cc);
+    }
+
+    #endregion
 
     protected override bool connectToControllerAddOn(ControllerAddOn cao) {
         if (hasBuiltInButton) { return false; }

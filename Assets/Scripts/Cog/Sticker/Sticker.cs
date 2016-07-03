@@ -95,4 +95,12 @@ public class Sticker : Cog, ICursorAgentClient
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         throw new NotImplementedException();
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }

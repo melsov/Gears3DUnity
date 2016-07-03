@@ -130,4 +130,12 @@ public class ConveyorBelt : Drivable , ICollisionProxyClient
         }
         collisions.Remove(collision);
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }

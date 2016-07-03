@@ -290,6 +290,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     protected virtual bool couldConnectTo(Collider other) {
+        return false; //TODO: integrate could connect w contracts
         return getDrivableConnection(other).viable;
     }
 
@@ -574,7 +575,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     public void triggerExitDuringDrag(Collider other) {
-        vTriggerExit(other);
+        //vTriggerExit(other); // FOR NOW: just never do this
     }
 //THIS DOESN'T GET TRIGGERED ?
     protected virtual void vTriggerExit(Collider other) {
@@ -703,7 +704,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         if (controllerAddOn == null) {
             print("controller add on connect " + cao.name + " parent cog: " + FindCog(cao.transform).name);
             controllerAddOn = cao;
-            controllerAddOn.setScalar = handleAddOnScalar;
+            controllerAddOn.setScalar += handleAddOnScalar;
             return true;
         }
         return false;

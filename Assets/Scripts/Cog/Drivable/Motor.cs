@@ -42,6 +42,7 @@ public class Motor : Drivable
             AddOn addOn = findAddOn(cogForTypeWorkaround);
             if (addOn) {
                 if (addOn is ControllerAddOn) {
+                    print("motor found addOn: " + addOn.name + " of cog: " + FindCog(addOn.transform).name);
                     List<ContractSpecification> specs = new List<ContractSpecification>();
                     specs.Add(new ContractSpecification(CogContractType.CONTROLLER_ADDON_DRIVABLE, RoleType.CLIENT));
                     return specs;
@@ -89,16 +90,36 @@ public class Motor : Drivable
             cas.receive = delegate (Cog _producer) {
                 print("receiving addOn contract");
                 controllerAddOn = (ControllerAddOn) findAddOn(_producer);
-                controllerAddOn.setScalar = handleAddOnScalar;
+                controllerAddOn.setScalar += handleAddOnScalar;
             };
             cas.beAbsolvedOf = delegate (Cog _producer) {
-                controllerAddOn.setScalar = null;
+                controllerAddOn.setScalar -= handleAddOnScalar;
                 controllerAddOn = null;
+                resetAddOnScalar();
             };
             return cas;
         }
         return ClientActions.getDoNothingActions();
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        //Get dictionary with entry for motor's controller add on site
+        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteBossFor(this);
+        //Add an entry for motors axel
+        CTARSet parentChildSet = new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER));
+        SiteSet ss = new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1));
+        lookup.Add(parentChildSet, ss);
+        return new ConnectionSiteBoss(lookup);
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
+            return ConnectionSiteAgreement.alignTarget(transform);
+        }
+        //CONSIDER: could we be asked to travel to a gear?
+        return ConnectionSiteAgreement.doNothing;
+    }
+
     #endregion
 
     //TODO: add on connections (on off gear switch) can't be reconnected?

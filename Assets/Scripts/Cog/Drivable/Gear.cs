@@ -7,8 +7,9 @@ using System.Collections.Generic;
 //TODO: generally convert tranform operations to (kinematic) rigidbody operations
 public class Gear : Drivable  {
 
-//TODO: plan out caps colider radius and assign programmatically
-//TODO: related: make var: tooth depth
+    private const int MAX_CLIENT_GEARS = 8;
+    //TODO: plan out caps colider radius and assign programmatically
+    //TODO: related: make var: tooth depth
     public int toothCount = 6;
     public float toothOffset = .25f;
     public const float ToothDepth = .25f;
@@ -52,7 +53,6 @@ public class Gear : Drivable  {
             if (cogForTypeWorkaround is Gear) {
                 result.Add(new ContractSpecification(CogContractType.DRIVER_DRIVEN, RoleType.CLIENT));
             } else if (cogForTypeWorkaround is Motor) {
-                print("pref for motor");
                 result.Add(new ContractSpecification(CogContractType.PARENT_CHILD, RoleType.CLIENT));
             }
             return result;
@@ -106,9 +106,9 @@ public class Gear : Drivable  {
         ClientActions actions = ClientActions.getDoNothingActions();
         if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
             actions.receive = delegate (Cog cog) {
-                _driver = (Drivable)cog;
-                positionRelativeTo(_driver);
-                adjustForCrowding();
+                //_driver = (Drivable)cog;
+                //positionRelativeTo(_driver);
+                //adjustForCrowding(); // * see connktAction
             };
             actions.beAbsolvedOf = delegate (Cog cog) {
                 print(name + " get absovled from contract");
@@ -117,13 +117,34 @@ public class Gear : Drivable  {
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
             actions.receive = delegate (Cog _producer) {
                 print("gear ParentChild receive action with: " + _producer.name);
-                setSocketClosestToAxel(getAxel(_producer));
+                //setSocketClosestToAxel(getAxel(_producer)); // * see connektAction
             };
             actions.beAbsolvedOf = delegate (Cog _producer) {
                 disconnectBackendSockets();
             };
         }
         return actions;
+    }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        return new ConnectionSiteBoss(new Dictionary<CTARSet, SiteSet>() {
+            {CTARSet.clientDrivenAndChildSet(), new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1))},
+            {new CTARSet(new ContractTypeAndRole(CogContractType.DRIVER_DRIVEN, RoleType.PRODUCER)), new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), MAX_CLIENT_GEARS))},
+        });
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+            return delegate (ConnectionSiteAgreement csa) {
+                positionRelativeTo((Drivable)csa.destination.cog);
+                adjustForCrowding();
+            };
+        } else if (specification.contractType == CogContractType.PARENT_CHILD) {
+            return delegate (ConnectionSiteAgreement csa) {
+                setSocketClosestToAxel(getAxel(csa.destination.cog));
+            };
+        }
+        return ConnectionSiteAgreement.doNothing;
     }
 
     #endregion
@@ -249,16 +270,16 @@ public class Gear : Drivable  {
     }
 
     protected virtual void setDistanceFrom(Gear gear) {
-        print("gear set dist from other " + gear.name);
-        Vector3 refPoint = gear.transform.position;
+        Vector3 refPoint = gear.gearTransform.position;
         if (gear is RackGear) {
             RackGear rackGear = (RackGear)gear;
-            refPoint = rackGear.closestPointOnLine(new VectorXZ(transform.position)).vector3(rackGear.transform.position.y);
+            refPoint = rackGear.closestPointOnLine(new VectorXZ(gearTransform.position)).vector3(rackGear.transform.position.y);
         }
-        Vector3 relPos = transform.position - refPoint;
-        print("setting position distance: " + relPos.magnitude);
+        Vector3 relPos = gearTransform.position - refPoint;
         relPos = relPos.normalized * (innerRadius + gear.innerRadius + ToothDepth);
-        transform.position = refPoint + relPos;
+        Vector3 target = refPoint + relPos;
+        Vector3 dif = target - gearTransform.position;
+        transform.position += dif;
     }
 
     protected override DrivableConnection getDrivableConnection(Collider other) {

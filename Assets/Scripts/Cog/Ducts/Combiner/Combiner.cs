@@ -95,4 +95,12 @@ public class Combiner : Drivable {
     public override Drive receiveDrive(Drive drive) {
         return drive;
     }
+
+    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        throw new NotImplementedException();
+    }
 }
