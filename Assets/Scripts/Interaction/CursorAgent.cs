@@ -71,8 +71,6 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     public void handleTriggerExit(Collider other) {
         if (client == null) { return; }
         client.triggerExitDuringDrag(other);
-
-        //client.triggerExitDuringDrag(other);
     }
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {
@@ -124,7 +122,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         dropper.removeAll();
     }
 
-    // CONSIDER: the need for this function shows problems with the collider dropper / cursor agent system : for now: 'oh well'
+    // CONSIDER: the need for this function shows problems with the collider dropper / cursor agent system 
     private void unhighlight(Collider c) {
         Highlighter h = c.GetComponent<Highlighter>();
         if (h != null) {
@@ -134,13 +132,17 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
 
 }
 
-public interface ICursorAgentClient
+public interface ICursorAgentUrClient
+{
+    void disconnect();
+    bool connectTo(Collider other);
+}
+
+public interface ICursorAgentClient : ICursorAgentUrClient
 {
     void handleTriggerEnter(Collider other);
     void suspendConnection();
     Collider shouldPreserveConnection();
-    void disconnect();
-    bool connectTo(Collider other);
     void onDragEnd();
     bool makeConnectionWithAfterCursorOverride(Collider other);
     void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider);

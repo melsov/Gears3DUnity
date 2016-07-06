@@ -28,6 +28,20 @@ public class CogContract
         }
     }
 
+    public bool valid {
+        get { return !(producer == null || producer.cog == null || client == null || client.cog == null); }
+    }
+
+    public bool isProducer(Cog cog) {
+        if (cog == null || !valid) { return false; }
+        return producer.cog == cog;
+    }
+
+    public bool isClient(Cog cog) {
+        if (cog == null || !valid) { return false; }
+        return client.cog == cog;
+    }
+
     public CogContract(Cog.ContractManager producer_, 
         Cog.ContractManager client_, 
         CogContractType _cct, 

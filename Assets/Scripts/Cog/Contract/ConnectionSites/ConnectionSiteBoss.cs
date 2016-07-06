@@ -18,7 +18,9 @@ public class ConnectionSiteBoss {
 //TODO: test Contract Specifcation lookup equality
     public SiteSet getSites(Cog offerer, ContractTypeAndRole specification) {
         foreach(CTARSet ctar in connectionSites.Keys) {
+            MonoBehaviour.print("get sites: ctar");
             if (ctar.set.Contains(specification)) {
+                MonoBehaviour.print("contains spec: " + specification.contractType);
                 return connectionSites[ctar];
             }
         }
@@ -59,6 +61,10 @@ public class SiteSet : IEnumerable<ConnectionSite>
         foreach(ConnectionSite s in sites) { UnityEngine.Assertions.Assert.IsTrue(s != null, "Site Set need non null connection sites"); }
     }
 
+    public int Length {
+        get { return sites.Length; }
+    }
+
     public bool Contains(ConnectionSite site) {
         foreach(ConnectionSite s in sites) {
             if (s == site) { return true; }
@@ -84,12 +90,10 @@ public class SiteSet : IEnumerable<ConnectionSite>
 public class ConnectionSite
 {
     private SiteOrientation orientation;
-    private WeakReference _contract;
+    //private WeakReference _contract = new WeakReference(null);
     public CogContract contract {
-        get { return (CogContract)_contract.Target; }
-        set {
-            _contract = new WeakReference(value);
-        }
+        get; // (CogContract)_contract.Target; }
+        set; // { _contract =  new WeakReference(value); }
     }
 
     public bool occupied {

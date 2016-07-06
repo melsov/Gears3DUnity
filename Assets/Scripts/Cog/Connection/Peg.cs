@@ -188,16 +188,17 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         return hingePrefab;
     }
 
-    public void disconnect() {
-        Socket socket = GetComponentInParent<Socket>();
-        if (socket) {
-            socket.childPeg = null;
-        }
-        if (_owner == null) {
-            transform.SetParent(null);
-        }
-        GetComponent<Highlighter>().unhighlight();
-    }
+// What to do?
+    //public void disconnect() {
+    //    Socket socket = GetComponentInParent<Socket>();
+    //    if (socket) {
+    //        socket.childPeg = null;
+    //    }
+    //    if (_owner == null) {
+    //        transform.SetParent(null);
+    //    }
+    //    GetComponent<Highlighter>().unhighlight();
+    //}
 
     public void detachChildren() {
         removeIsChildConstraintAndItsParentConstraint();
@@ -220,20 +221,21 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         //TODO: peg highlights if it could connect with other
     }
 
-    public bool connectTo(Collider other) {
-        if (!other) return false;
-        Pegboard pegboard = other.GetComponent<Pegboard>();
-        if (pegboard == null) {
-            IPegProxy ipp = other.GetComponent<IPegProxy>();
-            if (ipp != null) { pegboard = ipp.getPegboard(); }
-        }
-        if (pegboard != null) {
-            Socket socket = pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode);
-            if (socket == null) return false;
-            return beChildOf(socket);
-        }
-        return false;
-    }
+//???? WANT? what to do?
+    //public bool connectTo(Collider other) {
+    //    if (!other) return false;
+    //    Pegboard pegboard = other.GetComponent<Pegboard>();
+    //    if (pegboard == null) {
+    //        IPegProxy ipp = other.GetComponent<IPegProxy>();
+    //        if (ipp != null) { pegboard = ipp.getPegboard(); }
+    //    }
+    //    if (pegboard != null) {
+    //        Socket socket = pegboard.getFrontendSocketSet().getOpenParentSocketClosestTo(transform.position, pegIsChildRotationMode);
+    //        if (socket == null) return false;
+    //        return beChildOf(socket);
+    //    }
+    //    return false;
+    //}
 
     public bool makeConnectionWithAfterCursorOverride(Collider other) {
         return false;

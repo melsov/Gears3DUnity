@@ -3,6 +3,10 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
+/*
+ * Container for CogContracts and Connection Sites
+ * Tells if any offered sites correspond-to/jive-with any of its open sites
+ * */
 public class ContractPortfolio : IEnumerable<CogContract> {
 
     protected ConnectionSiteBoss connectionSiteBoss;
@@ -17,7 +21,7 @@ public class ContractPortfolio : IEnumerable<CogContract> {
 
     public void setContract(ConnectionSite site, CogContract contract) {
         if (!connectionSiteBoss.contains(site)) {
-            UnityEngine.Assertions.Assert.IsTrue(connectionSiteBoss.contains(site), "Wha? trying to set a contract to a site that we don't own " + contract.ToString());
+            Debug.LogError("Wha? trying to set a contract to a site that we don't own " + contract.ToString());
             return;
         }
         site.contract = contract;
@@ -34,10 +38,10 @@ public class ContractPortfolio : IEnumerable<CogContract> {
 
     public IEnumerator<CogContract> GetEnumerator() {
         foreach(SiteSet ss in connectionSiteBoss.getAllSites()) {
-            foreach(ConnectionSite site in ss) {
+            foreach (ConnectionSite site in ss) {
                 if (site.occupied) {
                     yield return site.contract;
-                }
+                } 
             }
         }
     }
@@ -48,10 +52,10 @@ public class ContractPortfolio : IEnumerable<CogContract> {
 
     public ContractSpecification accommodatedSpecification(Cog offerer, ContractPortfolio offerersPortfolio, ContractSpecification specification) {
         UnityEngine.Assertions.Assert.IsTrue(offerer != cog, "oh no, the offeree Cog is supposed to accommodate");
-
-        foreach(ConnectionSite site in connectionSiteBoss.getSites(offerer, specification.toContractTypeAndRoleForOfferee())) {
+        SiteSet ss = connectionSiteBoss.getSites(offerer, specification.toContractTypeAndRoleForOfferee());
+        foreach(ConnectionSite site in ss) {
             if (site.occupied) { continue; }
-            foreach(ConnectionSite offerersSite in offerersPortfolio.connectionSiteBoss.getSites(cog, specification.toContractTypeAndRoleForOfferer())) { // specification.connectionSiteProffer.offerersSites) {
+            foreach(ConnectionSite offerersSite in offerersPortfolio.connectionSiteBoss.getSites(cog, specification.toContractTypeAndRoleForOfferer())) { 
                 if (site.canAccommodate(offerersSite)) {
                     ContractSpecification rSpecification = specification;
                     rSpecification.connectionSiteAgreement = new ConnectionSiteAgreement();

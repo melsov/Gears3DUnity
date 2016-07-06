@@ -213,9 +213,9 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         } 
     }
 
-    public void disconnect() {
-        vDisconnect();
-    }
+    //public void disconnect() {
+    //    vDisconnect();
+    //}
 
 /* * Rest in pepperonis
     protected virtual void vDisconnect() {
@@ -285,9 +285,9 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         connectedSocket = null;
     }
 
-    public bool connectTo(Collider other) {
-        return vConnectTo(other);
-    }
+    //public bool connectTo(Collider other) {
+    //    return vConnectTo(other);
+    //}
 
     protected virtual bool couldConnectTo(Collider other) {
         return false; //TODO: integrate could connect w contracts

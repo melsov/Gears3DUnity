@@ -89,7 +89,7 @@ public class Dispenser : Drivable {
     }
 
     protected override ConnectionSiteBoss getConnectionSiteBoss() {
-        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteBossFor(this);
+        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
         return new ConnectionSiteBoss(lookup);
     }
 

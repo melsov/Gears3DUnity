@@ -20,7 +20,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
     public void handleTriggerEnter(Collider other) {
 
     }
-    public bool connectTo(Collider other) { return vConnectTo(other); }
+    //public bool connectTo(Collider other) { return vConnectTo(other); }
 
 /* rest in peace
     protected bool vConnectTo(Collider other) {
@@ -73,7 +73,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
         transform.position = pos;
     }
 
-    public void disconnect() { vDisconnect(); }
+   // public void disconnect() { vDisconnect(); }
 
 /* pepperoni
     protected virtual void vDisconnect() {

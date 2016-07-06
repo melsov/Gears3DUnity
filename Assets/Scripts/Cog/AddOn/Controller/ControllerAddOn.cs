@@ -77,7 +77,7 @@ public class ControllerAddOn : AddOn {
     }
 
     protected override ConnectionSiteBoss getConnectionSiteBoss() {
-        return new ConnectionSiteBoss(LocatableSiteSetAndCTARSetSetup.connectionSiteBossFor(this));
+        return new ConnectionSiteBoss(LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this));
     }
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {

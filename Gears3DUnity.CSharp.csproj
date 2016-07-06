@@ -127,7 +127,7 @@
     <Compile Include="Assets\Scripts\Cog\Contract\CogContract.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\ConnectionSiteBoss.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\FiniteSet.cs" />
-    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\LocatableCSBossSetup.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\LocatableSiteSetAndCTARSetSetup.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\SiteOrientation.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ContractEvent.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ContractPortfolio.cs" />

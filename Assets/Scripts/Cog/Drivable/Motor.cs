@@ -104,7 +104,7 @@ public class Motor : Drivable
 
     protected override ConnectionSiteBoss getConnectionSiteBoss() {
         //Get dictionary with entry for motor's controller add on site
-        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteBossFor(this);
+        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
         //Add an entry for motors axel
         CTARSet parentChildSet = new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER));
         SiteSet ss = new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1));

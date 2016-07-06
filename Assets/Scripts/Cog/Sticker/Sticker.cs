@@ -27,23 +27,24 @@ public class Sticker : Cog, ICursorAgentClient
         return t;
     }
 
-    public bool connectTo(Collider other) {
-        Cog cog = other.GetComponentInParent<Cog>();
-        if (cog == null) { print("no cog in sticker"); return false; }
-        Transform target = unscaledParent(other.transform);
-        transform.parent = target; // cog.transform;
-// TODO: ensure that camera isn't below the bow collider
-        transform.position = TransformUtil.SetY(transform.position, Mathf.Max(YLayer.Layer(typeof(Sticker)), target.transform.position.y + 1f));
-        return true;
-    }
+// ???
+//    public bool connectTo(Collider other) {
+//        Cog cog = other.GetComponentInParent<Cog>();
+//        if (cog == null) { print("no cog in sticker"); return false; }
+//        Transform target = unscaledParent(other.transform);
+//        transform.parent = target; // cog.transform;
+//// TODO: ensure that camera isn't below the bow collider
+//        transform.position = TransformUtil.SetY(transform.position, Mathf.Max(YLayer.Layer(typeof(Sticker)), target.transform.position.y + 1f));
+//        return true;
+//    }
 
-    public void disconnect() {
-        transform.parent = null;
-        foreach(Sticker s in GetComponentsInChildren<Sticker>()) {
-            if (s == this) { continue; }
-            s.disconnect();
-        }
-    }
+    //public void disconnect() {
+    //    transform.parent = null;
+    //    foreach(Sticker s in GetComponentsInChildren<Sticker>()) {
+    //        if (s == this) { continue; }
+    //        s.disconnect();
+    //    }
+    //}
     
     public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
         disconnect();

@@ -11,6 +11,7 @@ public class LocatableSiteSetAndCTARSetSetup : MonoBehaviour {
         List<LocatableConnectionSite> sites = new List<LocatableConnectionSite>();
         foreach(LocationOrientation lor in this.sites) {
             LocatableConnectionSite lcs = new LocatableConnectionSite(Cog.FindCog(transform), SiteOrientation.OrientedOrientation(lor.direction), lor.trans);
+            sites.Add(lcs);
         }
         return new SiteSet(sites.ToArray());
     }
@@ -19,7 +20,7 @@ public class LocatableSiteSetAndCTARSetSetup : MonoBehaviour {
         return new CTARSet(coTARs);
     }
     
-    public static Dictionary<CTARSet, SiteSet> connectionSiteBossFor(Cog cog) {
+    public static Dictionary<CTARSet, SiteSet> connectionSiteLookupFor(Cog cog) {
         LocatableSiteSetAndCTARSetSetup[] setups = cog.GetComponentsInChildren<LocatableSiteSetAndCTARSetSetup>();
         if (setups.Length == 0) {
             Debug.LogError("no Locatable site set setup in " + cog.name + ". what gives?");

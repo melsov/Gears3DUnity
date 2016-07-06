@@ -7,7 +7,7 @@ using System.Reflection;
 Base class for all mechanisms
 */
 [System.Serializable]
-public abstract class Cog : MonoBehaviour {
+public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
     private ContractManager contractManager;
     private ConnectionSiteBoss _connectionSiteBoss;
@@ -82,27 +82,9 @@ public abstract class Cog : MonoBehaviour {
         h.unhighlight();
     }
 
-    //private ConnectionSiteBossNESW _connectionSiteBoss;
-    //protected ConnectionSiteBossNESW connectionSiteBoss {
-    //    get {
-    //        if (!_connectionSiteBoss) {
-    //            _connectionSiteBoss = GetComponentInChildren<ConnectionSiteBossNESW>();
-    //        }
-    //        return _connectionSiteBoss;
-    //    }
-    //}
-
     public void positionRelativeToAddOn(AddOn addOn) {
-        //if (connectionSiteBoss && addOn.connectionSiteBoss) {
-        //    if (connectionSiteBoss.connectTo(addOn.connectionSiteBoss, transform)) {
-        //        return;
-        //    }
-        //}
         Vector3 pos = transform.position;
         Transform target = addOn.transform;
-        //if (addOn is IProxyAddOn) {
-        //    target = FindInCog<Drivable>(FindCog(addOn.transform).transform.parent).transform;
-        //}
         pos.x = target.position.x;
         Collider other = FindInCog<Collider>(target);
         Vector3 extents = GetComponentInParent<Collider>().bounds.extents;
@@ -158,7 +140,7 @@ public abstract class Cog : MonoBehaviour {
 
         
         /*
-        * Caller makes contract with itself as owner
+        * Caller makes contract with itself as producer
         *  */
         public virtual void setup(ContractManager client, ContractSpecification specification) {
             if (!specification.offererIsProducer) {
@@ -177,20 +159,19 @@ public abstract class Cog : MonoBehaviour {
             client.accept(cc, specification.connectionSiteAgreement);
             cc.producerActions.initiate(cc.client.cog);
             specification.connectionSiteAgreement.connect();
-
-            //contracts.Add(cc);
             contractPortfolio.setContract(specification.connectionSiteAgreement.producerSite, cc);
         }
 
         protected virtual void accept(CogContract cc, ConnectionSiteAgreement csa) {
             cc.clientActions.receive(cc.producer.cog);
             contractPortfolio.setContract(csa.clientSite, cc);
-            // get the client site and set cc as its contract
-            //contracts.Add(cc);
         }
 
         public virtual void dissolve(CogContract cc) {
-            if (cc.unbreakable) { return; }
+            print("dissolve");
+            if (cc.unbreakable) {
+                print("contract btwn: producer: " + cc.producer.cog.name + " and client: " + cc.client.cog.name + " was unbreakable.");
+                return; }
             cc.producer.dissolveAsProducer(cc);
         }
 
@@ -198,34 +179,23 @@ public abstract class Cog : MonoBehaviour {
             cc.client.forget(cc);
             cc.producerActions.dissolve(cc.client.cog);
             contractPortfolio.removeContract(cc);
-            //contracts.Remove(cc);
         }
 
         protected virtual void forget(CogContract cc) {
             cc.clientActions.beAbsolvedOf(cc.producer.cog);
             contractPortfolio.removeContract(cc);
-            //contracts.Remove(cc);
         }
 
         internal void getOutOfAll() {
+            
             foreach(CogContract cc in contractPortfolio) {
                 dissolve(cc);
             }
-            //while(contracts.Count > 0) {
-            //    dissolve(contracts[0]);
-            //}
         }
     }
 
     public class ContractNegotiator
     {
-        //TODO: Negotiator owns Contract Portfolio
-        // CP tells negotiator if a given specification has at least one open slot 
-        // Specification object comes with a list of Available Slot types per CP
-        // CP fills this list.
-        // In amenable: CP tells negotiator if any of the offered Slots correspond to/jive with any of its open Slots 
-        // There is a field in Specification: slotForOfferee. and another field: slotForOfferer. The amenable CP fills these two fields
-        // One other bit of data: a flag indicating which party moves to the other.
         private ViableContractLookup lookup {
             get { return cog.viableContractLookup; }
         }
@@ -246,7 +216,7 @@ public abstract class Cog : MonoBehaviour {
             if (amenableFor(lookup.availabilty(other, specification.contractType), specification.offererIsProducer)) {
                 return contractPortfolio.accommodatedSpecification(other, other.contractManager.contractPortfolio ,specification);
             }
-            return ContractSpecification.NonExistant(); // default(ContractSpecification);
+            return ContractSpecification.NonExistant(); 
         }
 
         private static bool amenableFor(RoleAvailablity ra, bool otherWantsProducer) {
@@ -263,7 +233,6 @@ public abstract class Cog : MonoBehaviour {
          * on an instance specific basis
          * */
         protected virtual List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
-            print("cog empty ordered list");
             return new List<ContractSpecification>();
         }
 
@@ -271,7 +240,6 @@ public abstract class Cog : MonoBehaviour {
             List<ContractSpecification> result = new List<ContractSpecification>();
             foreach(ContractSpecification specification in orderedContractPreferencesAsOfferer(other)) {
                 if (canOffer (other, specification)) {
-                    //TODO: here add 'has site for' ref/out specification
                     print("I, " + cog.name + ", can offer " + other.name );
                     result.Add(specification);
                 }
@@ -329,15 +297,8 @@ public abstract class Cog : MonoBehaviour {
         }
     }
 
-    protected virtual bool contractShouldBeUnbreakable(CogContract contract) {
-        return false;
-    }
+    protected virtual bool contractShouldBeUnbreakable(CogContract contract) { return false; }
 
-    protected virtual bool vConnectTo(Collider other) {
-        Cog cog = FindCog(other.transform);
-        if (cog == null) { return false; }
-        return enterContractWith(cog, false);
-    }
 
     private bool enterContractWith(Cog cog, bool permanent) {
         ContractSpecification spec = contractManager.negotiate(cog.contractManager);
@@ -348,12 +309,12 @@ public abstract class Cog : MonoBehaviour {
         return false;
     }
 
-    protected virtual void vDisconnect() {
-        contractManager.getOutOfAll();
-    }
-
     /*
-    * 
+    * Look-up whether--in theory--this cog could enter into
+    * a contract with a given other cog, contract-type, role-type.
+    * In theory because ViableContractLookup doesn't know 
+    * whether there are actaully any ConnectionSites available (ConnectionSiteBoss knows about that question)
+    * (CONSIDER: is VCL superfluous? Can CSB entirely take over VCL's job?)  
     * */
     public class ViableContractLookup
     {
@@ -429,4 +390,25 @@ public abstract class Cog : MonoBehaviour {
         return addOn;
     }
 
+    #region ICursorAgentUrClient
+
+    public bool connectTo(Collider other) {
+        return vConnectTo(other);
+    }
+
+    protected virtual bool vConnectTo(Collider other) {
+        Cog cog = FindCog(other.transform);
+        if (cog == null) { return false; }
+        return enterContractWith(cog, false);
+    }
+
+    public void disconnect() {
+        vDisconnect();
+    }
+
+    protected virtual void vDisconnect() {
+        contractManager.getOutOfAll();
+    }
+
+    #endregion;
 }
