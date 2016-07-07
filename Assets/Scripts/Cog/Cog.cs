@@ -30,6 +30,26 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
     }
 
+    private ContractPortfolio.ClientTree.Node _node;
+    public ContractPortfolio.ClientTree.Node node {
+        get {
+            if (_node == null) {
+                _node = new ContractPortfolio.ClientTree.Node(contractManager.contractPortfolio);
+            }
+            return _node;
+        }
+    }
+
+    private ContractPortfolio.ClientTree _clientTree;
+    public ContractPortfolio.ClientTree clientTree {
+        get {
+            if (_clientTree == null) {
+                _clientTree = new ContractPortfolio.ClientTree(node);
+            }
+            return _clientTree;
+        }
+    }
+
     protected virtual ViableContractLookup getViableContractLookup() {
         return new ViableContractLookup(this);
     }
@@ -47,6 +67,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
         contractManager = new ContractManager(this, getContractNegotiator());
 
+        if (GetComponent<Highlighter>() == null) {
+            gameObject.AddComponent<Highlighter>();
+        }
     }
 
     public void disableColliders() {
@@ -117,6 +140,10 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
         private bool isProducerFor(CogContract cc) {
             return cc.producer == this;
+        }
+
+        public bool hasAtleastOneContract {
+            get { return contractPortfolio.hasAtleastOneContract; }
         }
 
         public virtual ContractSpecification negotiate(ContractManager other) {
@@ -392,8 +419,40 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
     #region ICursorAgentUrClient
 
-    public bool connectTo(Collider other) {
-        return vConnectTo(other);
+    private DragHistory dragHistory;
+
+    protected class DragHistory
+    {
+        public Vector3 start;
+        public VectorXZ cursorStart;
+        public VectorXZ lastCursor;
+        public const float DisconnectRadius = 2f;
+        public bool beyond(VectorXZ pos) {
+            return DisconnectRadius * DisconnectRadius < (pos - cursorStart).magnitudeSquared;
+        }
+        public bool startedDisconnect;
+        public bool nothingToDisconnect;
+
+        public DragHistory(Vector3 start, VectorXZ cursorStart) {
+            this.start = start;
+            this.cursorStart = cursorStart;
+            lastCursor = cursorStart;
+        }
+
+        public VectorXZ relativeToStart(VectorXZ global) {
+            return global - start;
+        }
+
+        public VectorXZ relativeToCursorStart(VectorXZ global) {
+            return global - cursorStart;
+        }
+
+        public VectorXZ updateLastCursorGetRelative(VectorXZ nextCursorGlobal) {
+            VectorXZ result = nextCursorGlobal - lastCursor;
+            lastCursor = nextCursorGlobal;
+            return result;
+        }
+
     }
 
     protected virtual bool vConnectTo(Collider other) {
@@ -402,12 +461,43 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         return enterContractWith(cog, false);
     }
 
-    public void disconnect() {
-        vDisconnect();
-    }
-
     protected virtual void vDisconnect() {
         contractManager.getOutOfAll();
+    }
+
+    protected void drag(VectorXZ relative) {
+        transform.position += relative.vector3();
+    }
+    
+//TODO: universalize highlighting : will help in visualizing client sets
+
+/*
+ * interface methods 
+ * */
+    public bool connectTo(Collider other) {
+        if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect) { return false; }
+        return vConnectTo(other);
+    }
+
+    public void normalDragStart(VectorXZ cursorPos) {
+        dragHistory = new DragHistory(transform.position, cursorPos);
+        clientTree.highlight();
+        dragHistory.nothingToDisconnect = !contractManager.hasAtleastOneContract;
+    }
+
+    public void normalDrag(VectorXZ cursorPos) {
+        if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect && dragHistory.beyond(cursorPos)) {
+            dragHistory.startedDisconnect = true;
+           // vDisconnect(); //TEST WANT ********!
+        }
+        clientTree.moveRelative(dragHistory.updateLastCursorGetRelative(cursorPos).vector3());
+    }
+
+    public void normalDragEnd(VectorXZ cursorPos) {
+        clientTree.unhighlight();
+        if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect) {
+            transform.position = dragHistory.start;
+        }
     }
 
     #endregion;

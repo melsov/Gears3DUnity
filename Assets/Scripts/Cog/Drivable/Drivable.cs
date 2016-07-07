@@ -65,9 +65,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         }
 
         TransformUtil.PositionOnYLayer(transform);
-        if (GetComponent<Highlighter>() == null) {
-            gameObject.AddComponent<Highlighter>();
-        }
+        
         Pause.Instance.onPause += pause;
         setupSocketDelegates();
         setupPrefabPegs();
@@ -237,6 +235,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 
    protected virtual void disconnectAddOns() {
         Debug.LogError("DRIVEBL dissconn Add ons");
+/* pepp
         if (controllerAddOn) {
             controllerAddOn.disconnect();
         }
@@ -245,6 +244,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
             AddOn ao = ((IControllerAddOnProvider)this).getControllerAddOn();
             ao.disconnect();
         }
+*/
     }
 
     protected virtual void disconnectDrivens() {

@@ -7,6 +7,14 @@ public class ConnectionSiteBoss {
 
     private Dictionary<CTARSet, SiteSet> connectionSites;
 
+    public int Count {
+        get {
+            int result = 0;
+            foreach(SiteSet ss in connectionSites.Values) { result += ss.Length; }
+            return result;
+        }
+    }
+
     public ConnectionSiteBoss(Dictionary<CTARSet, SiteSet> connectionSites) {
         this.connectionSites = connectionSites;
         if (this.connectionSites == null) {
@@ -90,10 +98,9 @@ public class SiteSet : IEnumerable<ConnectionSite>
 public class ConnectionSite
 {
     private SiteOrientation orientation;
-    //private WeakReference _contract = new WeakReference(null);
     public CogContract contract {
-        get; // (CogContract)_contract.Target; }
-        set; // { _contract =  new WeakReference(value); }
+        get;
+        set;
     }
 
     public bool occupied {

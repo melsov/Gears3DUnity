@@ -47,7 +47,7 @@ public class Sticker : Cog, ICursorAgentClient
     //}
     
     public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
-        disconnect();
+        //disconnect(); //pepperonis
         handleRotator.startDragOverride(cursorGlobal, dragOverrideCollider);
     }
 

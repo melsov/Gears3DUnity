@@ -63,7 +63,7 @@ public class CursorInput : MonoBehaviour {
                     ciDragEnterInventory = false;
                     hideProxyImage();
                 }
-                ci.drag(new VectorXZ(mousePositionOnRootPegboard));
+                ci.drag(new VectorXZ(mousePositionOnRootPegboard)); 
             }
         }
         if (Input.GetButtonUp("Fire1")) {

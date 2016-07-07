@@ -14,6 +14,32 @@ public class ContractPortfolio : IEnumerable<CogContract> {
     protected Cog cog {
         get { return (Cog)_cog.Target; }
     }
+
+    
+
+    public bool hasAtleastOneContract {
+        get {
+            foreach (SiteSet ss in connectionSiteBoss.getAllSites()) {
+                foreach (ConnectionSite site in ss) {
+                    if (site.occupied) return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public int validContractCount {
+        get {
+            int result = 0;
+            foreach(SiteSet ss in connectionSiteBoss.getAllSites()) {
+                foreach(ConnectionSite site in ss) {
+                    if (site.occupied) result++;
+                }
+            }
+            return result;
+        }
+    }
+
     public ContractPortfolio(Cog cog_, ConnectionSiteBoss connectionSiteBoss_) {
         _cog = new WeakReference(cog_);
         connectionSiteBoss = connectionSiteBoss_;
@@ -74,4 +100,79 @@ public class ContractPortfolio : IEnumerable<CogContract> {
         }
         return ContractSpecification.NonExistant();
     }
+
+    #region ClientTree
+    public class ClientTree
+    {
+
+        public Node root;
+        
+        public ClientTree(Node root) {
+            this.root = root;
+        }
+
+        public delegate void CogAction(Cog cog);
+
+        public void action(CogAction cogAction) {
+            foreach(Node node in root.children()) {
+                cogAction(node.portfolio.cog);
+            }
+        }
+
+        public void moveRelative(Vector3 nudge) {
+            foreach(Node node in root.children()) {
+                node.portfolio.cog.transform.position += nudge;
+            }
+        }
+
+        public void highlight() {
+            highlight(true);
+        }
+
+        public void unhighlight() {
+            highlight(false);
+        }
+
+        private void highlight(bool doHighlight) {
+            foreach(Node node in root.children()) {
+                Cog c = node.portfolio.cog;
+                if (c && c.GetComponent<Highlighter>()) {
+                    if (doHighlight) {
+                        c.GetComponent<Highlighter>().highlight();
+                    } else {
+                        c.GetComponent<Highlighter>().unhighlight();
+                    }
+                }
+            }
+        }
+
+        public class Node
+        {
+            protected WeakReference _portfolio;
+            public ContractPortfolio portfolio {
+                get { return (ContractPortfolio)_portfolio.Target; }
+            }
+
+            public Node(ContractPortfolio cp_) {
+                _portfolio = new WeakReference(cp_);
+            }
+
+            public HashSet<Node> children() {
+                HashSet<Node> result = new HashSet<Node>();
+                children(ref result);
+                return result;
+            }
+
+            private void children(ref HashSet<Node> childNodes) {
+                if (childNodes.Contains(this)) { return; }
+                childNodes.Add(this);
+                foreach(CogContract cc in portfolio) {
+                    if (cc == null || cc.client == null || cc.client.cog == null) { continue; }
+                    cc.client.cog.node.children(ref childNodes);
+                }
+            }
+        }
+    }
+
+    #endregion
 }

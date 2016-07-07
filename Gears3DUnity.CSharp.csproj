@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.5f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -201,6 +203,7 @@
     <Compile Include="Assets\Scripts\Interaction\LinearHandleSet.cs" />
     <Compile Include="Assets\Scripts\Interaction\PhysicsCursorInteraction.cs" />
     <Compile Include="Assets\Scripts\Interaction\RotationHandle.cs" />
+    <Compile Include="Assets\Scripts\Interaction\Selection.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\Browser\Browser.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\Browser\BrowserBKUP.cs" />
     <Compile Include="Assets\Scripts\SaveLoad\KnightPasta\GenerateGuids.cs" />
@@ -218,6 +221,7 @@
     <Compile Include="Assets\Scripts\Score\ScoreManager.cs" />
     <Compile Include="Assets\Scripts\Tests\TestAngleMath.cs" />
     <Compile Include="Assets\Scripts\Tests\TestBoundsXZ.cs" />
+    <Compile Include="Assets\Scripts\Tests\TestKeyListener.cs" />
     <Compile Include="Assets\Scripts\UI\CameraOrbit.cs" />
     <Compile Include="Assets\Scripts\UI\SaveLoadController.cs" />
     <Compile Include="Assets\Scripts\UI\View\BinaryStateButton.cs" />

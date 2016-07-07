@@ -43,7 +43,8 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             if (overridingDrag) {
                 client.startDragOverride(cursorGlobal, _dragOverrideCollider);
             } else {
-                client.disconnect();
+                //client.disconnect();
+                client.normalDragStart(cursorGlobal);
                 disableCollider(true);
             }
         }
@@ -62,6 +63,8 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         disableCollider(false);
         if (overridingDrag) {
             client.dragOverride(cursorGlobal);
+        } else {
+            client.normalDrag(cursorGlobal);
         }
     }
     
@@ -79,7 +82,9 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         if (client == null) { return; }
         if (overridingDrag) {
             client.endDragOverride(cursorGlobal);
-        } 
+        } else {
+            client.normalDragEnd(cursorGlobal);
+        }
         connectToColliders(colliderDropper);
         client.onDragEnd();
     }
@@ -134,8 +139,13 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
 
 public interface ICursorAgentUrClient
 {
-    void disconnect();
+    //void disconnect();
     bool connectTo(Collider other);
+
+    void normalDragStart(VectorXZ cursorPos);
+    void normalDrag(VectorXZ cursorPos);
+    void normalDragEnd(VectorXZ cursorPos);
+
 }
 
 public interface ICursorAgentClient : ICursorAgentUrClient

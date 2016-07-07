@@ -14,8 +14,8 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
         return false;
     }
 
-    public void disconnect() {
-    }
+    //public void disconnect() {
+    //}
 
     public void dragOverride(VectorXZ cursorGlobal) {
     }
@@ -49,5 +49,17 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
 
     public void handleTriggerEnter(Collider other) {
         //TODO: highlight other? is this used by things that connect?
+    }
+
+    public void normalDragStart(VectorXZ cursorPos) {
+        throw new NotImplementedException();
+    }
+
+    public void normalDrag(VectorXZ cursorPos) {
+        throw new NotImplementedException();
+    }
+
+    public void normalDragEnd(VectorXZ cursorPos) {
+        throw new NotImplementedException();
     }
 }

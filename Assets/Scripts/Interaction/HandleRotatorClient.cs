@@ -17,8 +17,8 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
         return false;
     }
 
-    public void disconnect() {
-    }
+    //public void disconnect() {
+    //}
 
     public void dragOverride(VectorXZ cursorGlobal) {
         handleRotator.dragOverride(cursorGlobal);
@@ -38,6 +38,18 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
 
     public bool makeConnectionWithAfterCursorOverride(Collider other) {
         return false;
+    }
+
+    public void normalDrag(VectorXZ cursorPos) {
+        throw new NotImplementedException();
+    }
+
+    public void normalDragEnd(VectorXZ cursorPos) {
+        throw new NotImplementedException();
+    }
+
+    public void normalDragStart(VectorXZ cursorPos) {
+        throw new NotImplementedException();
     }
 
     public void onDragEnd() {

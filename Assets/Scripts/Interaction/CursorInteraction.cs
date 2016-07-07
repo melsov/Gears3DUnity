@@ -42,7 +42,7 @@ public class CursorInteraction : MonoBehaviour {
             ci.cursorInteracting(worldPoint);
         }
         if (!_shouldOverrideDrag) {
-            transform.position = (worldPoint - mouseLocal).vector3(transform.position.y);
+            //transform.position = (worldPoint - mouseLocal).vector3(transform.position.y); // pepp
         }
     }
 

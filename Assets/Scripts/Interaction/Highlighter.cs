@@ -12,6 +12,8 @@ public class Highlighter : MonoBehaviour {
     private Highlightable[] highlightables;
     public Color defaultColor = new Color(.2f, 1f, .7f);
 
+    private bool testHighlightedState;
+
     private void setupHighlightables() {
         List<Highlightable> result = new List<Highlightable>();
         
@@ -25,8 +27,21 @@ public class Highlighter : MonoBehaviour {
         highlightables = result.ToArray();
     }
 
+
+
 	void Awake () {
         setupHighlightables();
+
+        TestKeyListener.Instance.addKeyCode(KeyCode.H, delegate () {
+            if(testHighlightedState) {
+                testHighlightedState = false;
+                unhighlight();
+            } else {
+                testHighlightedState = true;
+                highlight();
+            }
+        });
+
         //foreach (Transform t in GetComponentInChildren<Transform>()) {
         //    if (t.CompareTag("HighlightMesh")) {
         //        highlightMesh = t.gameObject;
