@@ -94,7 +94,8 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
             getHinge().connect(socket.parentContainer.getRigidbodyWithGravity());
             getHinge().getHingeJoint().connectedAnchor = socket.transform.localPosition;
         } else {
-            TransformUtil.ParentToAndAlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
+            TransformUtil.AlignXZ(socket.parentContainer.getTransform(), transform, socket.transform); // <-- no parenting
+            //TransformUtil.ParentToAndAlignXZ(socket.parentContainer.getTransform(), transform, socket.transform);
         }
         socket.getParentDrivable().transform.position = TransformUtil.SetY(socket.getParentDrivable().transform.position, transform.position.y + YLayer.LayerHeight);
         _childSocket = new WeakReference(socket);

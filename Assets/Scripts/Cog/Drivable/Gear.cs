@@ -86,21 +86,21 @@ public class Gear : Drivable  {
         }
     }
 
-    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
-        ProducerActions actions = ProducerActions.getDoNothingActions();
-        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
-            actions.initiate = delegate (Cog cog) {
-                addDrivable((Drivable)cog);
-            };
-            actions.dissolve = delegate (Cog cog) {
-                while(drivables.Contains((Drivable)cog)) {
-                    drivables.Remove((Drivable)cog);
-                }
-            };
-            actions.fulfill = conveyDrive;
-        }
-        return actions;
-    }
+    //public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+    //    ProducerActions actions = ProducerActions.getDoNothingActions();
+    //    if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+    //        actions.initiate = delegate (Cog cog) {
+    //            addDrivable((Drivable)cog);
+    //        };
+    //        actions.dissolve = delegate (Cog cog) {
+    //            while(drivables.Contains((Drivable)cog)) {
+    //                drivables.Remove((Drivable)cog);
+    //            }
+    //        };
+    //        actions.fulfill = conveyDrive;
+    //    }
+    //    return actions;
+    //}
 
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         ClientActions actions = ClientActions.getDoNothingActions();

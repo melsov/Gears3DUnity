@@ -10,6 +10,11 @@ Base class for all mechanisms
 public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
     private ContractManager contractManager;
+    protected ContractPortfolio contractPortfolio {
+        get {
+            return contractManager.contractPortfolio;
+        }
+    }
     private ConnectionSiteBoss _connectionSiteBoss;
     protected ConnectionSiteBoss connectionSiteBoss {
         get {
@@ -34,7 +39,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
     public ContractPortfolio.ClientTree.Node node {
         get {
             if (_node == null) {
-                _node = new ContractPortfolio.ClientTree.Node(contractManager.contractPortfolio);
+                _node = new ContractPortfolio.ClientTree.Node(contractPortfolio);
             }
             return _node;
         }
@@ -176,21 +181,26 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
                 return;
             }
             CogContract cc = new CogContract(
-                this, 
-                client, 
-                specification.contractType, 
-                cog.producerActionsFor(client.cog, specification), 
-                client.cog.clientActionsFor(client.cog, specification));
+                this,
+                client,
+                specification.contractType,
+                cog.producerActionsFor(client.cog, specification),
+                client.cog.clientActionsFor(client.cog, specification),
+                specification.connectionSiteAgreement);
 
             cc.unbreakable = cog.contractShouldBeUnbreakable(cc) || client.cog.contractShouldBeUnbreakable(cc);
             client.accept(cc, specification.connectionSiteAgreement);
+            contractPortfolio.setContract(cc.connectionSiteAgreement.producerSite, cc);
+            initiateContract(cc);
+        }
+
+        public static void initiateContract(CogContract cc) {
+            cc.clientActions.receive(cc.producer.cog);
             cc.producerActions.initiate(cc.client.cog);
-            specification.connectionSiteAgreement.connect();
-            contractPortfolio.setContract(specification.connectionSiteAgreement.producerSite, cc);
+            cc.connectionSiteAgreement.connect();
         }
 
         protected virtual void accept(CogContract cc, ConnectionSiteAgreement csa) {
-            cc.clientActions.receive(cc.producer.cog);
             contractPortfolio.setContract(csa.clientSite, cc);
         }
 
@@ -214,8 +224,13 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
 
         internal void getOutOfAll() {
-            
+            getOutOfAllExcept(new HashSet<ContractPortfolio.ClientTree.Node>());
+        }
+
+        internal void getOutOfAllExcept(HashSet<ContractPortfolio.ClientTree.Node> preserve) {
             foreach(CogContract cc in contractPortfolio) {
+                Cog other = cc.getOtherParty(cog).cog;
+                if (preserve.Contains(other.node)) { continue; }
                 dissolve(cc);
             }
         }
@@ -462,24 +477,31 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
     }
 
     protected virtual void vDisconnect() {
-        contractManager.getOutOfAll();
+        contractManager.getOutOfAllExcept(clientTree.root.children());
     }
 
     protected void drag(VectorXZ relative) {
         transform.position += relative.vector3();
     }
     
-//TODO: universalize highlighting : will help in visualizing client sets
 
 /*
  * interface methods 
  * */
     public bool connectTo(Collider other) {
         if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect) { return false; }
-        return vConnectTo(other);
+        Vector3 before = transform.position;
+        bool result = vConnectTo(other);
+        if (result) {
+            clientTree.actionOnClientContractsBredthFirst(delegate (CogContract cc) {
+                ContractManager.initiateContract(cc);
+            });
+        }
+        return result;
     }
 
     public void normalDragStart(VectorXZ cursorPos) {
+        //CONSIDER: more efficient to generate client tree only once per drag session?
         dragHistory = new DragHistory(transform.position, cursorPos);
         clientTree.highlight();
         dragHistory.nothingToDisconnect = !contractManager.hasAtleastOneContract;
@@ -487,16 +509,18 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
     public void normalDrag(VectorXZ cursorPos) {
         if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect && dragHistory.beyond(cursorPos)) {
-            dragHistory.startedDisconnect = true;
-           // vDisconnect(); //TEST WANT ********!
+           dragHistory.startedDisconnect = true;
+           vDisconnect(); 
         }
+        //TODO: replace actual parent childing with psuedo parent childing in parent child contracts 
+        // it will de-head ache moving child sets
         clientTree.moveRelative(dragHistory.updateLastCursorGetRelative(cursorPos).vector3());
     }
 
     public void normalDragEnd(VectorXZ cursorPos) {
         clientTree.unhighlight();
         if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect) {
-            transform.position = dragHistory.start;
+            clientTree.moveRelative(dragHistory.start - transform.position);
         }
     }
 

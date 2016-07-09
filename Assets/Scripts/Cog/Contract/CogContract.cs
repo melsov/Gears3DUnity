@@ -14,7 +14,9 @@ public class CogContract
 
     public Cog.ProducerActions producerActions;
     public Cog.ClientActions clientActions;
-    //public ConnectionSiteAgreement connectionSiteAgreement;
+    public ConnectionSiteAgreement connectionSiteAgreement; // TODO: arrange so that csa's connektAction can be generated lazily, by asking the contract
+// for the necessary info (in a new kind of struct?) the info is currently stored in ContractSpecification. Use this struct or define a newer (slimmer?) one.
+// ultimate goal: be able to swap which party travels easily
 
     public Cog.ContractManager producer {
         get {
@@ -42,19 +44,31 @@ public class CogContract
         return client.cog == cog;
     }
 
+    public Cog.ContractManager getOtherParty(Cog cog) {
+        if (isClient(cog)) {
+            return producer;
+        }
+        return client;
+    }
+
     public CogContract(Cog.ContractManager producer_, 
         Cog.ContractManager client_, 
         CogContractType _cct, 
         Cog.ProducerActions producerActions_, 
-        Cog.ClientActions clientActions_
-        //ConnectionSiteAgreement connectionSiteAgreement_
+        Cog.ClientActions clientActions_,
+        ConnectionSiteAgreement connectionSiteAgreement_
         ) {
         this._producer = new WeakReference(producer_);
         this._client = new WeakReference(client_);
         type = _cct;
         producerActions = producerActions_;
         clientActions = clientActions_;
-        //this.connectionSiteAgreement = connectionSiteAgreement_;
+        this.connectionSiteAgreement = connectionSiteAgreement_;
+    }
+
+    public ContractSpecification regenerateSpecificationForOfferee(Cog cog) {
+        if (!valid) { return ContractSpecification.NonExistant(); }
+        return new ContractSpecification(type, isClient(cog) ? RoleType.PRODUCER : RoleType.CLIENT);
     }
 }
 
@@ -74,8 +88,29 @@ public class ConnectionSiteAgreement
         get; set;
     }
 
+    public void setTraveller(Cog cog) {
+        if (producerSite.cog == cog) {
+            producerIsTraveller = true;
+        } else if (clientSite.cog == cog) {
+            producerIsTraveller = false;
+        }
+    }
+
+    protected CogContract contract {
+        get { return clientSite.contract; }
+    }
+
     public delegate void ConnektAction(ConnectionSiteAgreement csa);
-    public ConnektAction connektAction;
+    public ConnektAction connektAction {
+        get {
+            if (producerIsTraveller) {
+                return producerSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(producerSite.cog));
+            } else {
+                return clientSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(clientSite.cog));
+            }
+        }
+    }
+
     public static ConnektAction doNothing = delegate (ConnectionSiteAgreement csa) { };
 
     public static ConnektAction alignTarget(UnityEngine.Transform transform) {

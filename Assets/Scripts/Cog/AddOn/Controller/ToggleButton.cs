@@ -30,7 +30,7 @@ public class ToggleButton : Switch , ICollisionProxyClient, ITriggerProxyClient 
     protected LineSegment lineSegment;
     protected LinearSpringConstraint linearSpringConstraint;
 
-    protected override void toggleOn() {
+    protected override void toggle() {
         if (isPulseButton) {
             on.setState(SwitchState.ON);
             if (onOffIndicator != null) {
@@ -39,7 +39,7 @@ public class ToggleButton : Switch , ICollisionProxyClient, ITriggerProxyClient 
             }
             updateClient();
         } else {
-            base.toggleOn();
+            base.toggle();
         }
     }
 
@@ -103,7 +103,7 @@ public class ToggleButton : Switch , ICollisionProxyClient, ITriggerProxyClient 
         linearSpringConstraint.pulse();
         shouldTrackPress = false;
         discreteCollisionTimer = Time.fixedTime;
-        toggleOn();
+        toggle();
         StartCoroutine(watch());
 
     }

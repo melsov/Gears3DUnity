@@ -78,7 +78,13 @@ public class Motor : Drivable
             ProducerActions pas = new ProducerActions();
             pas.initiate = delegate (Cog _client) { };
             pas.dissolve = delegate (Cog _client) { };
-            pas.fulfill = delegate (Cog _client) { };
+            pas.fulfill = delegate (Cog _client) {
+                if (_client is Gear) { // assume socket at center
+                    _client.transform.rotation = axel.transform.rotation;
+                } else {
+                    //TODO: set cog rotation to axel's rotation
+                }
+            };
             return pas;
         }
         return ProducerActions.getDoNothingActions();
@@ -193,6 +199,7 @@ public class Motor : Drivable
 	protected override void update () {
         angle += maxAngularVelocity * Time.deltaTime * power;
         axel.turnTo(angle);
+        base.update();
 	}
 
     public override bool isDriven() {

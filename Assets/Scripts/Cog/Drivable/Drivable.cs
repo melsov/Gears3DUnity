@@ -39,18 +39,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     protected Peg fixedPegPrefab;
     protected FreeRotationPeg freeRotationPegPrefab;
 
-    protected ProducerActions.ProducerAction _conveyDrive;
-    protected ProducerActions.ProducerAction conveyDrive {
-        get {
-            if (_conveyDrive == null) {
-                _conveyDrive = delegate (Cog cog) {
-                    ((Drivable)cog).receiveDrive(new Drive(driveScalar()));
-                };
-            }
-            return _conveyDrive;
-        }
-    }
-
     protected virtual float radius {
         get { return  GetComponent<CapsuleCollider>().radius * transform.localScale.x; }
     }
@@ -109,19 +97,35 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
-        throw new NotImplementedException();
+        ProducerActions actions = ProducerActions.getDoNothingActions();
+        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+            actions.initiate = delegate (Cog cog) {
+                addDrivable((Drivable)cog);
+            };
+            actions.dissolve = delegate (Cog cog) {
+                while(drivables.Contains((Drivable)cog)) {
+                    drivables.Remove((Drivable)cog);
+                }
+            };
+            actions.fulfill = delegate (Cog cog) {
+                ((Drivable)cog).receiveDrive(new Drive(driveScalar()));
+            };
+        }
+        return actions;
     }
+
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         throw new NotImplementedException();
     }
-
-    #endregion
 
     public class ViableDrivableContractLookup : ViableContractLookup
     {
         public ViableDrivableContractLookup(Cog cog_) : base(cog_) {
         }
     }
+
+    #endregion
+
 
     protected virtual void pause(bool isPaused) {
 
@@ -156,15 +160,21 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     protected virtual void update() {
         updateAngleStep();
 
-        for (int i=0; i < drivables.Count; ++i) {
-            Drivable dr = drivables[i];
-            if (dr == null) {
-                drivables.RemoveAt(i--);
-                continue;
-            }
-            dr.receiveDrive(new Drive(driveScalar()));
+        foreach(CogContract cc in contractPortfolio.contractsWithClients()) {
+            cc.producerActions.fulfill(cc.client.cog);
         }
+
+        //for (int i=0; i < drivables.Count; ++i) {
+        //    Drivable dr = drivables[i];
+        //    if (dr == null) {
+        //        drivables.RemoveAt(i--);
+        //        continue;
+        //    }
+        //    dr.receiveDrive(new Drive(driveScalar()));
+        //}
     }
+
+    
 
     protected virtual void setSocketClosestToAxel(Axel axel) {
         connectedSocket = _pegboard.getBackendSocketSet().getOpenChildSocketClosestTo(axel.transform.position, axel.pegIsParentRotationMode); 

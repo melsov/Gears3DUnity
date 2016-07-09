@@ -41,11 +41,11 @@ public class Switch : ControllerAddOn  {
         }
         OnOffIndicator ooi = underCursor.GetComponent<OnOffIndicator>();
         if (ooi == onOffIndicator) {
-            toggleOn();
+            toggle();
         }
     }
 
-    protected virtual void toggleOn() {
+    protected virtual void toggle() {
         on.nextState();
         if (onOffIndicator != null) {
             onOffIndicator.state = on.getState();
