@@ -29,8 +29,30 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         }
     }
     protected Socket connectedSocket;
-    protected Pegboard _pegboard;
-    protected Drivable _driver;
+    private Pegboard __pegboard;
+    protected Pegboard _pegboard {
+        get {
+            if (__pegboard == null) {
+                __pegboard = GetComponentInChildren<Pegboard>();
+                if (__pegboard == null) {
+                    __pegboard = gameObject.AddComponent<Pegboard>();
+                }
+            }
+            return __pegboard;
+        }
+    }
+    protected Drivable _driver; //TODO: property getting drivableConnectionSB's driver
+    protected UniqueClientConnectionSiteBoss uniqueClientConnectionSiteBoss {
+        get {
+            return (UniqueClientConnectionSiteBoss)connectionSiteBoss;
+        }
+    }
+    protected ConnectionSiteAgreement uniqueContractSiteAgreement {
+        get {
+            return uniqueClientConnectionSiteBoss.uniqueConnectionSiteAgreement;
+        }
+    }
+//TODO: all unique client connection sites require locatability
     protected List<Drivable> drivables = new List<Drivable>();
     protected ControllerAddOn controllerAddOn;
     protected List<ReceiverAddOn> receiverAddOns = new List<ReceiverAddOn>();
@@ -47,10 +69,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     
     protected override void awake() {
         base.awake();
-        _pegboard = GetComponentInChildren<Pegboard>();
-        if (_pegboard == null) {
-            _pegboard = gameObject.AddComponent<Pegboard>();
-        }
 
         TransformUtil.PositionOnYLayer(transform);
         
@@ -85,15 +103,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 
         public DrivableContractNegotiator(Cog cog_) : base(cog_) {
         }
-
-        //public override List<ContractSpecification> contractPreferencesAsOffererWith(Cog cog) {
-        //    List<ContractSpecification> prefs = new List<ContractSpecification>();
-        //    if (drivable.hasAddOnConnector) {
-        //        prefs.Add(new ContractSpecification(CogContractType.CONTROLLER_ADDON_DRIVABLE, RoleType.CLIENT));
-        //    }
-        //    return prefs;
-        //}
-
     }
 
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
@@ -108,14 +117,38 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
                 }
             };
             actions.fulfill = delegate (Cog cog) {
-                ((Drivable)cog).receiveDrive(new Drive(driveScalar()));
+                ((Drivable)cog).receiveDrive(new Drive(this, driveScalar()));
+            };
+        }
+        if (specification.contractType == CogContractType.PARENT_CHILD) {
+            actions.fulfill = delegate (Cog cog) {
+                TransformUtil.AlignXZAndAdoptRotation(
+                    ((Drivable)cog).uniqueContractSiteAgreement.producerSite.transform,
+                    ((Drivable)cog).uniqueContractSiteAgreement.clientSite.transform.position,
+                    cog.transform
+                    );
             };
         }
         return actions;
     }
 
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
-        throw new NotImplementedException();
+        ClientActions actions = ClientActions.getDoNothingActions();
+        if (specification.contractType == CogContractType.PARENT_CHILD) {
+            actions.receive = delegate (Cog cog) { };
+            actions.beAbsolvedOf = delegate (Cog cog) {
+                print(name + " be absolved  of " + cog.name);
+                transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType()));
+            };
+        }
+        return actions;
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        if (specification.contractType == CogContractType.PARENT_CHILD) {
+            return ConnectionSiteAgreement.alignAndPushYLayer(transform);
+        }
+        return ConnectionSiteAgreement.doNothing;
     }
 
     public class ViableDrivableContractLookup : ViableContractLookup
@@ -124,8 +157,45 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         }
     }
 
+    protected override sealed ContractSiteBoss getConnectionSiteBoss() {
+        UniqueClientConnectionSiteBoss uccsb = getUniqueClientSiteConnectionSiteBoss();
+        foreach(KeyValuePair<CTARSet,SiteSet> ctarSiteSetPair in additionalSites()) {
+            uccsb.addSiteSet(ctarSiteSetPair);
+        }
+        return uccsb;
+    }
+
+    protected abstract UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss();
+    protected virtual List<KeyValuePair<CTARSet, SiteSet>> additionalSites() {
+        return new List<KeyValuePair<CTARSet, SiteSet>>();
+    }
+
+    protected static void addConnectionSiteEntriesForBackSocketSet(Drivable drivable, ContractSiteBoss csb) {
+        csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getBackendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_CHILD));
+    }
+    protected static void addConnectionSiteEntriesForFrontSocketSet(Drivable drivable, ContractSiteBoss csb) {
+        csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getFrontendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_PARENT));
+    }
+
     #endregion
 
+    #region drag
+
+    protected override void suspendOnDragStart() {
+        if (uniqueClientConnectionSiteBoss.isInContractWithProducer) {
+            Bug.contractLog(name + " suspends contract with uniq producer ");
+            uniqueClientConnectionSiteBoss.producerSiteOfUniqueClientContractSite.contract.suspend();
+        }
+    }
+
+    protected override void restoreOnDragEnd() {
+        if (uniqueClientConnectionSiteBoss.isInContractWithProducer) {
+            Bug.contractLog(name + " restores contract with uniq producer");
+            uniqueClientConnectionSiteBoss.producerSiteOfUniqueClientContractSite.contract.restore();
+        }
+    }
+
+    #endregion
 
     protected virtual void pause(bool isPaused) {
 
@@ -308,6 +378,10 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 
     public bool hasOpenBackendSocket() {
         return openBackendSockets().Count > 0;
+    }
+
+    public bool hasOpenFrontendSockets() {
+        return _pegboard.getFrontendSocketSet().openParentSockets().Count > 0;
     }
 
     public List<Socket> openBackendSockets() {
@@ -814,17 +888,16 @@ public interface ISocketSetContainer
 
 public struct Drive
 {
-    public Transform atPoint;
     public float amount;
     public static Drive Zero = new Drive(null, 0f);
+    public readonly Drivable source;
 
-    public Drive(Transform _atPoint, float _amount) {
-        atPoint = _atPoint; amount = _amount;
+    public bool sourceIsType(Type type) {
+        return source.GetType() == type;
     }
 
-    public Drive(float _amount) {
-        atPoint = null; amount = _amount;
+    public Drive(Drivable source, float _amount) {
+        amount = _amount;
+        this.source = source;
     }
-
-
 }

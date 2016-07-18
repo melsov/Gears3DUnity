@@ -4,12 +4,12 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-//TODO: generally convert tranform operations to (kinematic) rigidbody operations
-public class Gear : Drivable  {
+public interface GearDrivable {}
 
-    private const int MAX_CLIENT_GEARS = 8;
-    //TODO: plan out caps colider radius and assign programmatically
-    //TODO: related: make var: tooth depth
+//TODO: generally convert tranform operations to (kinematic) rigidbody operations
+public class Gear : Drivable , GearDrivable
+{
+    protected const int MAX_CLIENT_GEARS = 8;
     public int toothCount = 6;
     public float toothOffset = .25f;
     public const float ToothDepth = .25f;
@@ -81,7 +81,10 @@ public class Gear : Drivable  {
             });
 
             asProducerLookup.Add(CogContractType.DRIVER_DRIVEN, delegate (Cog other) {
-                return other.GetComponent<Gear>();
+                return other.GetComponent<GearDrivable>() != null;
+            });
+            asProducerLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                return true;
             });
         }
     }
@@ -126,11 +129,30 @@ public class Gear : Drivable  {
         return actions;
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
-        return new ConnectionSiteBoss(new Dictionary<CTARSet, SiteSet>() {
-            {CTARSet.clientDrivenAndChildSet(), new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1))},
-            {new CTARSet(new ContractTypeAndRole(CogContractType.DRIVER_DRIVEN, RoleType.PRODUCER)), new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), MAX_CLIENT_GEARS))},
-        });
+    // TODO: at least two sub categories of Drivable: driven-and-driving (e.g. gear), driving only (e.g. motor)
+    // Driven-and-driving subclass implements and seals getCSBoss(): provides a unique client site,
+    // driving only provides no site set.
+    // ALSO: driven only?
+    // LASTLY: Drivable itself (actually) seals getCSB() to guarantee that it gets a DrivableCSB.
+    // Gets the actual DrivableCSB through an abstract method for sub classes
+    // ALSO LASTLY: could add key value pairs for any sockets in socket set
+
+    // TODO: convert _driver into a property whose get relies on drivableCSB.driver;
+
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        UniqueClientConnectionSiteBoss uccsb = new UniqueClientConnectionSiteBoss(
+            /* 1.) client site */
+            new KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet>(
+                ClientOnlyCTARSet.clientDrivenAndParentChildSet(), 
+                new ExclusionarySiteSet(new ContractSite(this, SiteOrientation.selfMatchingOrientation()))
+                ),
+            /* 2.) producer sites */
+            new Dictionary<CTARSet, SiteSet>() {
+                { new CTARSet(new ContractTypeAndRole(CogContractType.DRIVER_DRIVEN, RoleType.PRODUCER)),
+                    new SiteSet(ContractSite.factory(this, SiteOrientation.selfMatchingOrientation(), MAX_CLIENT_GEARS))},
+            });
+        addConnectionSiteEntriesForFrontSocketSet(this, uccsb);
+        return uccsb;
     }
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
@@ -165,7 +187,7 @@ public class Gear : Drivable  {
         }
     }
 
-    public float tangentVelocity() {
+     public float tangentVelocity() {
         return _angleStep.deltaAngle * Mathf.Deg2Rad * innerRadius;
     }
 
@@ -173,8 +195,9 @@ public class Gear : Drivable  {
         return _angleStep.deltaAngle / toothOffsetAngleRadians;
     }
 
+//CONSIDER: if needed this could be improved by replacing conditional with a delegate, set at contract receive time
     protected float rotationDeltaY(Drive drive) {
-        if (_driver is RackGear) {
+        if (drive.sourceIsType(typeof(RackGear))) {
             return -Mathf.Rad2Deg * drive.amount / innerRadius;
         } else {
             return drive.amount * -1f * toothOffsetAngleRadians;
@@ -227,10 +250,10 @@ public class Gear : Drivable  {
         BugLine.Instance.drawFromTo(transform.position + Vector3.up, 
             transform.position + Vector3.up + (Angles.UnitVectorAt(clockAngle * Mathf.Deg2Rad) * (outerRadius * .95f)).vector3());
     }
-    public override void positionRelativeTo(Drivable _driver) {
-        if (_driver != null) {
-            if (!(_driver is Gear)) { base.positionRelativeTo(_driver); return; }
-            Gear gear = (Gear)_driver;
+    public override void positionRelativeTo(Drivable _someDriver) {
+        if (_someDriver != null) {
+            if (!(_someDriver is Gear)) { base.positionRelativeTo(_someDriver); return; }
+            Gear gear = (Gear)_someDriver;
             moveToYPosOf(gear.gearTransform);
             setDistanceFrom(gear);
             gearTransform.eulerAngles = eulersRelativeToGear(gear);
@@ -317,6 +340,7 @@ public class Gear : Drivable  {
         return false;
     }
     public void beDrivenBy(Gear gear) {
+        Bug.bugAndPause("this doesn't happen right?");
         gear.addDrivable(this);
         _driver = gear;
         positionRelativeTo(gear);
@@ -327,7 +351,7 @@ public class Gear : Drivable  {
         foreach(Collider c in NearbyColliders.nearbyColliders(GetComponent<CapsuleCollider>(), .5f, LayerMask.GetMask("GearMesh"), 1.3f)) {
             Gear neighbor = c.GetComponent<Gear>();
             if (neighbor == this) { continue; }
-            if (!neighbor || neighbor == _driver || drivables.Contains(neighbor)) { continue; }
+            if (!neighbor || contractPortfolio.hasContractWith(neighbor)) { continue; }
             if (Mathf.Abs(gearTransform.position.y - neighbor.gearTransform.position.y) < YLayer.LayerHeight) {
                 yHeightOneLayerUpFrom(neighbor.gearTransform);
             }

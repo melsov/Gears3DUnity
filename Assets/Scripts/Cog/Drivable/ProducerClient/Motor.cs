@@ -72,6 +72,14 @@ public class Motor : Drivable
             });
         }
     }
+/*
+TODO: derive ConnectionSites from socket sets: (need new matching type? front-to-back?)
+fixed sockets map to PARENT_CHILD contract types
+free sockets map to ... contract types
+fixed socket parent children (unless motors) fulfill by adopting the rotation (set the child transform's rotation point btw)
+and position of the parent socket
+btw: use delegate to switch ways of moving (with a rigidbody or without) instead of if-else
+ *  */
 
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
         if (specification.contractType == CogContractType.PARENT_CHILD) {
@@ -107,16 +115,26 @@ public class Motor : Drivable
         }
         return ClientActions.getDoNothingActions();
     }
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        /* client */
+        KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> clientSitePair = LocatableSiteSetAndCTARSetSetup.uniqueSiteSetAndClientOnlyCTARFor(this);
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
-        //Get dictionary with entry for motor's controller add on site
-        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
-        //Add an entry for motors axel
-        CTARSet parentChildSet = new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER));
-        SiteSet ss = new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1));
-        lookup.Add(parentChildSet, ss);
-        return new ConnectionSiteBoss(lookup);
+        /* producer */
+        Dictionary<CTARSet, SiteSet> lookup = new Dictionary<CTARSet, SiteSet>() {
+            { new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER)),
+                new SiteSet(ContractSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1)) }
+        };
+        return new UniqueClientConnectionSiteBoss(clientSitePair, lookup);
     }
+    //protected override ConnectionSiteBoss getConnectionSiteBoss() {
+    //    //Get dictionary with entry for motor's controller add on site
+    //    Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
+    //    //Add an entry for motors axel
+    //    CTARSet parentChildSet = new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER));
+    //    SiteSet ss = new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1));
+    //    lookup.Add(parentChildSet, ss);
+    //    return new ConnectionSiteBoss(lookup);
+    //}
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
@@ -211,7 +229,7 @@ public class Motor : Drivable
     }
 
     public override Drive receiveDrive(Drive drive) {
-        return new Drive(0);
+        return new Drive(this, 0);
     }
 
     protected override void handleAddOnScalar(float scalar) {

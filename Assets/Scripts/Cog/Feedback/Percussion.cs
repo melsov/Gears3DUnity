@@ -17,7 +17,7 @@ public class Percussion : Instrument {
         return highlight;
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 

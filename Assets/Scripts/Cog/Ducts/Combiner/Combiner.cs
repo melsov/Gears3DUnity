@@ -96,7 +96,7 @@ public class Combiner : Drivable {
         return drive;
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 

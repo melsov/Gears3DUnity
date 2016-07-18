@@ -141,14 +141,15 @@ public class LinearActuator : Drivable , IPegProxy {
         }
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
-        throw new NotImplementedException();
-    }
+    #endregion
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         throw new NotImplementedException();
     }
-    #endregion
+
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        throw new NotImplementedException();
+    }
 }
 
 public interface IPegProxy

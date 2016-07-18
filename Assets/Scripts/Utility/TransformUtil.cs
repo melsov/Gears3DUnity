@@ -20,6 +20,13 @@ public class TransformUtil : MonoBehaviour
         fj.connectedBody = parent;
     }
 
+//TODO: we need the parent cog's rotation here also? because front's rotation isn't going to be representative? or is it.....??
+    public static void AlignXZAndAdoptRotation(Transform front, Vector3 back, Transform target) {
+        target.position += new VectorXZ(front.position - back).vector3();
+        //TODO / CONSIDER: would it help to set the target's rotation pivot point (not here but during setup of PARENT_CHILD contracts)?
+        target.rotation = front.rotation;
+    }
+
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
         Vector3 localOffset = Vector3.zero;
         if (localOffsetObject != null) {
@@ -89,5 +96,23 @@ public class TransformUtil : MonoBehaviour
             if (t == other) { return true; }
         }
         return false;
+    }
+    public static VectorXZ distanceToTangentPointAbsoluteNormalDirection(Gear gear, LineSegment lineSegment, float nudgeBeyondInnerRadius, bool flipNormal) {
+        return distanceToTangentPointParallelTo(gear, lineSegment, nudgeBeyondInnerRadius, flipNormal, false);
+    }
+    public static VectorXZ distanceToTangentPointDeriveNormalDirection(Gear gear, LineSegment lineSegment, float nudgeBeyondInnerRadius) {
+        return distanceToTangentPointParallelTo(gear, lineSegment, nudgeBeyondInnerRadius, false, true);
+    }
+    
+    private static VectorXZ distanceToTangentPointParallelTo(Gear gear, LineSegment lineSegment, float nudgeBeyondInnerRadius, bool flipNormal, bool deriveNormalDirection) {
+        VectorXZ closest = lineSegment.closestPointOnLine(new VectorXZ(gear.transform.position));
+        Vector3 pos;
+        if (deriveNormalDirection) {
+            VectorXZ dif = closest - gear.transform.position;
+            pos = gear.transform.position + dif.normalized.vector3() * (gear.innerRadius + nudgeBeyondInnerRadius);
+        } else {
+            pos = gear.transform.position + (lineSegment.normal * (flipNormal ? -1f : 1f)).vector3() * (gear.innerRadius + nudgeBeyondInnerRadius);
+        }
+        return pos - closest; 
     }
 }

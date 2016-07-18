@@ -14,9 +14,7 @@ public class CogContract
 
     public Cog.ProducerActions producerActions;
     public Cog.ClientActions clientActions;
-    public ConnectionSiteAgreement connectionSiteAgreement; // TODO: arrange so that csa's connektAction can be generated lazily, by asking the contract
-// for the necessary info (in a new kind of struct?) the info is currently stored in ContractSpecification. Use this struct or define a newer (slimmer?) one.
-// ultimate goal: be able to swap which party travels easily
+    public ConnectionSiteAgreement connectionSiteAgreement;
 
     public Cog.ContractManager producer {
         get {
@@ -44,6 +42,11 @@ public class CogContract
         return client.cog == cog;
     }
 
+    public bool isParticipant(Cog cog) {
+        if (!cog || !valid) { return false; }
+        return client.cog == cog || producer.cog == cog;
+    }
+
     public Cog.ContractManager getOtherParty(Cog cog) {
         if (isClient(cog)) {
             return producer;
@@ -66,6 +69,14 @@ public class CogContract
         this.connectionSiteAgreement = connectionSiteAgreement_;
     }
 
+    public void suspend() {
+        producerActions.suspend();
+    }
+
+    public void restore() {
+        producerActions.restore();
+    }
+
     public ContractSpecification regenerateSpecificationForOfferee(Cog cog) {
         if (!valid) { return ContractSpecification.NonExistant(); }
         return new ContractSpecification(type, isClient(cog) ? RoleType.PRODUCER : RoleType.CLIENT);
@@ -74,13 +85,16 @@ public class CogContract
 
 public class ConnectionSiteAgreement
 {
-    public ConnectionSite producerSite;
-    public ConnectionSite clientSite;
+    public ContractSite producerSite;
+    public ContractSite clientSite;
+    //public SiteOrientation producerSite;
+    //public SiteOrientation clientSite;
 
-    public ConnectionSite destination {
+
+    public ContractSite destination {
         get { return producerIsTraveller ? clientSite : producerSite; }
     }
-    public ConnectionSite traveller {
+    public ContractSite traveller {
         get { return producerIsTraveller ? producerSite : clientSite; }
     }
 
@@ -114,22 +128,22 @@ public class ConnectionSiteAgreement
     public static ConnektAction doNothing = delegate (ConnectionSiteAgreement csa) { };
 
     public static ConnektAction alignTarget(UnityEngine.Transform transform) {
+        //return delegate (ConnectionSiteAgreement csa) {
+        //    LocatableContractSite.align((LocatableContractSite)csa.traveller, (LocatableContractSite)csa.destination, transform);
+        //};
         return delegate (ConnectionSiteAgreement csa) {
-            LocatableConnectionSite.align((LocatableConnectionSite)csa.traveller, (LocatableConnectionSite)csa.destination, transform);
+            LocatableContractSite.align(csa.traveller.transform, csa.destination.transform, transform);
+        };
+    }
+
+    public static ConnektAction alignAndPushYLayer(UnityEngine.Transform transform) {
+        return delegate (ConnectionSiteAgreement csa) {
+            LocatableContractSite.alignAndPushYLayer(csa.traveller.transform, csa.destination.transform, transform);
         };
     }
 
     public void connect() {
         connektAction(this);
-    }
-}
-
-public class ConnectionSiteProffer
-{
-    public List<ConnectionSite> offerersSites;
-
-    public ConnectionSiteProffer(params ConnectionSite[] args) {
-        offerersSites = new List<ConnectionSite>(args);
     }
 }
 
@@ -178,7 +192,7 @@ public struct ContractTypeAndRole
     }
 }
 
-public struct CTARSet
+public class CTARSet
 {
     public HashSet<ContractTypeAndRole> set;
 
@@ -189,17 +203,42 @@ public struct CTARSet
         }
     }
 
-    public static CTARSet clientDrivenAndChildSet() {
-        return new CTARSet(
-            new ContractTypeAndRole(CogContractType.DRIVER_DRIVEN, RoleType.CLIENT),
-            new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.CLIENT)
-            );
-    }
-
     public static CTARSet fromCTAR(ContractTypeAndRole tar) {
         return new CTARSet(tar);
     }
+
+    public static CTARSet emptyCTARSet() {
+        return new CTARSet();
+    }
 }
+
+public class UniformRoleCTARSet : CTARSet
+{
+    public UniformRoleCTARSet(RoleType monoRoleType, params CogContractType[] args) : base(new ContractTypeAndRole[0]) { 
+        foreach(CogContractType cct in args) {
+            set.Add(new ContractTypeAndRole(cct, monoRoleType));
+        }
+    }
+
+}
+
+public class ClientOnlyCTARSet : UniformRoleCTARSet
+{
+    public ClientOnlyCTARSet(params CogContractType[] args) : base(RoleType.CLIENT, args) {}
+
+    public static ClientOnlyCTARSet clientDrivenAndParentChildSet() {
+        return new ClientOnlyCTARSet(CogContractType.PARENT_CHILD, CogContractType.DRIVER_DRIVEN);
+    }
+
+    public static ClientOnlyCTARSet drivenSet() {
+        return new ClientOnlyCTARSet(CogContractType.DRIVER_DRIVEN);
+    }
+
+    public static ClientOnlyCTARSet emptySet() {
+        return new ClientOnlyCTARSet();
+    }
+}
+
 
 public struct ContractSpecification
 {
@@ -215,7 +254,7 @@ public struct ContractSpecification
     public ContractTypeAndRole toContractTypeAndRoleForOfferer() {
         return new ContractTypeAndRole(contractType, offerersRole);
     }
-    public ContractTypeAndRole toContractTypeAndRoleForOfferee() {
+    public ContractTypeAndRole contractTypeAndRoleForOfferee() {
         return new ContractTypeAndRole(contractType, offereesRole);
     }
 
@@ -225,15 +264,13 @@ public struct ContractSpecification
         get { return offererIsProducer ? RoleType.CLIENT : RoleType.PRODUCER; }
     }
 
-    //public ConnectionSiteProffer connectionSiteProffer;
-
     public ContractSpecification(CogContractType type_, RoleType offerersRole_) {
         contractType = type_;
         offerersRole = offerersRole_;
         connectionSiteAgreement = null;
     }
 
-    public void setAdjoiningConnectionSite(ConnectionSite adjoiningSite) {
+    public void setAdjoiningContractSite(ContractSite adjoiningSite) {
         throw new NotImplementedException();
     }
 
@@ -243,6 +280,10 @@ public struct ContractSpecification
 
     public bool exists() {
         return contractType != CogContractType.NONEXISTENT && offereesRole != RoleType.UNINVOLVED;
+    }
+
+    public override string ToString() {
+        return string.Format("Contract Specification: {0} : {1}", contractType, offerersRole);
     }
 
     //public static implicit operator bool(ContractSpecification cs) { return cs != default(ContractSpecification); }

@@ -62,11 +62,11 @@ public class SteadyDispenser : Drivable {
         power = scalar;
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         throw new NotImplementedException();
     }
 
-    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 }

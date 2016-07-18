@@ -27,6 +27,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             colliderDropper = GetComponentInChildren<ColliderDropper>();
         }
         client = GetComponent<ICursorAgentClient>();
+
         Assert.IsTrue(client != null, "null cursor agent client: " + name);
         dragOverrideLayer = LayerMask.GetMask("DragOverride");
     }
@@ -105,6 +106,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     private void connectToColliders(ColliderDropper dropper) {
+        Bug.contractLog("connect to colliders with this many colliders: " + dropper.colliders.Count);
         if (dropper == null) {
             return;
         }

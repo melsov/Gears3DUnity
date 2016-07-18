@@ -20,9 +20,11 @@ public class ColliderDropper : MonoBehaviour {
     }
 
     void OnTriggerEnter(Collider other) {
+        Bug.contractLog(name + " on tr enter " + other.name);
         if (client.isCursorInteracting()) {
             if (!colliders.Contains(other)) {
                 client.handleTriggerEnter(other);
+                Bug.contractLog("adding collider " + other.name);
                 colliders.Add(other);
             }
         }
@@ -32,6 +34,7 @@ public class ColliderDropper : MonoBehaviour {
 // unintended behaviors surrounding droppers, cursor agents
     void OnTriggerExit(Collider other) {
         if (colliders.Contains(other)) {
+            Bug.contractLog("removing collider " + other.name);
             colliders.Remove(other);
         } else if (client.isCursorInteracting()) {
             if (!escapedFromColliders.Contains(other)) {
@@ -42,12 +45,12 @@ public class ColliderDropper : MonoBehaviour {
             if (client.isCursorInteracting()) {
 
                 if (Cog.FindCog(other.transform)) {
-                    print("client handle trigger exit with cog: " + Cog.FindCog(other.transform).name);
+                    //print("client handle trigger exit with cog: " + Cog.FindCog(other.transform).name);
                 }
                 if (other.transform.parent) {
-                    print("handle with coll parent: " + other.transform.parent.name);
+                    //print("handle with coll parent: " + other.transform.parent.name);
                 }
-                print("calling client handle trigger exit w collider: " + other.name);
+                //print("calling client handle trigger exit w collider: " + other.name);
 
                 client.handleTriggerExit(other);
             }

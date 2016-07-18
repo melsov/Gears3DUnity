@@ -31,7 +31,6 @@ public class Pulley : GearDrivenMechanism , IPegProxy {
     private void positionRopes() {
         Vector3 first = leftRope.firstLink.transform.position;
         Vector3 last = leftRope.lastLink.transform.position;
-        print(leftRope.count);
         float zDif = first.z - last.z;
         leftRope.baseLink.MovePosition(new Vector3(leftRope.baseLink.position.x, leftRope.baseLink.position.y, transform.position.z + zDif / 2f));
         rightRope.baseLink.MovePosition(new Vector3(rightRope.baseLink.position.x, rightRope.baseLink.position.y, transform.position.z + zDif / 2f));

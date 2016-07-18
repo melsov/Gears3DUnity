@@ -8,15 +8,24 @@ Base class for all mechanisms
 */
 [System.Serializable]
 public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
+    private ContractManager _contractManager;     
+    private ContractManager contractManager {
+        get {
+            if (_contractManager == null) {
+                _contractManager = new ContractManager(this, getContractNegotiator());
+            }
+            return _contractManager;
+        }
+    }
+        
 
-    private ContractManager contractManager;
     protected ContractPortfolio contractPortfolio {
         get {
             return contractManager.contractPortfolio;
         }
     }
-    private ConnectionSiteBoss _connectionSiteBoss;
-    protected ConnectionSiteBoss connectionSiteBoss {
+    private ContractSiteBoss _connectionSiteBoss;
+    protected ContractSiteBoss connectionSiteBoss {
         get {
             if (_connectionSiteBoss == null) {
                 _connectionSiteBoss = getConnectionSiteBoss();
@@ -70,8 +79,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         if (!colliderSet) {
             colliderSet = gameObject.AddComponent<ColliderSet>();
         }
-        contractManager = new ContractManager(this, getContractNegotiator());
-
         if (GetComponent<Highlighter>() == null) {
             gameObject.AddComponent<Highlighter>();
         }
@@ -136,7 +143,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             contractPortfolio = new ContractPortfolio(cog, cog.connectionSiteBoss);
         }
 
-        public virtual bool hasContractWith(ContractManager other) {
+        public bool hasContractWith(ContractManager other) {
             foreach(CogContract cc in contractPortfolio) {
                 if (cc.producer == other || cc.client == other) { return true; }
             }
@@ -156,10 +163,12 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             if (other == null) {
                 print("other ccm null in other found by " + cog.name);
             }
+            if (hasContractWith(other)) { return ContractSpecification.NonExistant(); }
             foreach(ContractSpecification specification in negotiator.contractPreferencesAsOffererWith(other.cog)) {
+                print(cog.name + " offering: " + specification.ToString());
                 ContractSpecification rSpecification = other.amenable(cog, specification);
                 if (rSpecification.exists()) {
-                    print(cog.name + " is amenable");
+                    print(other.cog.name + " is amenable");
                     return rSpecification;
                 }
             }
@@ -192,6 +201,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             client.accept(cc, specification.connectionSiteAgreement);
             contractPortfolio.setContract(cc.connectionSiteAgreement.producerSite, cc);
             initiateContract(cc);
+            print("we have a contract " + hasAtleastOneContract);
         }
 
         public static void initiateContract(CogContract cc) {
@@ -202,6 +212,11 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
         protected virtual void accept(CogContract cc, ConnectionSiteAgreement csa) {
             contractPortfolio.setContract(csa.clientSite, cc);
+            print(" we have this site? " + contractPortfolio.containsSite(csa.clientSite));
+            print(" client contract null? " + (cc == null));
+            print(" null in contract site? " + csa.clientSite.contract == null);
+            print(" we client have a contract: " + hasAtleastOneContract);
+            
         }
 
         public virtual void dissolve(CogContract cc) {
@@ -256,6 +271,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
         public virtual ContractSpecification amenable(Cog other, ContractSpecification specification) {
             if (amenableFor(lookup.availabilty(other, specification.contractType), specification.offererIsProducer)) {
+                print("amenable for");
                 return contractPortfolio.accommodatedSpecification(other, other.contractManager.contractPortfolio ,specification);
             }
             return ContractSpecification.NonExistant(); 
@@ -300,7 +316,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
     public abstract ProducerActions producerActionsFor(Cog client, ContractSpecification specification);
     public abstract ClientActions clientActionsFor(Cog producer, ContractSpecification specification);
-    protected abstract ConnectionSiteBoss getConnectionSiteBoss();
+    protected abstract ContractSiteBoss getConnectionSiteBoss();
     
     public abstract ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification);
     
@@ -314,14 +330,32 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         public ProducerAction initiate;
         public ProducerAction fulfill;
         public ProducerAction dissolve;
+        private bool isFulfillSuspended;
+        private ProducerAction suspendedFulfill;
+
+        private static int doNothingTestPrint;
+        private static readonly ProducerAction nothingAction = delegate (Cog cog) { if ((doNothingTestPrint++ % 40) == 0) print("producer nothing action for client " + cog.name); };
 
         public static ProducerActions getDoNothingActions() {
-            ProducerAction nothingAction = delegate (Cog cog) { print("producer nothing action for client " + cog.name); };
             ProducerActions pa = new ProducerActions();
             pa.initiate = nothingAction;
             pa.fulfill = nothingAction;
             pa.dissolve = nothingAction;
+            pa.isFulfillSuspended = true;
             return pa;
+        }
+
+        public void suspend() {
+            suspendedFulfill = fulfill;
+            fulfill = nothingAction;
+            isFulfillSuspended = true;
+        }
+        
+        public void restore() {
+            if (!isFulfillSuspended) { return; }
+            fulfill = suspendedFulfill;
+            suspendedFulfill = nothingAction;
+            isFulfillSuspended = false;
         }
     }
 
@@ -343,11 +377,13 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
 
     private bool enterContractWith(Cog cog, bool permanent) {
+        Bug.contractLog(name + "enter contract with " + cog.name);
         ContractSpecification spec = contractManager.negotiate(cog.contractManager);
         if(spec.contractType != CogContractType.NONEXISTENT) {
             contractManager.setup(cog.contractManager, spec);
             return true;
         }
+        Bug.contractLog(name + " unable to negotiate a contract" + cog.name);
         return false;
     }
 
@@ -390,6 +426,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             if (asProducerLookup.ContainsKey(cct)) {
                 return asProducerLookup[cct](other);
             }
+            print(cog.name + " doesn't have a key for: " + cct);
             return false;
         }
 
@@ -446,7 +483,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             return DisconnectRadius * DisconnectRadius < (pos - cursorStart).magnitudeSquared;
         }
         public bool startedDisconnect;
-        public bool nothingToDisconnect;
+        //public bool somethingToDisconnect;
+        public bool wasContractedToAProducer;
 
         public DragHistory(Vector3 start, VectorXZ cursorStart) {
             this.start = start;
@@ -471,6 +509,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
     }
 
     protected virtual bool vConnectTo(Collider other) {
+        print(name + " vConn");
         Cog cog = FindCog(other.transform);
         if (cog == null) { return false; }
         return enterContractWith(cog, false);
@@ -489,7 +528,10 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
  * interface methods 
  * */
     public bool connectTo(Collider other) {
-        if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect) { return false; }
+        if (dragHistory == null) {
+            return false; //sometimes use this without dragging??
+        }
+        if (dragHistory.wasContractedToAProducer && !dragHistory.startedDisconnect) { return false; }
         Vector3 before = transform.position;
         bool result = vConnectTo(other);
         if (result) {
@@ -499,30 +541,35 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
         return result;
     }
+// TODO: sort out rack gear connections/contracts/moves etc..
 
     public void normalDragStart(VectorXZ cursorPos) {
         //CONSIDER: more efficient to generate client tree only once per drag session?
         dragHistory = new DragHistory(transform.position, cursorPos);
         clientTree.highlight();
-        dragHistory.nothingToDisconnect = !contractManager.hasAtleastOneContract;
+        dragHistory.wasContractedToAProducer = contractPortfolio.contractedToProducer;
+        Bug.contractLog(name + " contracted to a producer: " + dragHistory.wasContractedToAProducer);
+        suspendOnDragStart();
     }
 
     public void normalDrag(VectorXZ cursorPos) {
-        if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect && dragHistory.beyond(cursorPos)) {
+        if (dragHistory.wasContractedToAProducer && !dragHistory.startedDisconnect && dragHistory.beyond(cursorPos)) {
            dragHistory.startedDisconnect = true;
            vDisconnect(); 
         }
-        //TODO: replace actual parent childing with psuedo parent childing in parent child contracts 
-        // it will de-head ache moving child sets
         clientTree.moveRelative(dragHistory.updateLastCursorGetRelative(cursorPos).vector3());
     }
 
     public void normalDragEnd(VectorXZ cursorPos) {
         clientTree.unhighlight();
-        if (!dragHistory.nothingToDisconnect && !dragHistory.startedDisconnect) {
+        if (dragHistory.wasContractedToAProducer && !dragHistory.startedDisconnect) {
             clientTree.moveRelative(dragHistory.start - transform.position);
+            restoreOnDragEnd();
         }
     }
+
+    protected virtual void suspendOnDragStart() { }
+    protected virtual void restoreOnDragEnd() { }
 
     #endregion;
 }

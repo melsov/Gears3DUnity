@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 //TODO: debug rack gear restore from save: driven gears are not moving
 public class RackGear : Gear {
@@ -24,21 +25,17 @@ public class RackGear : Gear {
     }
 
     protected override void updateAngleStep() {
-        if (!isDriven()) {
-            return;
-        }
+        //if (!isDriven()) {
+        //    return;
+        //}
         _angleStep.update(offset.magnitude * offsetDirection);
     }
     public override bool isDriven() {
         if (base.isDriven()) { return true; }
         return anchor != null;
     }
-    protected Gear drivingGear {
-        get {
-            if (_driver == null) return null;
-            return (Gear)_driver;
-        }
-    }
+//TODO: purge RackGear and any others of '_driver'
+    
     public override float innerRadius {
         get {
             return ToothBaseHeight;
@@ -48,6 +45,103 @@ public class RackGear : Gear {
         base.awake();
         lineSegment = GetComponent<LineSegment>();
     }
+
+    #region contract
+
+    protected override ContractNegotiator getContractNegotiator() {
+        return new RackGearContractNegotiator(this);
+    }
+
+    public class RackGearContractNegotiator : GearContractNegotiator
+    {
+        public RackGearContractNegotiator(Cog cog_) : base(cog_) {
+        }
+
+        protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
+            List<ContractSpecification> result = new List<ContractSpecification>();
+            if (cogForTypeWorkaround is Piston) {
+                result.Add(new ContractSpecification(CogContractType.PARENT_CHILD, RoleType.CLIENT));
+            } else if (cogForTypeWorkaround is Gear) {
+                result.Add(new ContractSpecification(CogContractType.DRIVER_DRIVEN, RoleType.CLIENT));
+            }
+            return result;
+        }
+    }
+
+    protected override ViableContractLookup getViableContractLookup() {
+        return new ViableRackGearContractLookup(this);
+    }
+
+    public class ViableRackGearContractLookup : ViableGearContractLookup
+    {
+        public ViableRackGearContractLookup(Cog cog_) : base(cog_) {
+        }
+
+        protected override void setupLookups() {
+            asClientLookup.Add(CogContractType.DRIVER_DRIVEN, delegate (Cog other) {
+                return other.GetComponent<Gear>();
+            });
+            asClientLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                return true;
+            });
+
+            asProducerLookup.Add(CogContractType.DRIVER_DRIVEN, delegate (Cog other) {
+                return other.GetComponent<Gear>();
+            });
+            asProducerLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                return true;
+            });
+        }
+    }
+
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        List<ContractSite> sites = ContractSite.contractSiteListFromSocketSet(this, _pegboard.getBackendSocketSet());
+        sites.Add(new ContractSite(this, SiteOrientation.selfMatchingOrientation()));
+        UniqueClientConnectionSiteBoss uccsb = new UniqueClientConnectionSiteBoss(
+            /* 1.) client site */
+            new ExclusionarySiteSetClientPair(
+                ClientOnlyCTARSet.clientDrivenAndParentChildSet(),
+                new ExclusionarySiteSet(sites.ToArray())
+                ),
+            /* 2.) producer sites */
+            new Dictionary<CTARSet, SiteSet>() {
+                { new CTARSet(new ContractTypeAndRole(CogContractType.DRIVER_DRIVEN, RoleType.PRODUCER)),
+                    new SiteSet(ContractSite.factory(this, SiteOrientation.selfMatchingOrientation(), MAX_CLIENT_GEARS))},
+            });
+        addConnectionSiteEntriesForFrontSocketSet(this, uccsb);
+        return uccsb;
+    }
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        ClientActions actions = ClientActions.getDoNothingActions();
+        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+            actions = base.clientActionsFor(producer, specification);
+        } else if (specification.contractType == CogContractType.PARENT_CHILD) {
+            actions.receive = delegate (Cog _producer) {
+                print("rack gear ParentChild receive action with: " + _producer.name);
+                basePosition = xzPosition;
+                //setSocketClosestToAxel(getAxel(_producer)); // * see connektAction
+            };
+            actions.beAbsolvedOf = delegate (Cog _producer) {
+                disconnectBackendSockets();
+            };
+        }
+        return actions;
+    }
+
+    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
+        if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
+            return delegate (ConnectionSiteAgreement csa) {
+                positionRelativeTo((Drivable)csa.destination.cog);
+                adjustForCrowding();
+            };
+        } else if (specification.contractType == CogContractType.PARENT_CHILD) {
+            return ConnectionSiteAgreement.alignAndPushYLayer(transform);
+        }
+        return ConnectionSiteAgreement.doNothing;
+    }
+
+    #endregion
 
     protected LinearActuator findConnectedLinearActuator(Collider other) {
         Drivable d = other.GetComponentInParent<Drivable>();
@@ -96,10 +190,10 @@ public class RackGear : Gear {
         public RackGearConnection(Drivable _drivable) : base(_drivable) { }
     }
 
-    protected override bool vConnectTo(Collider other) {
-        DrivableConnection dc = getDrivableConnection(other);
-        return dc.connect();
-    }
+    //protected override bool vConnectTo(Collider other) {
+    //    DrivableConnection dc = getDrivableConnection(other);
+    //    return dc.connect();
+    //}
 
     protected bool makeConnectionWithLinearMotionDrivable(DrivableConnection dc) {
         RackGearConnection rgc = (RackGearConnection)dc;
@@ -122,6 +216,7 @@ public class RackGear : Gear {
     protected override void onSocketToParentPeg(Socket socket) {
         base.onSocketToParentPeg(socket);
         anchor = socket.drivingPeg.transform;
+        Debug.LogError("on sock to parent peg rack gear");
         basePosition = xzPosition;
     }
 
@@ -140,13 +235,14 @@ public class RackGear : Gear {
         return false;
     }
     public override float driveScalar() {
-        return _angleStep.deltaAngle; // / toothWidth;
+        return _angleStep.deltaAngle;
     }
 
     public override Drive receiveDrive(Drive drive) {
-        if (drivingGear != null) {
+        if (drive.sourceIsType(typeof(Gear))) { 
+        //if (drivingGear != null) {
             Vector3 dir = transform.rotation * Vector3.right;
-            float scalar = -drivingGear.tangentVelocity(); 
+            float scalar = -((Gear)drive.source).tangentVelocity(); // -drivingGear.tangentVelocity(); 
             transform.position += dir * scalar;
         }
         return drive;
@@ -191,9 +287,7 @@ public class RackGear : Gear {
     }
 
     protected override void setDistanceFrom(Gear gear) {
-        VectorXZ closest = lineSegment.closestPointOnLine(new VectorXZ(gear.transform.position));
-        Vector3 pos = _driver.transform.position + (lineSegment.normal * -1f).vector3() * (innerRadius + gear.innerRadius + ToothDepth);
-        transform.position += pos - closest.vector3(transform.position.y);
+        transform.position += TransformUtil.distanceToTangentPointAbsoluteNormalDirection(gear, lineSegment, innerRadius + ToothDepth, true).vector3(gear.transform.position.y);
     }
 
     public override float proportionalCWToothOffsetFromAbsPosition(VectorXZ global) {
@@ -203,10 +297,10 @@ public class RackGear : Gear {
         return dif.magnitude / toothWidth;
     }
 
-    public override void positionRelativeTo(Drivable _driver) {
-        if (_driver != null) {
-            if (!(_driver is Gear)) { base.positionRelativeTo(_driver); return; }
-            Gear gear = (Gear)_driver;
+    public override void positionRelativeTo(Drivable _someDriver) {
+        if (_someDriver != null) {
+            if (!(_someDriver is Gear)) { base.positionRelativeTo(_someDriver); return; }
+            Gear gear = (Gear)_someDriver;
 
             //set distance
             setDistanceFrom(gear);

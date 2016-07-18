@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Dispenser : Drivable {
+public class Dispenser : Drivable { 
 
     public Dispensable item;
     public Transform spawnPlatform;
@@ -88,9 +88,13 @@ public class Dispenser : Drivable {
         return ClientActions.getDoNothingActions();
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
-        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
-        return new ConnectionSiteBoss(lookup);
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        //TODO: restore this but make Dispenser a cog????? (awkward because its only driver is an add on...)
+        //Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
+        //UnityEngine.Assertions.Assert.IsTrue(lookup.Keys.Count == 1, "Dispenser should have exactly one connection site");
+        //UniqueSiteSiteSet usss;
+
+        return new UniqueClientConnectionSiteBoss(LocatableSiteSetAndCTARSetSetup.uniqueSiteSetAndClientOnlyCTARFor(this));
     }
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {

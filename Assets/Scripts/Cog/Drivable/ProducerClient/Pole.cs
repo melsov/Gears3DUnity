@@ -219,7 +219,7 @@ public class Pole : Drivable
         base.restoreConnectionData(ref connectionData);
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 

@@ -151,4 +151,11 @@ public class Bug : MonoBehaviour {
     public static void bugError(string v) {
         UnityEngine.Debug.LogError(v);
     }
+
+    private const bool DEBUG_CONTRACT = true;
+    internal static void contractLog(string v) {
+        if (DEBUG_CONTRACT) {
+            print(v);
+        }
+    }
 }

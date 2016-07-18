@@ -133,14 +133,45 @@ public class CursorInput : MonoBehaviour {
         }
 
         if (ci == null) {
-            if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) {
-                ci = rayHit.collider.GetComponentInParent<CursorInteraction>();
-            }
+            ci = getHighestYInteractable(ray);
         }
         if (ci == null) {
             return;
         }
         ci.mouseDown(new VectorXZ(rayHit.point));
+    }
+
+    private CursorInteraction getHighestYInteractable(Ray ray) {
+        HashSet<Collider> ciColliders = new HashSet<Collider>();
+        int safe = 0;
+        while (true) {
+            if (safe++ > 5) { break; }
+            if (Physics.Raycast(ray, out rayHit, 100f, layerMask)) {
+                CursorInteraction ci = rayHit.collider.GetComponentInParent<CursorInteraction>();
+                if (ci == null) {
+                    break;
+                } else {
+                    ray = raySlightlyBelowHit(ray, rayHit);
+                    ciColliders.Add(rayHit.collider);
+                }
+            }
+        }
+
+        CursorInteraction result = null;
+        foreach(Collider col in ciColliders) {
+            CursorInteraction ci = col.GetComponentInParent<CursorInteraction>();
+            if (ci) {
+                if (result == null || result.transform.position.y < ci.transform.position.y) {
+                    result = ci;
+                }
+            }
+        }
+        return result;
+        
+    }
+
+    public static Ray raySlightlyBelowHit(Ray ray, RaycastHit rayCastHit) {
+        return new Ray(rayCastHit.point + ray.direction * .01f, ray.direction);
     }
 
     private void setProxyImage() {

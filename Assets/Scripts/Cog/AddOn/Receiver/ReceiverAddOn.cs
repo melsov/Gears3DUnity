@@ -18,7 +18,7 @@ public class ReceiverAddOn : AddOn {
         throw new NotImplementedException();
     }
 
-    protected override ConnectionSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 
