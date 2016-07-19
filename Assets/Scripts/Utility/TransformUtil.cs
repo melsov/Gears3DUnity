@@ -2,6 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class TransformUtil : MonoBehaviour
 {
@@ -73,6 +74,25 @@ public class TransformUtil : MonoBehaviour
         T result = t.GetComponent<T>();
         if (result == null) {
             result = t.GetComponentInParent<T>();
+        }
+        return result;
+    }
+
+    public static List<T> FindInCogExcludingChildCogs<T>(Cog cog) {
+        List<T> result = new List<T>();
+        Queue<Transform> search = new Queue<Transform>();
+        search.Enqueue(cog.transform);
+        while(search.Count > 0) {
+            Transform trans = search.Dequeue();
+            T found = trans.GetComponent<T>();
+            if (found != null) {
+                result.Add(found);
+            }
+            foreach(Transform child in trans) {
+                if (!child.GetComponent<Cog>()) {
+                    search.Enqueue(child);
+                }
+            }
         }
         return result;
     }

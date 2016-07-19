@@ -18,7 +18,7 @@ public class ContractPortfolio : IEnumerable<CogContract>
 
     public bool hasAtleastOneContract {
         get {
-            foreach (SiteSet ss in contractSiteBoss.getAllSites()) {
+            foreach (SiteSet ss in contractSiteBoss.getAllSiteSets()) {
                 foreach (ContractSite site in ss) {
                     if (site.occupied) return true;
                 }
@@ -41,7 +41,7 @@ public class ContractPortfolio : IEnumerable<CogContract>
     public int validContractCount {
         get {
             int result = 0;
-            foreach(SiteSet ss in contractSiteBoss.getAllSites()) {
+            foreach(SiteSet ss in contractSiteBoss.getAllSiteSets()) {
                 foreach(ContractSite site in ss) {
                     if (site.occupied) result++;
                 }
@@ -87,7 +87,7 @@ public class ContractPortfolio : IEnumerable<CogContract>
     }
 
     public bool containsSite(ContractSite cs) {
-        foreach (SiteSet ss in contractSiteBoss.getAllSites()) {
+        foreach (SiteSet ss in contractSiteBoss.getAllSiteSets()) {
             foreach (ContractSite site in ss) {
                 if (site == cs) return true;
             }
@@ -97,7 +97,7 @@ public class ContractPortfolio : IEnumerable<CogContract>
 
 
     public IEnumerator<CogContract> GetEnumerator() {
-        foreach(SiteSet ss in contractSiteBoss.getAllSites()) {
+        foreach(SiteSet ss in contractSiteBoss.getAllSiteSets()) {
             foreach (ContractSite site in ss) {
                 if (site.occupied) {
                     yield return site.contract;
@@ -114,28 +114,44 @@ public class ContractPortfolio : IEnumerable<CogContract>
         Assert.IsTrue(offerer != cog, "oh no, the offeree Cog is supposed to accommodate");
 
         SiteSet ss = contractSiteBoss.getSiteSet(specification.contractTypeAndRoleForOfferee());
-        foreach(ContractSite site in ss) {
+        SiteSet offererSiteSet = offerersPortfolio.contractSiteBoss.getSiteSet(specification.toContractTypeAndRoleForOfferer());
+        foreach (ContractSite site in ss) {
             if (site.occupied) { continue; }
-            SiteSet offererSiteSet = offerersPortfolio.contractSiteBoss.getSiteSet(specification.toContractTypeAndRoleForOfferer());
             foreach(ContractSite offerersSite in offererSiteSet.sitesOrderedByDistanceFrom(site.transform.position)) { // offerersPortfolio.contractSiteBoss.getSiteSet(specification.toContractTypeAndRoleForOfferer())) { 
                 if (site.canAccommodate(offerersSite)) {
-                    ContractSpecification rSpecification = specification;
-                    rSpecification.connectionSiteAgreement = new ConnectionSiteAgreement();
-                    if (specification.offererIsProducer) {
-                        rSpecification.connectionSiteAgreement.producerSite = offerersSite; //.siteOrientationFor(site);
-                        rSpecification.connectionSiteAgreement.clientSite = site;// siteOrientationFor(offerersSite);
-                    } else {
-                        rSpecification.connectionSiteAgreement.producerSite = site;//.siteOrientationFor(offerersSite);
-                        rSpecification.connectionSiteAgreement.clientSite = offerersSite;//.siteOrientationFor(site);
-                    }
-                    rSpecification.connectionSiteAgreement.producerIsTraveller = specification.offererIsProducer;
-                    return rSpecification;
+                    return createContractSpecificationFrom(specification, offerersSite, site);
+                    //ContractSpecification rSpecification = specification;
+                    //rSpecification.connectionSiteAgreement = new ConnectionSiteAgreement();
+                    //if (specification.offererIsProducer) {
+                    //    rSpecification.connectionSiteAgreement.producerSite = offerersSite; //.siteOrientationFor(site);
+                    //    rSpecification.connectionSiteAgreement.clientSite = site;// siteOrientationFor(offerersSite);
+                    //} else {
+                    //    rSpecification.connectionSiteAgreement.producerSite = site;//.siteOrientationFor(offerersSite);
+                    //    rSpecification.connectionSiteAgreement.clientSite = offerersSite;//.siteOrientationFor(site);
+                    //}
+                    //rSpecification.connectionSiteAgreement.producerIsTraveller = specification.offererIsProducer;
+                    //return rSpecification;
                 }
             }
         }
         Debug.Log("return non existent");
         return ContractSpecification.NonExistant();
     }
+
+    private ContractSpecification createContractSpecificationFrom(ContractSpecification specification, ContractSite offerersSite, ContractSite site) {
+        ContractSpecification rSpecification = specification;
+        rSpecification.connectionSiteAgreement = new ConnectionSiteAgreement();
+        if (specification.offererIsProducer) {
+            rSpecification.connectionSiteAgreement.producerSite = offerersSite; 
+            rSpecification.connectionSiteAgreement.clientSite = site;
+        } else {
+            rSpecification.connectionSiteAgreement.producerSite = site;
+            rSpecification.connectionSiteAgreement.clientSite = offerersSite;
+        }
+        rSpecification.connectionSiteAgreement.producerIsTraveller = specification.offererIsProducer;
+        return rSpecification;
+    }
+
 
     #region ClientTree
     public class ClientTree

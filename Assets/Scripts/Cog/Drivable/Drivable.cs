@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System;
 
 //TODOs
+//--Allow Cogs to have pegboards too --> then, reinstate (contract-ize) auto-connect pegs: in order to 
+// --Allow GearSwitches to have PARENT_CHILD contracts with their proxy switches : in general to allow permanent 'composite' Cogs
+
 //--Pegs sometimes are hard to grab from gears??? Try to reproduce
 //--Create: system for 
 //   a: universal connecting / disconnecting across all cogs
@@ -29,22 +32,11 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         }
     }
     protected Socket connectedSocket;
-    private Pegboard __pegboard;
-    protected Pegboard _pegboard {
-        get {
-            if (__pegboard == null) {
-                __pegboard = GetComponentInChildren<Pegboard>();
-                if (__pegboard == null) {
-                    __pegboard = gameObject.AddComponent<Pegboard>();
-                }
-            }
-            return __pegboard;
-        }
-    }
+
     protected Drivable _driver; //TODO: property getting drivableConnectionSB's driver
     protected UniqueClientConnectionSiteBoss uniqueClientConnectionSiteBoss {
         get {
-            return (UniqueClientConnectionSiteBoss)connectionSiteBoss;
+            return (UniqueClientConnectionSiteBoss)contractSiteBoss;
         }
     }
     protected ConnectionSiteAgreement uniqueContractSiteAgreement {
@@ -157,7 +149,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         }
     }
 
-    protected override sealed ContractSiteBoss getConnectionSiteBoss() {
+    protected override sealed ContractSiteBoss getContractSiteBoss() {
         UniqueClientConnectionSiteBoss uccsb = getUniqueClientSiteConnectionSiteBoss();
         foreach(KeyValuePair<CTARSet,SiteSet> ctarSiteSetPair in additionalSites()) {
             uccsb.addSiteSet(ctarSiteSetPair);
@@ -170,12 +162,12 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         return new List<KeyValuePair<CTARSet, SiteSet>>();
     }
 
-    protected static void addConnectionSiteEntriesForBackSocketSet(Drivable drivable, ContractSiteBoss csb) {
-        csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getBackendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_CHILD));
-    }
-    protected static void addConnectionSiteEntriesForFrontSocketSet(Drivable drivable, ContractSiteBoss csb) {
-        csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getFrontendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_PARENT));
-    }
+    //protected static void addConnectionSiteEntriesForBackSocketSet(Drivable drivable, ContractSiteBoss csb) {
+    //    csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getBackendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_CHILD));
+    //}
+    //protected static void addConnectionSiteEntriesForFrontSocketSet(Drivable drivable, ContractSiteBoss csb) {
+    //    csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getFrontendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_PARENT));
+    //}
 
     #endregion
 

@@ -8,7 +8,12 @@ public class PairCTARSiteSet
 {
     public readonly CTARSet ctarSet;
     public readonly SiteSet siteSet;
-    
+    internal bool isEmpty {
+        get {
+            return ctarSet.isEmpty;
+        }
+    }
+
     public PairCTARSiteSet(CTARSet ctarSet, SiteSet siteSet) {
         this.ctarSet = ctarSet;
         this.siteSet = siteSet;
@@ -27,7 +32,7 @@ public class PairCTARSiteSet
     }
 
     public static PairCTARSiteSet fromSocketSet(Cog cog, SocketSet socketSet, RigidRelationshipConstraint rrc) {
-        if (socketSet.sockets.Length == 0) { Debug.LogError("returning empty pair"); return emptyPair(); }
+        if (socketSet.sockets.Length == 0) { Debug.LogError("CSB returning empty pair for: " + cog.name); return emptyPair(); }
         SiteOrientation ori = SiteOrientation.fromRigidRelationshipConstraint(rrc);
         // ermmmmm...how to deal with rotation mode???? (don't allow free rotations any more? and just make hinge joints into full-fledged cogs? <-- like)
         CTARSet tar = new CTARSet(new ContractTypeAndRole(
@@ -35,11 +40,18 @@ public class PairCTARSiteSet
             rrc == RigidRelationshipConstraint.CAN_ONLY_BE_CHILD ? RoleType.CLIENT : RoleType.PRODUCER));
         List<ContractSite> temp = new List<ContractSite>(socketSet.sockets.Length);
         foreach (Socket s in socketSet.sockets) {
-            temp.Add(new LocatableContractSite(cog, ori, s.transform));
+            temp.Add(new LocatableContractSite(cog, ori, s.transform, s.earMark));
         }
         SiteSet ss = new SiteSet(temp.ToArray());
         return new PairCTARSiteSet(tar, ss);
     }
+
+    //public static PairCTARSiteSet ParentChildPair(Cog cog, RoleType rt) {
+    //    return new PairCTARSiteSet(
+    //        new CTARSet(ContractTypeAndRole.GetParentChildCoTAR(rt)),
+    //        new SingleSiteSet(new ContractSite(cog))
+    //        );
+    //}
 
 //TODO: SiteSets can be exclusionary!
 //Meaning only one of their sites can have a contract
@@ -73,7 +85,8 @@ public class ExclusionarySiteSetClientPair
 
 }
 
-public class ContractSiteBoss { 
+public class ContractSiteBoss : IEnumerable<ContractSite>
+{ 
 
     private readonly Dictionary<CTARSet, SiteSet> contractSites;
 
@@ -124,24 +137,69 @@ public class ContractSiteBoss {
             return;
         }
         ss.setContract(site, cc);
-
     }
 
     public ContractSite siteHoldingContract(CogContract cc) {
-        foreach(SiteSet ss in contractSites.Values) {
-            foreach(ContractSite site in ss) {
-                if (site.contract == cc) {
-                    return site;
-                }
+        foreach(ContractSite site in this) {
+            if (site.contract == cc) { return site; }
+        }
+        return null;
+    }
+
+    internal IEnumerable<SiteSet> getAllSiteSets() {
+        return contractSites.Values;
+    }
+
+    internal ContractSite findEarmarkedSite(Earmark earmark) {
+        foreach (ContractSite site in this) {
+            if (EarmarkMatch.match(site.earmark, earmark)) {
+                return site;
             }
         }
         return null;
     }
 
-    internal IEnumerable<SiteSet> getAllSites() {
-        return contractSites.Values;
+    public IEnumerator<ContractSite> GetEnumerator() {
+        foreach(SiteSet ss in contractSites.Values) {
+            foreach(ContractSite site in ss) { yield return site; }
+        }
     }
 
+    IEnumerator IEnumerable.GetEnumerator() {
+        return GetEnumerator();
+    }
+
+    #region forced-parent-child
+
+    //public SingleSiteSet childSingleSiteSet(Cog cog) {
+    //    CTARSet key = null;
+    //    foreach(CTARSet tar in contractSites.Keys) {
+    //        foreach(ContractTypeAndRole cotar in tar.set) {
+    //            if (cotar.contractType == CogContractType.PARENT_CHILD && cotar.role == RoleType.CLIENT) {
+    //                key = tar;
+    //                break;
+    //            }
+    //        }
+    //    }
+    //    SiteSet siteSet = null;
+    //    if (key != null) {
+    //        siteSet = contractSites[key];
+    //    }
+    //    if (siteSet) {
+    //        if (!siteSet.exacltyOneSite) {
+    //            Debug.LogError("this CBS can take multiple parents???"); return null;
+    //        }
+    //        siteSet = siteSet.GetSingleSiteSet();
+    //    } else {
+    //        siteSet
+    //    }
+    //    if (!(contractSites.ContainsKey(new CTARSet(ContractTypeAndRole.GetParentChildCoTAR(rt))))) {
+    //        addSiteSet(PairCTARSiteSet.ParentChildPair(cog, rt));
+    //    }
+    //    return (SingleSiteSet)contractSites[new CTARSet(ContractTypeAndRole.GetParentChildCoTAR(rt))];
+    //}
+
+    #endregion
 
 }
 
@@ -223,6 +281,10 @@ public class SiteSet : IEnumerable<ContractSite>
         get { return sites.Length; }
     }
 
+    public bool exacltyOneSite {
+        get { return Length == 1; }
+    }
+
     public bool Contains(ContractSite site) {
         foreach(ContractSite s in sites) {
             if (s == site) { return true; }
@@ -254,6 +316,11 @@ public class SiteSet : IEnumerable<ContractSite>
 
     internal virtual void setContract(ContractSite site, CogContract cc) {
         site.contract = cc;
+    }
+
+    public SingleSiteSet GetSingleSiteSet() {
+        if (!exacltyOneSite) { throw new Exception("trying to convert multi-site site set to single. what gives?"); }
+        return new SingleSiteSet(sites[0]);
     }
 
     public static implicit operator bool(SiteSet ss) { return ss != null; }
@@ -296,6 +363,15 @@ public class ExclusionarySiteSet : SiteSet
     }
 }
 
+public class SingleSiteSet : SiteSet
+{
+    public SingleSiteSet(ContractSite site) : base(new ContractSite[] { site }) {}
+
+    public ContractSite site {
+        get { return sites[0]; }
+    }
+}
+
 
 
 [System.Serializable]
@@ -308,8 +384,8 @@ public class ContractSite
     }
 
     public virtual CogContract contract {
-        get; // { return _orientation.contract; }
-        set; // { _orientation.contract = value; }
+        get; 
+        set; 
     }
 
     public virtual Transform transform {
@@ -320,17 +396,22 @@ public class ContractSite
         get { return contract != null; }
     }
 
+    public readonly Earmark earmark;
     private WeakReference _cog;
+
     public Cog cog {
         get { return (Cog)_cog.Target; }
     }
-    
-    public ContractSite(Cog cog_) : this(cog_, SiteOrientation.selfMatchingOrientation()) {
+
+    public ContractSite(Cog cog_, SiteOrientation ori) : this(cog_, ori, Earmark.NONE) { }
+
+    public ContractSite(Cog cog_) : this(cog_, SiteOrientation.selfMatchingOrientation(), Earmark.NONE) {
     }
 
-    public ContractSite(Cog cog_, SiteOrientation orientation_) {
+    public ContractSite(Cog cog_, SiteOrientation orientation_, Earmark earMark) {
         _cog = new WeakReference(cog_);
         orientation = orientation_;
+        this.earmark = earMark;
     }
 
     public bool canAccommodate(ContractSite other) {
@@ -342,7 +423,7 @@ public class ContractSite
     public static ContractSite[] factory(Cog cog_, SiteOrientation ori_, int copies) {
         ContractSite[] sites = new ContractSite[copies];
         for(int i = 0; i < sites.Length; ++i) {
-            sites[i] = new ContractSite(cog_, ori_);
+            sites[i] = new ContractSite(cog_, ori_, Earmark.NONE);
         }
         return sites;
     }
@@ -360,7 +441,7 @@ public class ContractSite
 
 public class NonExistantContractSite : ContractSite
 {
-    public NonExistantContractSite() : base(null, SiteOrientation.alignsWithNothing()) { }
+    public NonExistantContractSite() : base(null, SiteOrientation.alignsWithNothing(), Earmark.NONE) { }
 
     public override CogContract contract {
         get { return null; }
@@ -393,7 +474,9 @@ public class LocatableContractSite : ContractSite
         }
     }
 
-    public LocatableContractSite(Cog cog_, SiteOrientation orientation_, Transform site_) : base(cog_, orientation_) {
+    public LocatableContractSite(Cog cog_, SiteOrientation ori, Transform site_) : this(cog_, ori, site_, Earmark.NONE) { }
+
+    public LocatableContractSite(Cog cog_, SiteOrientation orientation_, Transform site_, Earmark earMark) : base(cog_, orientation_, earMark) {
         trans = site_;
     }
 
@@ -417,3 +500,12 @@ public class LocatableContractSite : ContractSite
 
 }
 
+public enum Earmark { NONE, A, B, C, D, E, F, G, H, I, J, K, L, M };
+
+public static class EarmarkMatch
+{
+    public static bool match(Earmark a, Earmark b) {
+        if (a==Earmark.NONE) { return false; }
+        return a == b;
+    }
+}

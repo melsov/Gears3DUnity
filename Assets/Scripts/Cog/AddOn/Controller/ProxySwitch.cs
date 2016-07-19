@@ -2,8 +2,7 @@
 using System.Collections;
 
 public class ProxySwitch : Switch , IProxyAddOn {
-
-    public void toggle() {
+    public void doToggle() {
         base.toggle();
     }
 }

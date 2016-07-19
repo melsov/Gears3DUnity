@@ -17,7 +17,18 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             return _contractManager;
         }
     }
-        
+    private Pegboard __pegboard;
+    protected Pegboard _pegboard {
+        get {
+            if (__pegboard == null) {
+                __pegboard = GetComponentInChildren<Pegboard>();
+                if (__pegboard == null) {
+                    __pegboard = gameObject.AddComponent<Pegboard>();
+                }
+            }
+            return __pegboard;
+        }
+    }        
 
     protected ContractPortfolio contractPortfolio {
         get {
@@ -25,10 +36,10 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
     }
     private ContractSiteBoss _connectionSiteBoss;
-    protected ContractSiteBoss connectionSiteBoss {
+    protected ContractSiteBoss contractSiteBoss {
         get {
             if (_connectionSiteBoss == null) {
-                _connectionSiteBoss = getConnectionSiteBoss();
+                _connectionSiteBoss = getContractSiteBoss();
             }
             return _connectionSiteBoss;
         }
@@ -140,7 +151,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         public ContractManager(Cog cog_, ContractNegotiator negotiator_) {
             _cog = new WeakReference(cog_);
             negotiator = negotiator_;
-            contractPortfolio = new ContractPortfolio(cog, cog.connectionSiteBoss);
+            contractPortfolio = new ContractPortfolio(cog, cog.contractSiteBoss);
         }
 
         public bool hasContractWith(ContractManager other) {
@@ -158,13 +169,18 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             get { return contractPortfolio.hasAtleastOneContract; }
         }
 
-        public virtual ContractSpecification negotiate(ContractManager other) {
+        public ContractSpecification negotiateLimitOffer(ContractManager other, params ContractSpecification[] specs) {
+            return negotiate(other, new List<ContractSpecification>(specs));
+        }
+
+        public ContractSpecification negotiate(ContractManager other) {
+            return negotiate(other, negotiator.contractPreferencesAsOffererWith(other.cog));
+        }
+
+        private ContractSpecification negotiate(ContractManager other, List<ContractSpecification> specifications) {
             print("negotiate");
-            if (other == null) {
-                print("other ccm null in other found by " + cog.name);
-            }
             if (hasContractWith(other)) { return ContractSpecification.NonExistant(); }
-            foreach(ContractSpecification specification in negotiator.contractPreferencesAsOffererWith(other.cog)) {
+            foreach(ContractSpecification specification in specifications) {
                 print(cog.name + " offering: " + specification.ToString());
                 ContractSpecification rSpecification = other.amenable(cog, specification);
                 if (rSpecification.exists()) {
@@ -175,15 +191,15 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             return ContractSpecification.NonExistant();
         }
 
+//CONSIDER?TODO: make negotiation for only one site on offeree side?
         protected virtual ContractSpecification amenable(Cog other, ContractSpecification specification) {
             return negotiator.amenable(other, specification);
         }
-
         
         /*
         * Caller makes contract with itself as producer
         *  */
-        public virtual void setup(ContractManager client, ContractSpecification specification) {
+        public void setup(ContractManager client, ContractSpecification specification) {
             if (!specification.offererIsProducer) {
                 specification.offererIsProducer = true;
                 client.setup(this, specification);
@@ -198,10 +214,18 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
                 specification.connectionSiteAgreement);
 
             cc.unbreakable = cog.contractShouldBeUnbreakable(cc) || client.cog.contractShouldBeUnbreakable(cc);
-            client.accept(cc, specification.connectionSiteAgreement);
+            enter(client, cc);
+        }
+
+        public void forceUnbreakable(ContractManager client, CogContract cc) {
+            cc.unbreakable = true;
+            enter(client, cc);
+        }
+
+        private void enter(ContractManager client, CogContract cc) {
+            client.accept(cc); //, specification.connectionSiteAgreement);
             contractPortfolio.setContract(cc.connectionSiteAgreement.producerSite, cc);
             initiateContract(cc);
-            print("we have a contract " + hasAtleastOneContract);
         }
 
         public static void initiateContract(CogContract cc) {
@@ -210,8 +234,10 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             cc.connectionSiteAgreement.connect();
         }
 
-        protected virtual void accept(CogContract cc, ConnectionSiteAgreement csa) {
-            contractPortfolio.setContract(csa.clientSite, cc);
+        protected virtual void accept(CogContract cc) { //, ConnectionSiteAgreement csa) {
+            contractPortfolio.setContract(cc.connectionSiteAgreement.clientSite, cc);
+            //DBUG
+            ConnectionSiteAgreement csa = cc.connectionSiteAgreement;
             print(" we have this site? " + contractPortfolio.containsSite(csa.clientSite));
             print(" client contract null? " + (cc == null));
             print(" null in contract site? " + csa.clientSite.contract == null);
@@ -316,7 +342,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
 
     public abstract ProducerActions producerActionsFor(Cog client, ContractSpecification specification);
     public abstract ClientActions clientActionsFor(Cog producer, ContractSpecification specification);
-    protected abstract ContractSiteBoss getConnectionSiteBoss();
+    protected abstract ContractSiteBoss getContractSiteBoss();
     
     public abstract ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification);
     
@@ -345,6 +371,12 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             return pa;
         }
 
+        public static ProducerAction getParentChildFulfillAction(Transform frontEnd, Transform childBackEnd, Transform child) {
+            return delegate (Cog _cog) {
+                TransformUtil.AlignXZAndAdoptRotation(frontEnd, childBackEnd.position, child);
+            };
+        }
+
         public void suspend() {
             suspendedFulfill = fulfill;
             fulfill = nothingAction;
@@ -365,7 +397,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         public ClientAction beAbsolvedOf;
 
         public static ClientActions getDoNothingActions() {
-            ClientAction nothingAction = delegate (Cog cog) { print("client nothing action for producer: " + cog.name); };
+            ClientAction nothingAction = delegate (Cog cog) { Bug.contractLog("client nothing action for producer: " + cog.name); };
             ClientActions ca = new ClientActions();
             ca.receive = nothingAction;
             ca.beAbsolvedOf = nothingAction;
@@ -445,6 +477,56 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             if (canBeClient) { return RoleAvailablity.CAN_ONLY_BE_CLIENT; }
             return RoleAvailablity.UNAVAILABLE;
         }
+    }
+
+    protected void forceEarmarkedParentChildContractWithChild(Cog child, Earmark earmark) {
+        CogContractType cct = CogContractType.PARENT_CHILD;
+        ContractSite parentSite = contractSiteBoss.findEarmarkedSite(earmark);
+        ContractSite childSite = child.contractSiteBoss.findEarmarkedSite(earmark);
+        if (!parentSite || !childSite) {
+            Debug.LogError(string.Format(" an earmarked site wasn't found: parent: {0} child {1} ", parentSite != null, childSite != null));
+            return;
+        }
+        if (!childSite.canAccommodate(parentSite)) {
+            Debug.LogError("child site cannot accommodate parent site");
+            return;
+        }
+        Vector3 dif = child.transform.localPosition; // child.transform.position - transform.position;
+        child.transform.SetParent(null);
+        child.transform.position = transform.position + dif;
+
+        ConnectionSiteAgreement csa = ConnectionSiteAgreement.NoConnektActionConnectionSiteAgreement(parentSite, childSite);
+        ContractSpecification fakeishSpecification = new ContractSpecification(cct, RoleType.PRODUCER);
+        ProducerActions prodActions = producerActionsFor(child, fakeishSpecification);
+        prodActions.fulfill = ProducerActions.getParentChildFulfillAction(parentSite.transform, childSite.transform, child.transform);
+        ClientActions cliActions = child.clientActionsFor(this, fakeishSpecification);
+        CogContract cc = new CogContract(
+            contractManager, 
+            child.contractManager, 
+            cct, 
+            prodActions,
+            cliActions,
+            csa);
+        contractManager.forceUnbreakable(child.contractManager, cc);
+    }
+
+    //private static void forceContract(Cog producer, Cog client, CogContractType cct, ConnectionSiteAgreement csa) {
+    //    ContractSpecification spec = new ContractSpecification(cct, RoleType.PRODUCER);
+    //    spec.connectionSiteAgreement = csa;
+    //    producer.contractManager.setup(client.contractManager, spec);
+    //}
+
+
+    protected static void addConnectionSiteEntriesForBackSocketSet(Cog cog, ContractSiteBoss csb) {
+        PairCTARSiteSet pair = PairCTARSiteSet.fromSocketSet(cog, cog._pegboard.getBackendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_CHILD);
+        if (pair.isEmpty) { return; }
+        csb.addSiteSet(pair);
+    }
+
+    protected static void addConnectionSiteEntriesForFrontSocketSet(Cog cog, ContractSiteBoss csb) {
+        PairCTARSiteSet pair = PairCTARSiteSet.fromSocketSet(cog, cog._pegboard.getFrontendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_PARENT);
+        if (pair.isEmpty) { return; }
+        csb.addSiteSet(pair);
     }
 
     #endregion
@@ -541,7 +623,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
         return result;
     }
-// TODO: sort out rack gear connections/contracts/moves etc..
 
     public void normalDragStart(VectorXZ cursorPos) {
         //CONSIDER: more efficient to generate client tree only once per drag session?

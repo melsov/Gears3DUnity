@@ -97,7 +97,7 @@ public class Sticker : Cog, ICursorAgentClient
         throw new NotImplementedException();
     }
 
-    protected override ContractSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getContractSiteBoss() {
         throw new NotImplementedException();
     }
 

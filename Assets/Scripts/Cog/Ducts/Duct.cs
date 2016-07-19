@@ -16,7 +16,7 @@ public class Duct : Cog
         throw new NotImplementedException();
     }
 
-    protected override ContractSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getContractSiteBoss() {
         throw new NotImplementedException();
     }
 }

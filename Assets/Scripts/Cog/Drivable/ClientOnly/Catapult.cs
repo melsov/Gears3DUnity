@@ -23,7 +23,7 @@ public class Catapult : Cog {
         throw new NotImplementedException();
     }
 
-    protected override ContractSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getContractSiteBoss() {
         throw new NotImplementedException();
     }
 }

@@ -104,14 +104,14 @@ public class Dispenser : Drivable {
         return ConnectionSiteAgreement.doNothing;
     }
 
-    protected override bool contractShouldBeUnbreakable(CogContract cc) {
-        if (cc.type == CogContractType.CONTROLLER_ADDON_DRIVABLE &&
-            TransformUtil.IsChildOf(transform, cc.producer.cog.transform) &&
-            cc.client.cog == this) {
-            return true;
-        }
-        return base.contractShouldBeUnbreakable(cc);
-    }
+    //protected override bool contractShouldBeUnbreakable(CogContract cc) {
+    //    if (cc.type == CogContractType.CONTROLLER_ADDON_DRIVABLE &&
+    //        TransformUtil.IsChildOf(transform, cc.producer.cog.transform) &&
+    //        cc.client.cog == this) {
+    //        return true;
+    //    }
+    //    return base.contractShouldBeUnbreakable(cc);
+    //}
 
     #endregion
 

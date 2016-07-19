@@ -18,10 +18,11 @@ public class GearSwitch : GearDrivenMechanism, IControllerAddOnProvider  {
         }
         rotationObserver.intervals = 2;
         rotationObserver.notifyRotation = onRotationEvent;
+        forceEarmarkedParentChildContractWithChild(proxySwitch, Earmark.A);
     }
 
     public void onRotationEvent(RotationEvent re) {
-        proxySwitch.toggle();
+        proxySwitch.doToggle();
     }
 
     public ControllerAddOn getControllerAddOn() {

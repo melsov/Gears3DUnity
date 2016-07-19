@@ -87,9 +87,6 @@ public class ConnectionSiteAgreement
 {
     public ContractSite producerSite;
     public ContractSite clientSite;
-    //public SiteOrientation producerSite;
-    //public SiteOrientation clientSite;
-
 
     public ContractSite destination {
         get { return producerIsTraveller ? clientSite : producerSite; }
@@ -117,6 +114,7 @@ public class ConnectionSiteAgreement
     public delegate void ConnektAction(ConnectionSiteAgreement csa);
     public ConnektAction connektAction {
         get {
+            if (alwaysNothingAction) { return doNothing; }
             if (producerIsTraveller) {
                 return producerSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(producerSite.cog));
             } else {
@@ -126,11 +124,9 @@ public class ConnectionSiteAgreement
     }
 
     public static ConnektAction doNothing = delegate (ConnectionSiteAgreement csa) { };
+    private bool alwaysNothingAction;
 
     public static ConnektAction alignTarget(UnityEngine.Transform transform) {
-        //return delegate (ConnectionSiteAgreement csa) {
-        //    LocatableContractSite.align((LocatableContractSite)csa.traveller, (LocatableContractSite)csa.destination, transform);
-        //};
         return delegate (ConnectionSiteAgreement csa) {
             LocatableContractSite.align(csa.traveller.transform, csa.destination.transform, transform);
         };
@@ -140,6 +136,19 @@ public class ConnectionSiteAgreement
         return delegate (ConnectionSiteAgreement csa) {
             LocatableContractSite.alignAndPushYLayer(csa.traveller.transform, csa.destination.transform, transform);
         };
+    }
+
+    public static ConnectionSiteAgreement GetConnectionSiteAgreement(ContractSite producerSite, ContractSite clientSite) {
+        ConnectionSiteAgreement csa = new ConnectionSiteAgreement();
+        csa.producerSite = producerSite;
+        csa.clientSite = clientSite;
+        return csa;
+    }
+
+    public static ConnectionSiteAgreement NoConnektActionConnectionSiteAgreement(ContractSite producerSite, ContractSite clientSite) {
+        ConnectionSiteAgreement csa = GetConnectionSiteAgreement(producerSite, clientSite);
+        csa.alwaysNothingAction = true;
+        return csa;
     }
 
     public void connect() {
@@ -153,7 +162,7 @@ public enum CogContractType
     DRIVER_DRIVEN, 
     CONTROLLER_ADDON_DRIVABLE,
     RECEIVER_ADDON_DRIVABLE,
-    PARENT_CHILD
+    PARENT_CHILD, 
 }
 
 public enum RoleAvailablity
@@ -190,11 +199,18 @@ public struct ContractTypeAndRole
     public override int GetHashCode() {
         return base.GetHashCode();
     }
+
+    public static ContractTypeAndRole GetParentChildCoTAR(RoleType rt) {
+        return new ContractTypeAndRole(CogContractType.PARENT_CHILD, rt);
+    }
 }
 
 public class CTARSet
 {
     public HashSet<ContractTypeAndRole> set;
+    internal bool isEmpty {
+        get { return set.Count == 0; }
+    }
 
     public CTARSet(params ContractTypeAndRole[] args) {
         set = new HashSet<ContractTypeAndRole>();

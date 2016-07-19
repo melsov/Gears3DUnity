@@ -13,7 +13,7 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
         throw new NotImplementedException();
     }
-    protected override ContractSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getContractSiteBoss() {
         throw new NotImplementedException();
     }
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {

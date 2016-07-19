@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class Pegboard : MonoBehaviour, ISocketSetContainer
 {
@@ -38,23 +39,32 @@ public class Pegboard : MonoBehaviour, ISocketSetContainer
     }
 
     public SocketSet getBackendSocketSet() {
-        if (backendSocketSet == null) {
-            backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
-            if (backendSocketSet == null) {
-                backendSocketSet = new SocketSet(null);
-            }
-        }
-        return backendSocketSet;
+        return getSocketSet<BackendSocket>(backendSocketSet);
+        //if (backendSocketSet == null) {
+        //    backendSocketSet = new SocketSet(GetComponentsInChildren<BackendSocket>());
+        //    if (backendSocketSet == null) {
+        //        backendSocketSet = new SocketSet(null);
+        //    }
+        //}
+        //return backendSocketSet;
     }
 
     public SocketSet getFrontendSocketSet() {
-        if (frontendSocketSet == null) {
-            frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
-            if (frontendSocketSet == null) {
-                frontendSocketSet = new SocketSet(null);
-            }
+        return getSocketSet<FrontendSocket>(frontendSocketSet);
+        //if (frontendSocketSet == null) {
+        //    frontendSocketSet = new SocketSet(GetComponentsInChildren<FrontendSocket>());
+        //    if (frontendSocketSet == null) {
+        //        frontendSocketSet = new SocketSet(null);
+        //    }
+        //}
+        //return frontendSocketSet;
+    }
+
+    private SocketSet getSocketSet<T>(SocketSet _socketSet) where T : Socket {
+        if (_socketSet == null) {
+            _socketSet = new SocketSet(TransformUtil.FindInCogExcludingChildCogs<T>(Cog.FindCog(transform)).ToArray());
         }
-        return frontendSocketSet;
+        return _socketSet;
     }
 
     public Socket closestOppositeEndSocket(Socket socket) {

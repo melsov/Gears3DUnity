@@ -2,9 +2,14 @@
 using UnityEngine.Assertions;
 using System.Collections.Generic;
 
-public class ColliderDropper : MonoBehaviour {
-    
-    public List<Collider> colliders = new List<Collider>();
+public class ColliderDropper : MonoBehaviour
+{
+    private HashSet<Collider> _colliders = new HashSet<Collider>();
+    public List<Collider> colliders {
+        get {
+            return new List<Collider>(_colliders);
+        }
+    }
     public List<Collider> escapedFromColliders = new List<Collider>();
     private IColliderDropperClient client;
 
@@ -22,10 +27,10 @@ public class ColliderDropper : MonoBehaviour {
     void OnTriggerEnter(Collider other) {
         Bug.contractLog(name + " on tr enter " + other.name);
         if (client.isCursorInteracting()) {
-            if (!colliders.Contains(other)) {
+            if (!_colliders.Contains(other)) {
                 client.handleTriggerEnter(other);
                 Bug.contractLog("adding collider " + other.name);
-                colliders.Add(other);
+                _colliders.Add(other);
             }
         }
     }
@@ -33,9 +38,9 @@ public class ColliderDropper : MonoBehaviour {
 //TODO: with linear actuator, there are a whole bunch of 
 // unintended behaviors surrounding droppers, cursor agents
     void OnTriggerExit(Collider other) {
-        if (colliders.Contains(other)) {
+        if (_colliders.Contains(other)) {
             Bug.contractLog("removing collider " + other.name);
-            colliders.Remove(other);
+            _colliders.Remove(other);
         } else if (client.isCursorInteracting()) {
             if (!escapedFromColliders.Contains(other)) {
                 escapedFromColliders.Add(other);
@@ -60,8 +65,9 @@ public class ColliderDropper : MonoBehaviour {
     }
 
     public void removeAll() {
-        colliders.RemoveRange(0, colliders.Count);
-        escapedFromColliders.RemoveRange(0, escapedFromColliders.Count);
+        _colliders.Clear();
+        //colliders.RemoveRange(0, colliders.Count);
+        escapedFromColliders.Clear();
     }
     
     

@@ -1,0 +1,17 @@
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\Assembly-CSharp-firstpass.pdb
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEditor.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEditor.iOS.Extensions.Common.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEditor.iOS.Extensions.Xcode.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEngine.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEngine.Networking.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEngine.UI.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEngine.xml
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEngine.UI.xml
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEngine.Networking.xml
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEditor.xml
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEditor.iOS.Extensions.Xcode.xml
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_bin\Debug\UnityEditor.iOS.Extensions.Common.xml
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_obj\Debug\Gears3DUnity.CSharp.Plugins.csprojResolveAssemblyReference.cache
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_obj\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\melsov\Documents\unities\Gears3DUnity\Temp\UnityVS_obj\Debug\Assembly-CSharp-firstpass.pdb

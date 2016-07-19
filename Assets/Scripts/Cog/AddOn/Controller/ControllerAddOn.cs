@@ -76,8 +76,11 @@ public class ControllerAddOn : AddOn {
         return ClientActions.getDoNothingActions();
     }
 
-    protected override ContractSiteBoss getConnectionSiteBoss() {
-        return new ContractSiteBoss(LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this));
+    protected override ContractSiteBoss getContractSiteBoss() {
+        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
+        ContractSiteBoss csb = new ContractSiteBoss(LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this));
+        addConnectionSiteEntriesForBackSocketSet(this, csb);
+        return csb;
     }
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {

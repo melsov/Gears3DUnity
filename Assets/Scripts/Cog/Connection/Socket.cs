@@ -9,6 +9,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
 
     public Peg autoconnectPeg;
     public int id;
+    public Earmark earMark = Earmark.NONE;
 
     public virtual RotationMode socketIsChildRotationMode {
         get { return RotationMode.FREE_OR_FIXED; }

@@ -38,7 +38,7 @@ public class Chime : Instrument {
         return colorRange[note];
     }
 
-    protected override ContractSiteBoss getConnectionSiteBoss() {
+    protected override ContractSiteBoss getContractSiteBoss() {
         throw new NotImplementedException();
     }
 
