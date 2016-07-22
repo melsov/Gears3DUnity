@@ -173,11 +173,25 @@ public class ContractPortfolio : IEnumerable<CogContract>
         public delegate void ContractAction(CogContract cc);
 
         public void actionOnClientContractsBredthFirst(ContractAction contractAction) {
-            foreach(Node node in root.orderedChildrenBredthFirst()) {
-                foreach(CogContract cc in node.portfolio.contractsWithClients()) {
+            //foreach(Node node in root.orderedChildrenBredthFirst()) {
+            //    foreach(CogContract cc in node.portfolio.contractsWithClients()) {
+            //        Debug.LogError("cog: " + cc.producer.cog.name);
+            //        contractAction(cc);
+            //    }
+            //}
+        }
+
+        public IEnumerator testSlowActionOnClients(ContractAction contractAction) {
+            foreach (Node node in root.orderedChildrenBredthFirst()) {
+                foreach (CogContract cc in node.portfolio.contractsWithClients()) {
+                    Debug.LogError("cog: " + cc.producer.cog.name);
+                    float waitTime = Time.maximumDeltaTime * 1.1f;
+                    Debug.Log(waitTime);
+                    yield return new WaitForSeconds(waitTime);
                     contractAction(cc);
                 }
             }
+
         }
 
         public void bredthFirstActionChildrenOnly(CogAction cogAction) {

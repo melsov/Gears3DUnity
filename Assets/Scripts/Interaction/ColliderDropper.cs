@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 public class ColliderDropper : MonoBehaviour
 {
-    private HashSet<Collider> _colliders = new HashSet<Collider>();
+    private List<Collider> _colliders = new List<Collider>();
     public List<Collider> colliders {
         get {
-            return new List<Collider>(_colliders);
+            return _colliders; // new List<Collider>(_colliders);
         }
     }
     public List<Collider> escapedFromColliders = new List<Collider>();
@@ -25,8 +25,8 @@ public class ColliderDropper : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider other) {
-        Bug.contractLog(name + " on tr enter " + other.name);
         if (client.isCursorInteracting()) {
+        Bug.contractLog(name + " on tr enter " + other.name);
             if (!_colliders.Contains(other)) {
                 client.handleTriggerEnter(other);
                 Bug.contractLog("adding collider " + other.name);

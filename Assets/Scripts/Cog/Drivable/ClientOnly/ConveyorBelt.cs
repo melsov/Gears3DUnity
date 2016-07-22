@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System;
 
-
-//TODO: Make the belt rotate but not the entire conveyor belt parent object
-public class ConveyorBelt : GearDrivenMechanism // Drivable , ICollisionProxyClient , GearDrivable
+public class ConveyorBelt : GearDrivenMechanism , ICollisionProxyClient // Drivable , GearDrivable
 {
     protected LineSegment lineSegment;
     protected float _radius;
-    protected List<Collision> collisions;
+    protected List<Collision> collisions = new List<Collision>();
     protected AngleStep wheelRotation;
     public float speedMultiplier = 10f;
     private float damper = 1000f;
@@ -40,7 +38,6 @@ public class ConveyorBelt : GearDrivenMechanism // Drivable , ICollisionProxyCli
     protected override void awake() {
         base.awake();
         lineSegment = GetComponentInChildren<LineSegment>();
-        collisions = new List<Collision>();
         rotationIndicators = GetComponentsInChildren<RotationIndicator>();
         if (rotationIndicators == null) { rotationIndicators = new RotationIndicator[0]; }
     }
@@ -52,7 +49,7 @@ public class ConveyorBelt : GearDrivenMechanism // Drivable , ICollisionProxyCli
         }
     }
 
-    void FixedUpdate() {
+    public void FixedUpdate() {
         for (int i = 0; i < collisions.Count; ++i) {
             Collision coll = collisions[i];
             if (coll == null || coll.rigidbody == null) {
@@ -70,6 +67,7 @@ public class ConveyorBelt : GearDrivenMechanism // Drivable , ICollisionProxyCli
         return 0f;
     }
 
+    #region ICollisionProxyClient
     public void proxyCollisionEnter(Collision collision) {
         collision.rigidbody.velocity = Vector3.zero;
         collision.rigidbody.useGravity = false;
@@ -85,6 +83,7 @@ public class ConveyorBelt : GearDrivenMechanism // Drivable , ICollisionProxyCli
         }
         collisions.Remove(collision);
     }
+    #endregion
 
     #region contract
     protected override ContractNegotiator getContractNegotiator() {

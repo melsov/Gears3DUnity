@@ -223,7 +223,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
 
         private void enter(ContractManager client, CogContract cc) {
-            client.accept(cc); //, specification.connectionSiteAgreement);
+            client.accept(cc); 
             contractPortfolio.setContract(cc.connectionSiteAgreement.producerSite, cc);
             initiateContract(cc);
         }
@@ -234,19 +234,11 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             cc.connectionSiteAgreement.connect();
         }
 
-        protected virtual void accept(CogContract cc) { //, ConnectionSiteAgreement csa) {
+        protected virtual void accept(CogContract cc) { 
             contractPortfolio.setContract(cc.connectionSiteAgreement.clientSite, cc);
-            //DBUG
-            ConnectionSiteAgreement csa = cc.connectionSiteAgreement;
-            print(" we have this site? " + contractPortfolio.containsSite(csa.clientSite));
-            print(" client contract null? " + (cc == null));
-            print(" null in contract site? " + csa.clientSite.contract == null);
-            print(" we client have a contract: " + hasAtleastOneContract);
-            
         }
 
         public virtual void dissolve(CogContract cc) {
-            print("dissolve");
             if (cc.unbreakable) {
                 print("contract btwn: producer: " + cc.producer.cog.name + " and client: " + cc.client.cog.name + " was unbreakable.");
                 return; }
@@ -510,13 +502,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         contractManager.forceUnbreakable(child.contractManager, cc);
     }
 
-    //private static void forceContract(Cog producer, Cog client, CogContractType cct, ConnectionSiteAgreement csa) {
-    //    ContractSpecification spec = new ContractSpecification(cct, RoleType.PRODUCER);
-    //    spec.connectionSiteAgreement = csa;
-    //    producer.contractManager.setup(client.contractManager, spec);
-    //}
-
-
     protected static void addConnectionSiteEntriesForBackSocketSet(Cog cog, ContractSiteBoss csb) {
         PairCTARSiteSet pair = PairCTARSiteSet.fromSocketSet(cog, cog._pegboard.getBackendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_CHILD);
         if (pair.isEmpty) { return; }
@@ -617,9 +602,10 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         Vector3 before = transform.position;
         bool result = vConnectTo(other);
         if (result) {
-            clientTree.actionOnClientContractsBredthFirst(delegate (CogContract cc) {
+            //clientTree.actionOnClientContractsBredthFirst(delegate (CogContract cc) {
+            StartCoroutine(clientTree.testSlowActionOnClients(delegate(CogContract cc) { 
                 ContractManager.initiateContract(cc);
-            });
+            })); //TODO: make this work as required: terciary child node/cogs don't really re-init their positions as expected
         }
         return result;
     }

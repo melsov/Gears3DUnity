@@ -61,6 +61,8 @@ public class Dispenser : Drivable {
 
         protected override void setupLookups() {
             asClientLookup.Add(CogContractType.CONTROLLER_ADDON_DRIVABLE, delegate (Cog other) {
+                print("hi");
+                print("dispenser client look up. controller add on null " + (dispenser.controllerAddOn == null));
                 return dispenser.controllerAddOn == null; 
             });
         }

@@ -2,6 +2,7 @@
 using UnityEngine.Assertions;
 using System.Collections;
 
+//TODO: check if collision proxy is needed (and, for that matter, if 2 colliders are needed) (for proxy switch)
 public class CollisionProxy : MonoBehaviour {
 
     private ICollisionProxyClient client;
@@ -10,7 +11,7 @@ public class CollisionProxy : MonoBehaviour {
         Assert.IsTrue(GetComponent<Collider>() != null);
         Assert.IsTrue(GetComponent<Collider>().isTrigger == false);
         client = GetComponentInParent<ICollisionProxyClient>(); 
-        Assert.IsTrue(client != null);
+        Assert.IsTrue(client != null, string.Format("No ICollisionProxyClient for {0} of cog {1}", name, Cog.FindCog(transform).name));
     }
 	
     void OnCollisionEnter(Collision collision) {

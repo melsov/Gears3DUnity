@@ -19,10 +19,8 @@ public class Switch : ControllerAddOn  {
         } else {
             on = new OnOffSwitchState(SwitchState.ON);
         }
-        UnityEngine.Assertions.Assert.IsTrue(on != null, "wait on (switch state toggle) is null?");
         onOffIndicator = GetComponentInChildren<OnOffIndicator>();
     }
-
 
     public override bool connectToClient(Cog cog) {
         if (base.connectToClient(cog)) {

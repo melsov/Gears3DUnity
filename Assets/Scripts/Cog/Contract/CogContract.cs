@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using System.Linq;
 using System.Text;
 
@@ -83,10 +84,18 @@ public class CogContract
     }
 }
 
+public class ConnektReconstruction
+{
+    public Vector3 relativePosition;
+
+    public static implicit operator bool(ConnektReconstruction exists) { return exists != null; }
+}
+
 public class ConnectionSiteAgreement
 {
     public ContractSite producerSite;
     public ContractSite clientSite;
+    public ConnektReconstruction connektReconstruction;
 
     public ContractSite destination {
         get { return producerIsTraveller ? clientSite : producerSite; }
@@ -118,6 +127,7 @@ public class ConnectionSiteAgreement
             if (producerIsTraveller) {
                 return producerSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(producerSite.cog));
             } else {
+                MonoBehaviour.print("*** client con aktn as traveller for");
                 return clientSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(clientSite.cog));
             }
         }
@@ -128,6 +138,7 @@ public class ConnectionSiteAgreement
 
     public static ConnektAction alignTarget(UnityEngine.Transform transform) {
         return delegate (ConnectionSiteAgreement csa) {
+            Debug.LogError(csa.traveller.transform.name + " of " + transform.name + " aligning to " + csa.destination.transform.name);
             LocatableContractSite.align(csa.traveller.transform, csa.destination.transform, transform);
         };
     }

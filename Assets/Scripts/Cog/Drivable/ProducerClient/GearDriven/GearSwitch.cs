@@ -25,6 +25,9 @@ public class GearSwitch : GearDrivenMechanism, IControllerAddOnProvider  {
         proxySwitch.doToggle();
     }
 
+    /*
+     * IControllerAddOnProvider method
+     * */
     public ControllerAddOn getControllerAddOn() {
         return proxySwitch;
     }

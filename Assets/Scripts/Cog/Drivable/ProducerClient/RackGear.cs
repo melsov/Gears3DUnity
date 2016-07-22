@@ -286,8 +286,12 @@ public class RackGear : Gear {
         return lineSegment.startXZ + lineSegment.normalized * toothDist;
     }
 
-    protected override void setDistanceFrom(Gear gear) {
-        transform.position += TransformUtil.distanceToTangentPointAbsoluteNormalDirection(gear, lineSegment, innerRadius + ToothDepth, true).vector3(gear.transform.position.y);
+    protected override void setDistanceFrom(Gear gear, ConnektReconstruction cr) {
+        transform.position += TransformUtil.distanceToTangentPointAbsoluteNormalDirection(
+            gear, 
+            lineSegment, 
+            innerRadius + ToothDepth, 
+            true).vector3(gear.transform.position.y);
     }
 
     public override float proportionalCWToothOffsetFromAbsPosition(VectorXZ global) {
@@ -297,13 +301,13 @@ public class RackGear : Gear {
         return dif.magnitude / toothWidth;
     }
 
-    public override void positionRelativeTo(Drivable _someDriver) {
+    public override void gearPositionRelativeTo(Drivable _someDriver, ConnektReconstruction cr) {
         if (_someDriver != null) {
             if (!(_someDriver is Gear)) { base.positionRelativeTo(_someDriver); return; }
             Gear gear = (Gear)_someDriver;
 
             //set distance
-            setDistanceFrom(gear);
+            setDistanceFrom(gear, cr);
 
             //nudge to engage other's teeth
             VectorXZ gearXZ = new VectorXZ(gear.transform.position);

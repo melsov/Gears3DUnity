@@ -82,7 +82,9 @@ public class TransformUtil : MonoBehaviour
         List<T> result = new List<T>();
         Queue<Transform> search = new Queue<Transform>();
         search.Enqueue(cog.transform);
+        int safe = 0;
         while(search.Count > 0) {
+            if (safe++ > 100) { Debug.LogError("hit safe limit"); break; }
             Transform trans = search.Dequeue();
             T found = trans.GetComponent<T>();
             if (found != null) {

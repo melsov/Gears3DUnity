@@ -158,7 +158,7 @@ public class Gear : Drivable , GearDrivable
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
             return delegate (ConnectionSiteAgreement csa) {
-                positionRelativeTo((Drivable)csa.destination.cog);
+                gearPositionRelativeTo((Drivable)csa.destination.cog, csa.connektReconstruction);
                 adjustForCrowding();
             };
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
@@ -250,12 +250,13 @@ public class Gear : Drivable , GearDrivable
         BugLine.Instance.drawFromTo(transform.position + Vector3.up, 
             transform.position + Vector3.up + (Angles.UnitVectorAt(clockAngle * Mathf.Deg2Rad) * (outerRadius * .95f)).vector3());
     }
-    public override void positionRelativeTo(Drivable _someDriver) {
+    public virtual void gearPositionRelativeTo(Drivable _someDriver, ConnektReconstruction cr) {
         if (_someDriver != null) {
             if (!(_someDriver is Gear)) { base.positionRelativeTo(_someDriver); return; }
+            print("$$$ pos rel to gear");
             Gear gear = (Gear)_someDriver;
             moveToYPosOf(gear.gearTransform);
-            setDistanceFrom(gear);
+            setDistanceFrom(gear, cr);
             gearTransform.eulerAngles = eulersRelativeToGear(gear);
         }
     }
@@ -292,13 +293,18 @@ public class Gear : Drivable , GearDrivable
         return euler; 
     }
 
-    protected virtual void setDistanceFrom(Gear gear) {
+    protected virtual void setDistanceFrom(Gear gear, ConnektReconstruction cr) {
         Vector3 refPoint = gear.gearTransform.position;
         if (gear is RackGear) {
             RackGear rackGear = (RackGear)gear;
             refPoint = rackGear.closestPointOnLine(new VectorXZ(gearTransform.position)).vector3(rackGear.transform.position.y);
         }
-        Vector3 relPos = gearTransform.position - refPoint;
+        Vector3 relPos = cr ? cr.relativePosition : gearTransform.position - refPoint;
+        /* First time ? store the rel pos we found */
+        if (!cr) {
+            cr = new ConnektReconstruction();
+            cr.relativePosition = relPos;
+        }
         relPos = relPos.normalized * (innerRadius + gear.innerRadius + ToothDepth);
         Vector3 target = refPoint + relPos;
         Vector3 dif = target - gearTransform.position;
