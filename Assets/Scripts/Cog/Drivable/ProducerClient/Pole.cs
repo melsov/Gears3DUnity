@@ -5,6 +5,9 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 //using UnityEditor;
 
+/*
+TODO: decide/define what this cog should do. Make a bopper pole and be done?
+ *  */
 //TODO: connectTo method will apply for any free-rotatable drivable
 // make class FreeRotatableDrivabe
 [System.Serializable]
@@ -219,11 +222,58 @@ public class Pole : Drivable
         base.restoreConnectionData(ref connectionData);
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
-        throw new NotImplementedException();
+    #region contract
+    protected override ContractNegotiator getContractNegotiator() {
+        return new PoleContractNegotiator(this);
+    }
+
+    public class PoleContractNegotiator : ContractNegotiator
+    {
+        public PoleContractNegotiator(Cog cog_) : base(cog_) {
+        }
+
+        protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
+            List<ContractSpecification> result = new List<ContractSpecification>();
+            result.Add(new ContractSpecification(CogContractType.PARENT_CHILD, RoleType.CLIENT));
+            result.Add(new ContractSpecification(CogContractType.PARENT_CHILD, RoleType.PRODUCER));
+            return result;
+        }
+    }
+
+    protected override ViableContractLookup getViableContractLookup() {
+        return new ViablePoleContractLookup(this);
+    }
+
+    public class ViablePoleContractLookup : ViableContractLookup
+    {
+        public ViablePoleContractLookup(Cog cog_) : base(cog_) {
+        }
+
+        protected override void setupLookups() {
+            asProducerLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                return true;
+            });
+            asClientLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
+                return true;
+            });
+        }
+    }
+
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        UniqueClientContractSiteBoss uccsb = new UniqueClientContractSiteBoss(
+           ExclusionarySiteSetClientPair.fromSocketSet(this, _pegboard.getBackendSocketSet()));
+                
+        addConnectionSiteEntriesForFrontSocketSet(this, uccsb);
+        return uccsb;
     }
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
-        throw new NotImplementedException();
+        if (specification.contractType == CogContractType.PARENT_CHILD) {
+            return ConnectionSiteAgreement.alignAndPushYLayer(transform);
+        }
+        return ConnectionSiteAgreement.doNothing;
     }
+
+    #endregion
+
 }

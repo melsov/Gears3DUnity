@@ -4,7 +4,7 @@ using System;
 
 public abstract class DriverDriven : Drivable {
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 

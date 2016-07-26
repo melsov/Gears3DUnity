@@ -7,7 +7,8 @@ using System.Reflection;
 Base class for all mechanisms
 */
 [System.Serializable]
-public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
+public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
+{
     private ContractManager _contractManager;     
     private ContractManager contractManager {
         get {
@@ -210,7 +211,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
                 client,
                 specification.contractType,
                 cog.producerActionsFor(client.cog, specification),
-                client.cog.clientActionsFor(client.cog, specification),
+                client.cog.clientActionsFor(cog, specification),
                 specification.connectionSiteAgreement);
 
             cc.unbreakable = cog.contractShouldBeUnbreakable(cc) || client.cog.contractShouldBeUnbreakable(cc);
@@ -229,6 +230,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         }
 
         public static void initiateContract(CogContract cc) {
+            Debug.LogError("Prod: " + cc.producer.cog.name + " Cli: " + cc.client.cog.name);
             cc.clientActions.receive(cc.producer.cog);
             cc.producerActions.initiate(cc.client.cog);
             cc.connectionSiteAgreement.connect();
@@ -363,9 +365,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
             return pa;
         }
 
-        public static ProducerAction getParentChildFulfillAction(Transform frontEnd, Transform childBackEnd, Transform child) {
+        public static ProducerAction getParentChildFulfillAction(Transform frontEnd, Transform childBackEnd, Quaternion deltaQuat, Transform child) {
             return delegate (Cog _cog) {
-                TransformUtil.AlignXZAndAdoptRotation(frontEnd, childBackEnd.position, child);
+                TransformUtil.AlignXZPushRotation(frontEnd, childBackEnd.position, deltaQuat, child);
             };
         }
 
@@ -490,7 +492,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         ConnectionSiteAgreement csa = ConnectionSiteAgreement.NoConnektActionConnectionSiteAgreement(parentSite, childSite);
         ContractSpecification fakeishSpecification = new ContractSpecification(cct, RoleType.PRODUCER);
         ProducerActions prodActions = producerActionsFor(child, fakeishSpecification);
-        prodActions.fulfill = ProducerActions.getParentChildFulfillAction(parentSite.transform, childSite.transform, child.transform);
+        prodActions.fulfill = ProducerActions.getParentChildFulfillAction(parentSite.transform, childSite.transform, Quaternion.identity, child.transform);
         ClientActions cliActions = child.clientActionsFor(this, fakeishSpecification);
         CogContract cc = new CogContract(
             contractManager, 
@@ -602,10 +604,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient {
         Vector3 before = transform.position;
         bool result = vConnectTo(other);
         if (result) {
-            //clientTree.actionOnClientContractsBredthFirst(delegate (CogContract cc) {
             StartCoroutine(clientTree.testSlowActionOnClients(delegate(CogContract cc) { 
                 ContractManager.initiateContract(cc);
-            })); //TODO: make this work as required: terciary child node/cogs don't really re-init their positions as expected
+            }));
         }
         return result;
     }

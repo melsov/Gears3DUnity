@@ -4,13 +4,24 @@ using System.Collections.Generic;
 
 public class CombinerSlot : MonoBehaviour {
 
-    protected List<Combinable> _combinables = new List<Combinable>();
+    private List<Combinable> __combinables = new List<Combinable>();
+    protected virtual List<Combinable> _combinables {
+        get { return __combinables; }
+    }
     public IEnumerable<Combinable> combinables() {
         foreach (Combinable com in _combinables) {
             yield return com;
         }
     }
-    protected TextMesh itemCountText;
+    private TextMesh _itemCountText;
+    protected TextMesh itemCountText {
+        get {
+            if (!_itemCountText) {
+                _itemCountText = GetComponentInChildren<TextMesh>();
+            }
+            return _itemCountText;
+        }
+    }
     protected SpriteRenderer icon;
     protected Sprite emptySprite;
 
@@ -21,27 +32,16 @@ public class CombinerSlot : MonoBehaviour {
         itemCountText.text = "" + _count;
     }
     public int count { get { return _count; } }
-    protected WeakReference _combiner;
-    protected Combiner combiner {
-        get {
-            return (Combiner) _combiner.Target;
-        }
-        set { _combiner = new WeakReference(value); }
-    }
+    protected WeakReference _combiner = new WeakReference(null);
+    protected Combiner combiner { get { return (Combiner)_combiner.Target; } }
 
-    void Awake() {
-        awake();
-    }
-
-    protected virtual void awake() {
-        combiner = GetComponentInParent<Combiner>();
-        itemCountText = GetComponentInChildren<TextMesh>();
+    public virtual void Awake() {
+        _combiner = new WeakReference(GetComponentInParent<Combiner>());
         icon = GetComponentInChildren<SpriteRenderer>();
         emptySprite = icon.sprite;
-        setCount(_count);
     }
 
-    public void addCombinable(Combinable combinable) {
+    public virtual void addCombinable(Combinable combinable) {
         if (_type == null) {
             _type = combinable.GetType();
             if (combinable.sprite != null) {
@@ -65,8 +65,8 @@ public class CombinerSlot : MonoBehaviour {
         get { return new TypeAmount(_type, count); }
     }
 
-    public void release() {
-        _combinables.RemoveRange(0, _combinables.Count);
+    public virtual void clear() {
+        _combinables.Clear();
         _type = null;
         icon.sprite = emptySprite;
         setCount(0);

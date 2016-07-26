@@ -19,10 +19,29 @@ public class EmitterDevice : Dispenser {
             openCloseAnimationHandler.stateChangedTo = animatorCallback;
         }
     }
+
+    protected override float power {
+        get {
+            return base.power;
+        }
+        set {
+            if (Time.fixedTime - timer > fireRate) {
+                if (toggleOnOff) {
+                    emit(value > 0f);
+                    //shouldDispense = true;
+                    //_power = 1f;
+                    timer = Time.fixedTime;
+                } else {
+                    shouldDispense = true;
+
+                }
+            }
+        }
+    }
+
     protected override void dispense() {
         if (toggleOnOff) {
             emit(!emitter.gameObject.activeSelf);
-            
             return;
         }
         StartCoroutine(pulseEmit());
@@ -36,6 +55,7 @@ public class EmitterDevice : Dispenser {
     }
 
     private void emit(bool _emit) {
+        if (_emit == isEmitting) { return; }
         if (openCloseAnimationHandler != null) {
             openCloseAnimationHandler.open(_emit);
             return;
@@ -47,6 +67,8 @@ public class EmitterDevice : Dispenser {
         print("call back: " + state);
         activate(state);
     }
+
+    private bool isEmitting { get { return emitter.gameObject.activeSelf; } }
 
     private void activate(bool state) {
         emitter.gameObject.SetActive(state);

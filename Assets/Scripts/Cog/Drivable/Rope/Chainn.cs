@@ -52,7 +52,7 @@ public class Chainn : Drivable {
         return drive;
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 

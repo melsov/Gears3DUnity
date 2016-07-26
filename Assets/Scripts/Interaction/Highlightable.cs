@@ -33,7 +33,11 @@ public class Highlightable : MonoBehaviour {
         }
         Bug.assertPause(_renderer.materials[0] != null, "_renderer [0] is null?");
         defaultMaterial = _renderer.material;
-        defaultColor = defaultMaterial.color;
+        if (defaultMaterial.HasProperty("_Color")) {
+            defaultColor = defaultMaterial.color;
+        } else {
+            defaultColor = Color.blue;
+        }
 	}
     
     public void highlight() {
@@ -65,7 +69,9 @@ public class Highlightable : MonoBehaviour {
             }
         } else {
             _renderer.material = defaultMaterial;
-            _renderer.material.color = defaultColor;
+            if (defaultMaterial.HasProperty("_Color")) {
+                _renderer.material.color = defaultColor;
+            }
         }
     }
     protected class NullableColor

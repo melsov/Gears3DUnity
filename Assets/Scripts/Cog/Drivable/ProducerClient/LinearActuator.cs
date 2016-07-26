@@ -147,7 +147,7 @@ public class LinearActuator : Drivable , IPegProxy {
         throw new NotImplementedException();
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 }

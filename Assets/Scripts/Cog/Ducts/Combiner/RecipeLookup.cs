@@ -44,9 +44,6 @@ public class RecipeLookup : Singleton<RecipeLookup> {
         return RecipeState.POTENTIALLY_VALID;
     }
 
-    public GameObject instantiateType(Type type) {
-        return null;
-    }
 }
 
 [Serializable]

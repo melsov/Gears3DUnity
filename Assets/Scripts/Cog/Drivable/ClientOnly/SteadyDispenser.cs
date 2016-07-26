@@ -66,7 +66,7 @@ public class SteadyDispenser : Drivable {
         throw new NotImplementedException();
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 }

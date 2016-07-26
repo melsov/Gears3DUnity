@@ -58,8 +58,8 @@ public abstract class GearDrivenMechanism : Gear {
         }
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
-        UniqueClientConnectionSiteBoss uccsb = new UniqueClientConnectionSiteBoss(
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        UniqueClientContractSiteBoss uccsb = new UniqueClientContractSiteBoss(
             new KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet>(
                 ClientOnlyCTARSet.drivenSet(),
                 new ExclusionarySiteSet(new ContractSite(this, SiteOrientation.selfMatchingOrientation())))

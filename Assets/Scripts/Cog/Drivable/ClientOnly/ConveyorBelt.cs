@@ -124,8 +124,8 @@ public class ConveyorBelt : GearDrivenMechanism , ICollisionProxyClient // Driva
         }
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
-        return new UniqueClientConnectionSiteBoss(
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        return new UniqueClientContractSiteBoss(
             /* 1.) client site */
             new KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet>(
                 ClientOnlyCTARSet.drivenSet(),

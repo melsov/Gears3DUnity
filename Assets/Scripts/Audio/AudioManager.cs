@@ -7,7 +7,7 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
     // TODO: know which (note) sounds are playing when (not nec. in AudioManager?)
 
     public uint maxAllowedAudioSources = 16; //a guess
-    List<Cog> sources = new List<Cog>();
+    List<MonoBehaviour> sources = new List<MonoBehaviour>();
 
     private bool muted;
 
@@ -20,11 +20,11 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
         }
     }
 
-    public void play(Cog cog, string soundName) {
+    public void play(MonoBehaviour cog, string soundName) {
         getAudioEntityFor(cog, soundName).getAudioSource().Play();
     }
 
-    public void stop(Cog cog, string soundName) {
+    public void stop(MonoBehaviour cog, string soundName) {
         AudioEntity ae = lookupAudioEntityFor(cog, soundName);
         if (ae != null) {
             ae.getAudioSource().Stop();
@@ -32,7 +32,7 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
     }
 
 //CONSIDER: is this too slow (using GetCIC<> everytime)?
-    public AudioEntity getAudioEntityFor(Cog cog, string soundName) {
+    public AudioEntity getAudioEntityFor(MonoBehaviour cog, string soundName) {
         AudioEntity ae = lookupAudioEntityFor(cog, soundName);
         if (ae != null) { return ae; }
         return attachAudioEntity(cog, soundName);
@@ -46,7 +46,7 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
         return n;
     }
 
-    public AudioEntity lookupAudioEntityFor(Cog cog, string soundName) {
+    public AudioEntity lookupAudioEntityFor(MonoBehaviour cog, string soundName) {
         foreach (AudioEntity ae in cog.GetComponentsInChildren<AudioEntity>()) {
             string n = removeClone(ae.name);
             if (n.Equals(soundName)) { return ae; }
@@ -54,7 +54,7 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
         return null;
     }
 
-    private AudioEntity attachAudioEntity(Cog cog, string soundName) {
+    private AudioEntity attachAudioEntity(MonoBehaviour cog, string soundName) {
         cullIfLimit();
         AudioEntity ae = Instantiate(AudioLibrary.Instance.getAudioEntity(soundName));
         ae.getAudioSource().mute = muted;
@@ -73,9 +73,9 @@ public class AudioManager : Singleton<AudioManager> , IBinaryStateButtonClient {
         }
         AudioEntity ae = null;
         AudioEntity[] entities = null;
-        Cog cog = null;
+        MonoBehaviour cog = null;
 
-        for(int i = 0; i < sources.Count; ++i) {
+        for (int i = 0; i < sources.Count; ++i) {
             cog = sources[i];
             if (cog == null) { sources.RemoveAt(i--); continue; }
             entities = cog.GetComponentsInChildren<AudioEntity>();

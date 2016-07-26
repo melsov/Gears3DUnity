@@ -120,17 +120,6 @@ public class ContractPortfolio : IEnumerable<CogContract>
             foreach(ContractSite offerersSite in offererSiteSet.sitesOrderedByDistanceFrom(site.transform.position)) { // offerersPortfolio.contractSiteBoss.getSiteSet(specification.toContractTypeAndRoleForOfferer())) { 
                 if (site.canAccommodate(offerersSite)) {
                     return createContractSpecificationFrom(specification, offerersSite, site);
-                    //ContractSpecification rSpecification = specification;
-                    //rSpecification.connectionSiteAgreement = new ConnectionSiteAgreement();
-                    //if (specification.offererIsProducer) {
-                    //    rSpecification.connectionSiteAgreement.producerSite = offerersSite; //.siteOrientationFor(site);
-                    //    rSpecification.connectionSiteAgreement.clientSite = site;// siteOrientationFor(offerersSite);
-                    //} else {
-                    //    rSpecification.connectionSiteAgreement.producerSite = site;//.siteOrientationFor(offerersSite);
-                    //    rSpecification.connectionSiteAgreement.clientSite = offerersSite;//.siteOrientationFor(site);
-                    //}
-                    //rSpecification.connectionSiteAgreement.producerIsTraveller = specification.offererIsProducer;
-                    //return rSpecification;
                 }
             }
         }

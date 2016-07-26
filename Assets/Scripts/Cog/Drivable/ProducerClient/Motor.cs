@@ -115,7 +115,7 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         }
         return ClientActions.getDoNothingActions();
     }
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         /* client */
         KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> clientSitePair = LocatableSiteSetAndCTARSetSetup.uniqueSiteSetAndClientOnlyCTARFor(this);
 
@@ -124,7 +124,7 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
             { new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER)),
                 new SiteSet(ContractSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1)) }
         };
-        return new UniqueClientConnectionSiteBoss(clientSitePair, lookup);
+        return new UniqueClientContractSiteBoss(clientSitePair, lookup);
     }
     //protected override ConnectionSiteBoss getConnectionSiteBoss() {
     //    //Get dictionary with entry for motor's controller add on site

@@ -46,16 +46,7 @@ public class PairCTARSiteSet
         return new PairCTARSiteSet(tar, ss);
     }
 
-    //public static PairCTARSiteSet ParentChildPair(Cog cog, RoleType rt) {
-    //    return new PairCTARSiteSet(
-    //        new CTARSet(ContractTypeAndRole.GetParentChildCoTAR(rt)),
-    //        new SingleSiteSet(new ContractSite(cog))
-    //        );
-    //}
 
-//TODO: SiteSets can be exclusionary!
-//Meaning only one of their sites can have a contract
-//get around if statements with a delegate that returns the correct site (or null)
 }
 
 public class ExclusionarySiteSetClientPair
@@ -106,11 +97,14 @@ public class ContractSiteBoss : IEnumerable<ContractSite>
         }
     }
 
+    public static ContractSiteBoss emptyBoss() {
+        return new ContractSiteBoss(new Dictionary<CTARSet, SiteSet>());
+    }
+
     public void addSiteSet(KeyValuePair<CTARSet,SiteSet> pair) {
         contractSites.Add(pair.Key, pair.Value);
     }
 
-//TODO: test Contract Specification lookup equality
     public SiteSet getSiteSet(ContractTypeAndRole specification) {
         foreach(CTARSet ctar in contractSites.Keys) {
             if (ctar.set.Contains(specification)) {
@@ -169,41 +163,9 @@ public class ContractSiteBoss : IEnumerable<ContractSite>
         return GetEnumerator();
     }
 
-    #region forced-parent-child
-
-    //public SingleSiteSet childSingleSiteSet(Cog cog) {
-    //    CTARSet key = null;
-    //    foreach(CTARSet tar in contractSites.Keys) {
-    //        foreach(ContractTypeAndRole cotar in tar.set) {
-    //            if (cotar.contractType == CogContractType.PARENT_CHILD && cotar.role == RoleType.CLIENT) {
-    //                key = tar;
-    //                break;
-    //            }
-    //        }
-    //    }
-    //    SiteSet siteSet = null;
-    //    if (key != null) {
-    //        siteSet = contractSites[key];
-    //    }
-    //    if (siteSet) {
-    //        if (!siteSet.exacltyOneSite) {
-    //            Debug.LogError("this CBS can take multiple parents???"); return null;
-    //        }
-    //        siteSet = siteSet.GetSingleSiteSet();
-    //    } else {
-    //        siteSet
-    //    }
-    //    if (!(contractSites.ContainsKey(new CTARSet(ContractTypeAndRole.GetParentChildCoTAR(rt))))) {
-    //        addSiteSet(PairCTARSiteSet.ParentChildPair(cog, rt));
-    //    }
-    //    return (SingleSiteSet)contractSites[new CTARSet(ContractTypeAndRole.GetParentChildCoTAR(rt))];
-    //}
-
-    #endregion
-
 }
 
-public class UniqueClientConnectionSiteBoss : ContractSiteBoss
+public class UniqueClientContractSiteBoss : ContractSiteBoss
 {
     protected readonly ExclusionarySiteSet exclusionarySiteSet;
     public Cog uniqueProducer {
@@ -229,44 +191,18 @@ public class UniqueClientConnectionSiteBoss : ContractSiteBoss
         }
     }
 
-    public UniqueClientConnectionSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueClientSiteEntry) : 
+    public UniqueClientContractSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueClientSiteEntry) : 
         this(uniqueClientSiteEntry, new Dictionary<CTARSet, SiteSet>()) { }
 
-    public UniqueClientConnectionSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueClientSiteEntry, Dictionary<CTARSet, SiteSet> connectionSites) : base(connectionSites) {
+    public UniqueClientContractSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueClientSiteEntry, Dictionary<CTARSet, SiteSet> connectionSites) : base(connectionSites) {
         connectionSites.Add(uniqueClientSiteEntry.Key, uniqueClientSiteEntry.Value);
         exclusionarySiteSet = uniqueClientSiteEntry.Value;
     }
-}
 
-/*
-public class ControllerClientConnectionSiteBoss : UniqueClientConnectionSiteBoss
-{
-
-    public ControllerAddOn controllerAddOn {
-        get {
-            return (ControllerAddOn)uniqueProducer;
-        }
-    }
-
-    public ControllerClientConnectionSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueProducerSiteEntry, Dictionary<CTARSet, SiteSet> connectionSites) : base(uniqueProducerSiteEntry, connectionSites) {
+    public static UniqueClientContractSiteBoss emptyBoss() {
+        return new UniqueClientContractSiteBoss(new KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet>(ClientOnlyCTARSet.emptySet(),ExclusionarySiteSet.emptySet()));
     }
 }
-
-public class DrivableConnectionSiteBoss : UniqueClientConnectionSiteBoss
-{
-    public Drivable driver {
-        get { return (Drivable) uniqueProducer; }
-    }
-
-    public DrivableConnectionSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueProducerSiteEntry, Dictionary<CTARSet, SiteSet> connectionSites) : base(uniqueProducerSiteEntry, connectionSites) {
-    }
-
-    public DrivableConnectionSiteBoss(KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet> uniqueProducerSiteEntry) : this(uniqueProducerSiteEntry, new Dictionary<CTARSet, SiteSet>()) {
-    }
-}
-*/
-
-//TODO: ensure that we have a mechanism for instantiating ConnectionSites as needed
 
 public class SiteSet : IEnumerable<ContractSite>
 {

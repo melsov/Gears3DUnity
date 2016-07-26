@@ -139,8 +139,8 @@ public class Gear : Drivable , GearDrivable
 
     // TODO: convert _driver into a property whose get relies on drivableCSB.driver;
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
-        UniqueClientConnectionSiteBoss uccsb = new UniqueClientConnectionSiteBoss(
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        UniqueClientContractSiteBoss uccsb = new UniqueClientContractSiteBoss(
             /* 1.) client site */
             new KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet>(
                 ClientOnlyCTARSet.clientDrivenAndParentChildSet(), 

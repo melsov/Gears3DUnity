@@ -125,7 +125,7 @@
     <Compile Include="Assets\Scripts\Cog\Constraint\LinearSpringConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Constraint\LookAtConstraint.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\CogContract.cs" />
-    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\ConnectionSiteBoss.cs" />
+    <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\ContractSiteBoss.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\FiniteSet.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\LocatableSiteSetAndCTARSetSetup.cs" />
     <Compile Include="Assets\Scripts\Cog\Contract\ConnectionSites\SiteOrientation.cs" />
@@ -147,6 +147,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\DrivenDrivable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\Placeable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\DriverDriven.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Gear.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\GearDriven\GearDrivenMechanism.cs" />
@@ -166,7 +167,9 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Rope\HingeChainLink.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Rope\Rope.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\Combiner.cs" />
+    <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\CombinerMultiSlot.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\CombinerSlot.cs" />
+    <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\OrderedRecipeLookup.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Combiner\RecipeLookup.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\Duct.cs" />
     <Compile Include="Assets\Scripts\Cog\Ducts\ElbowTube.cs" />

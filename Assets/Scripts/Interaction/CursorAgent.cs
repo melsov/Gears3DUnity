@@ -3,11 +3,19 @@ using UnityEngine.Assertions;
 using System.Collections;
 using System;
 
+//CONSIDER: instead of all the 'isClient' conditions, make a sub-class for CursorAgents that deal with full fledged clients
 public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperClient {
 
     private ColliderDropper colliderDropper;
     private bool _cursorInteracting;
-    public ICursorAgentClient client;
+    public ICursorAgentUrClient urClient;
+    private ICursorAgentClient client {
+        get {
+            if (isClient) { return (ICursorAgentClient)urClient; }
+            return null;
+        }
+    }
+    private bool isClient { get { return urClient is ICursorAgentClient; } }
 
     private Collider preservedCollider;
     private int dragOverrideLayer;
@@ -26,9 +34,9 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         if (colliderDropper == null) {
             colliderDropper = GetComponentInChildren<ColliderDropper>();
         }
-        client = GetComponent<ICursorAgentClient>();
+        urClient = GetComponent<ICursorAgentUrClient>();
 
-        Assert.IsTrue(client != null, "null cursor agent client: " + name);
+        Assert.IsTrue(urClient != null, "null cursor agent Ur client: " + name);
         dragOverrideLayer = LayerMask.GetMask("DragOverride");
     }
 
@@ -40,19 +48,21 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         _cursorInteracting = true;
         _dragOverrideCollider = null;
         _dragOverrideCollider = RayCastUtil.getColliderUnderCursor(dragOverrideLayer, out rayHit);
-        if (client != null) {
+        if (urClient != null) {
             if (overridingDrag) {
-                client.startDragOverride(cursorGlobal, _dragOverrideCollider);
+                if (isClient)
+                    client.startDragOverride(cursorGlobal, _dragOverrideCollider);
             } else {
                 //client.disconnect();
-                client.normalDragStart(cursorGlobal);
+                urClient.normalDragStart(cursorGlobal);
                 disableCollider(true);
             }
         }
     }
 
     private void disableCollider(bool disable) {
-        client.mainCollider().enabled = !disable;
+        if (isClient)
+            client.mainCollider().enabled = !disable;
     }
 
     public bool shouldOverrideDrag(VectorXZ cursorGlobal) {
@@ -60,34 +70,34 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     public void cursorInteracting(VectorXZ cursorGlobal) {
-        if (client == null) { return; }
+        if (urClient == null) { return; }
         disableCollider(false);
         if (overridingDrag) {
-            client.dragOverride(cursorGlobal);
+            if (isClient) client.dragOverride(cursorGlobal);
         } else {
-            client.normalDrag(cursorGlobal);
+            urClient.normalDrag(cursorGlobal);
         }
     }
     
     public void handleTriggerEnter(Collider other) {
-        client.handleTriggerEnter(other);
+        if (isClient) client.handleTriggerEnter(other);
     }
     public void handleTriggerExit(Collider other) {
-        if (client == null) { return; }
-        client.triggerExitDuringDrag(other);
+        if (urClient == null) { return; }
+        if (isClient) client.triggerExitDuringDrag(other);
     }
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {
         _cursorInteracting = false;
         unhighlight();
-        if (client == null) { return; }
+        if (urClient == null) { return; }
         if (overridingDrag) {
-            client.endDragOverride(cursorGlobal);
+            if (isClient) client.endDragOverride(cursorGlobal);
         } else {
-            client.normalDragEnd(cursorGlobal);
+            urClient.normalDragEnd(cursorGlobal);
         }
         connectToColliders(colliderDropper);
-        client.onDragEnd();
+        if (isClient) client.onDragEnd();
     }
 
     private void unhighlight() {
@@ -114,16 +124,21 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
             Collider c = dropper.colliders[0];
             dropper.colliders.RemoveAt(0);
             unhighlight(c);
-            bool done = !overridingDrag ? client.connectTo(c) : client.makeConnectionWithAfterCursorOverride(c);
+            bool done;
+            if (isClient && overridingDrag) {
+                done = client.makeConnectionWithAfterCursorOverride(c);
+            } else {
+                done = urClient.connectTo(c);
+            }
             if (done) { 
                 break;
             }
         }
-        if (client is ICursorAgentClientExtended) {
+        if (urClient is ICursorAgentClientExtended) {
             while (dropper.escapedFromColliders.Count > 0) {
                 Collider c = dropper.escapedFromColliders[0];
                 dropper.escapedFromColliders.RemoveAt(0);
-                ((ICursorAgentClientExtended)client).handleEscapedFromCollider(c);
+                ((ICursorAgentClientExtended)urClient).handleEscapedFromCollider(c);
             }
         }
         dropper.removeAll();

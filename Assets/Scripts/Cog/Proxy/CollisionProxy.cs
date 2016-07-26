@@ -9,7 +9,7 @@ public class CollisionProxy : MonoBehaviour {
 
 	void Awake () {
         Assert.IsTrue(GetComponent<Collider>() != null);
-        Assert.IsTrue(GetComponent<Collider>().isTrigger == false);
+        Assert.IsTrue(GetComponent<Collider>().isTrigger == false, name + " of " + Cog.FindCog(transform) + " wants a physics collider but got a trigger collider");
         client = GetComponentInParent<ICollisionProxyClient>(); 
         Assert.IsTrue(client != null, string.Format("No ICollisionProxyClient for {0} of cog {1}", name, Cog.FindCog(transform).name));
     }

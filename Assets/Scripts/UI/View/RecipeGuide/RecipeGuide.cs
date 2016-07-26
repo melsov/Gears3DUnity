@@ -18,6 +18,7 @@ public class RecipeGuide : MonoBehaviour {
     }
     
 	public void showRecipes() {
+        throw new System.NotImplementedException("need to convert to Ordered recipe lookup");
         if (GetComponentsInChildren<RecipeEntryPanel>().Length > 1) { return; }
         float lastHeight = -50f; 
         print(recipeEntryPrefab.GetComponent<RectTransform>().rect.position.y);

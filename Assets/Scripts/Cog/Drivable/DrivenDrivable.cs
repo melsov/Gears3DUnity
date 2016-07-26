@@ -9,7 +9,7 @@ public abstract class DrivenDrivable : Drivable
 {
     
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         throw new NotImplementedException();
     }
 }

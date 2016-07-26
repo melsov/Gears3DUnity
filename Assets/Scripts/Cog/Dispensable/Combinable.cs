@@ -17,16 +17,15 @@ public abstract class Combinable : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider other) {
-        onTriggerEnter(other);
-    }
-
-    protected virtual void onTriggerEnter(Collider other) {
+    public void OnTriggerEnter(Collider other) {
         CombinerSlot slot = other.GetComponent<CombinerSlot>();
-
-        if (slot != null) {
+        if (slot) {
             slot.addCombinable(this);
         }
+    }
+
+    public static bool SameType(Combinable a, Combinable b) {
+        return a.GetType() == b.GetType();
     }
 
     public void disable() {

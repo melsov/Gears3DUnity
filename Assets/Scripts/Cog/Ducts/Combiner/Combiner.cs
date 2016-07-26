@@ -3,39 +3,26 @@ using System.Collections.Generic;
 using System.Collections;
 using System;
 //TODO: save / restore combiner
-
-public class Combiner : Drivable {
+/*
+ * TODO: the tubes connected to combiner should become composite cogs with combiner? <--no
+ * INSTEAD: there's a cog called 'HasBackSocket', its owns various ducts, etc. and duct is no longer a Cog at all
+ *  */
+ 
+public class Combiner : Cog {
 
     public Transform outTube;
     public Transform ejectArea;
     public Collider _mainCollider;
+    protected Combinable defaultRock;
+    protected CombinerMultiSlot multiSlot;
 
-    protected CombinerSlot[] slots;
+    private bool isBaking;
 
     protected override void awake() {
         base.awake();
-        slots = GetComponentsInChildren<CombinerSlot>();
+        defaultRock = Resources.LoadAll<Rock>("Prefabs/Dispensables")[0];
+        multiSlot = GetComponentInChildren<CombinerMultiSlot>();
 	}
-
-    protected override Collider vMainCollider() {
-        return _mainCollider;
-    }
-
-    protected void eject() {
-        foreach(Combinable c in combinables()) {
-            c.transform.position = ejectArea.position;
-            c.enable();
-        }
-        resetSlots();
-    }
-
-    public IEnumerable<Combinable> combinables() {
-        foreach(CombinerSlot cs in slots) {
-            foreach (Combinable c in cs.combinables()) {
-                yield return c;
-            }
-        }
-    }
 
     protected void combine(Transform combined) {
         Transform result = Instantiate<Transform>(combined);
@@ -44,42 +31,32 @@ public class Combiner : Drivable {
     }
 
     protected void destroyIngredients() {
-        foreach(Combinable c in combinables()) {
-            Destroy(c.gameObject);
-        }
-        resetSlots();
-    }
-    protected void resetSlots() {
-        foreach (CombinerSlot slot in slots) {
-            slot.release();
-        }
+        multiSlot.clear();
     }
 
     public void evaluate() {
         if (isBaking) { return; }
-        Recipe recipe = new Recipe();
-        foreach(CombinerSlot slot in slots) {
-            recipe.add(slot.typeAmount);
-        }
+        OrderedRecipe recipe = multiSlot.getOrderedRecipe();
         Transform result = null;
-        RecipeState state = RecipeLookup.Instance.lookup(recipe, ref result);
+
+        RecipeState state = OrderedRecipeLookup.Instance.lookup(recipe, ref result);
         switch (state) {
             case RecipeState.POTENTIALLY_VALID:
             default:
                 break;
             case RecipeState.VALID:
-                StartCoroutine(bake(recipe, result));
+                StartCoroutine(bake(.5f, result));
                 break;
             case RecipeState.INVALID:
-                eject();
+                bakeDefaultRock();
                 break;
         }
     }
-    protected bool isBaking;
-    protected IEnumerator bake(Recipe recipe, Transform result) {
+
+    protected IEnumerator bake(float bakingTime, Transform result) {
         if (!isBaking) {
             isBaking = true;
-            yield return new WaitForSeconds(recipe.bakeTimeSeconds);
+            yield return new WaitForSeconds(bakingTime);
             combine(result);
             destroyIngredients();
             isBaking = false;
@@ -87,20 +64,27 @@ public class Combiner : Drivable {
             yield return null;
         }
     }
-
-    public override float driveScalar() {
-        return 0f;
+    protected void bakeDefaultRock() {
+        StartCoroutine(bake(.3f, defaultRock.transform));
     }
 
-    public override Drive receiveDrive(Drive drive) {
-        return drive;
-    }
-
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
-        throw new NotImplementedException();
-    }
+    #region cog implementation
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
-        throw new NotImplementedException();
+        return ConnectionSiteAgreement.doNothing;
     }
+
+    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
+        return ProducerActions.getDoNothingActions();
+    }
+
+    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
+        return ClientActions.getDoNothingActions();
+    }
+
+    protected override ContractSiteBoss getContractSiteBoss() {
+        return ContractSiteBoss.emptyBoss();
+    }
+
+    #endregion
 }

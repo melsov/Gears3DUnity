@@ -34,9 +34,9 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     protected Socket connectedSocket;
 
     protected Drivable _driver; //TODO: property getting drivableConnectionSB's driver
-    protected UniqueClientConnectionSiteBoss uniqueClientConnectionSiteBoss {
+    protected UniqueClientContractSiteBoss uniqueClientConnectionSiteBoss {
         get {
-            return (UniqueClientConnectionSiteBoss)contractSiteBoss;
+            return (UniqueClientContractSiteBoss)contractSiteBoss;
         }
     }
     protected ConnectionSiteAgreement uniqueContractSiteAgreement {
@@ -68,7 +68,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         setupSocketDelegates();
         setupPrefabPegs();
     }
-
+ 
 
     private void setupPrefabPegs() {
         foreach(Peg p in Resources.LoadAll<Peg>("Prefabs/Cog")) {
@@ -87,15 +87,15 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     #region contract
-    public class DrivableContractNegotiator : ContractNegotiator
-    {
-        protected Drivable drivable {
-            get { return (Drivable)cog; }
-        }
+    //public class DrivableContractNegotiator : ContractNegotiator
+    //{
+    //    protected Drivable drivable {
+    //        get { return (Drivable)cog; }
+    //    }
 
-        public DrivableContractNegotiator(Cog cog_) : base(cog_) {
-        }
-    }
+    //    public DrivableContractNegotiator(Cog cog_) : base(cog_) {
+    //    }
+    //}
 
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
         ProducerActions actions = ProducerActions.getDoNothingActions();
@@ -113,10 +113,14 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
             };
         }
         if (specification.contractType == CogContractType.PARENT_CHILD) {
+            actions.initiate = delegate (Cog cog) {
+
+            };
             actions.fulfill = delegate (Cog cog) {
-                TransformUtil.AlignXZAndAdoptRotation(
+                TransformUtil.AlignXZPushRotation(
                     ((Drivable)cog).uniqueContractSiteAgreement.producerSite.transform,
                     ((Drivable)cog).uniqueContractSiteAgreement.clientSite.transform.position,
+                    ((Drivable)cog).uniqueContractSiteAgreement.deltaAngle,
                     cog.transform
                     );
             };
@@ -150,24 +154,17 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     protected override sealed ContractSiteBoss getContractSiteBoss() {
-        UniqueClientConnectionSiteBoss uccsb = getUniqueClientSiteConnectionSiteBoss();
+        UniqueClientContractSiteBoss uccsb = getUniqueClientSiteConnectionSiteBoss();
         foreach(KeyValuePair<CTARSet,SiteSet> ctarSiteSetPair in additionalSites()) {
             uccsb.addSiteSet(ctarSiteSetPair);
         }
         return uccsb;
     }
 
-    protected abstract UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss();
+    protected abstract UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss();
     protected virtual List<KeyValuePair<CTARSet, SiteSet>> additionalSites() {
         return new List<KeyValuePair<CTARSet, SiteSet>>();
     }
-
-    //protected static void addConnectionSiteEntriesForBackSocketSet(Drivable drivable, ContractSiteBoss csb) {
-    //    csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getBackendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_CHILD));
-    //}
-    //protected static void addConnectionSiteEntriesForFrontSocketSet(Drivable drivable, ContractSiteBoss csb) {
-    //    csb.addSiteSet(PairCTARSiteSet.fromSocketSet(drivable, drivable._pegboard.getFrontendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_PARENT));
-    //}
 
     #endregion
 
@@ -768,14 +765,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         return null;
     }
 
-    //public bool connectToAddOn(AddOn addOn_) {
-    //    if (addOn_ is ControllerAddOn) {
-    //        return connectToControllerAddOn((ControllerAddOn)addOn_);
-    //    } else if (addOn_ is ReceiverAddOn) {
-    //        return connectToReceiverAddOn((ReceiverAddOn)addOn_);
-    //    }
-    //    return false;
-    //}
     protected virtual bool connectToControllerAddOn(ControllerAddOn cao) {
         if (controllerAddOn == null) {
             print("controller add on connect " + cao.name + " parent cog: " + FindCog(cao.transform).name);

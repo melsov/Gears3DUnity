@@ -4,8 +4,8 @@ using System;
 
 public class CameraOrbit : MonoBehaviour , IBinaryStateButtonClient {
 
-    protected Vector3 swivelled = new Vector3(45f, 35f, 0f);
-    protected Vector3 normal = new Vector3(90f, 0f, 0f);
+    protected readonly Vector3 swivelled = new Vector3(45f, 35f, 0f);
+    protected readonly Vector3 normal = new Vector3(90f, 0f, 0f);
     private bool isSwivelled;
 
     private Vector3 offset;
@@ -18,9 +18,10 @@ public class CameraOrbit : MonoBehaviour , IBinaryStateButtonClient {
             return isSwivelled ? swivelled : normal;
         }
     }
-    
-	
+
+    private bool isSwivelling;
     public void toggleSwivel() {
+        if (isSwivelling) { return; }
         isSwivelled = !isSwivelled;
         StartCoroutine(swivel());
     }
@@ -58,7 +59,9 @@ public class CameraOrbit : MonoBehaviour , IBinaryStateButtonClient {
         get { return isSwivelled ? 45f : -45f; } //NOTE: imprecise
     }
     
+    //TODO: eliminate need for isSwivelling by finding the exact transform we want in both swivelled and unswivelled cases
     private IEnumerator swivel() {
+        isSwivelling = true;
         int incr = 36;
         Quaternion camRo = Camera.main.transform.rotation;
         Quaternion target = Quaternion.Euler(targetPosition);
@@ -68,7 +71,8 @@ public class CameraOrbit : MonoBehaviour , IBinaryStateButtonClient {
             //Camera.main.transform.rotation = Quaternion.Slerp(Camera.main.transform.rotation, target, .2f); //WANT?
             yield return new WaitForFixedUpdate();
         }
-        //Camera.main.transform.rotation = target; //WANT?
+        isSwivelling = false;
+        //Camera.main.transform.rotation = target; //WANT? <--not in current state of 'target'
     }
 	void Update () {
         

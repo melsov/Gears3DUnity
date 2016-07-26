@@ -90,13 +90,13 @@ public class Dispenser : Drivable {
         return ClientActions.getDoNothingActions();
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         //TODO: restore this but make Dispenser a cog????? (awkward because its only driver is an add on...)
         //Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
         //UnityEngine.Assertions.Assert.IsTrue(lookup.Keys.Count == 1, "Dispenser should have exactly one connection site");
         //UniqueSiteSiteSet usss;
 
-        return new UniqueClientConnectionSiteBoss(LocatableSiteSetAndCTARSetSetup.uniqueSiteSetAndClientOnlyCTARFor(this));
+        return new UniqueClientContractSiteBoss(LocatableSiteSetAndCTARSetSetup.uniqueSiteSetAndClientOnlyCTARFor(this));
     }
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
@@ -123,10 +123,10 @@ public class Dispenser : Drivable {
     }
 
     protected float _power = 1f;
-    public float power {
+    protected virtual float power {
         get { return _power; }
         set {
-            if (Time.fixedTime - timer > fireRate) {
+            if (Time.fixedTime - timer > fireRate && value > 0f) {
                 shouldDispense = true;
                 _power = 1f;
                 timer = Time.fixedTime;
@@ -165,5 +165,10 @@ public class Dispenser : Drivable {
 
     protected override void handleAddOnScalar(float scalar) {
         power = scalar;
+    }
+
+    protected override void resetAddOnScalar() {
+        base.resetAddOnScalar();
+        power = 0f;
     }
 }

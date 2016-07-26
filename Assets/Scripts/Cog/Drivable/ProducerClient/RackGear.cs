@@ -82,7 +82,7 @@ public class RackGear : Gear {
                 return other.GetComponent<Gear>();
             });
             asClientLookup.Add(CogContractType.PARENT_CHILD, delegate (Cog other) {
-                return true;
+                return other.GetComponent<LinearDrive>() != null; //(i.e. Piston)
             });
 
             asProducerLookup.Add(CogContractType.DRIVER_DRIVEN, delegate (Cog other) {
@@ -94,10 +94,10 @@ public class RackGear : Gear {
         }
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
         List<ContractSite> sites = ContractSite.contractSiteListFromSocketSet(this, _pegboard.getBackendSocketSet());
         sites.Add(new ContractSite(this, SiteOrientation.selfMatchingOrientation()));
-        UniqueClientConnectionSiteBoss uccsb = new UniqueClientConnectionSiteBoss(
+        UniqueClientContractSiteBoss uccsb = new UniqueClientContractSiteBoss(
             /* 1.) client site */
             new ExclusionarySiteSetClientPair(
                 ClientOnlyCTARSet.clientDrivenAndParentChildSet(),
@@ -117,11 +117,12 @@ public class RackGear : Gear {
         if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
             actions = base.clientActionsFor(producer, specification);
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
-            actions.receive = delegate (Cog _producer) {
-                print("rack gear ParentChild receive action with: " + _producer.name);
-                basePosition = xzPosition;
-                //setSocketClosestToAxel(getAxel(_producer)); // * see connektAction
-            };
+            if (producer is LinearDrive) {
+                actions.receive = delegate (Cog _producer) {
+                    transform.rotation = Quaternion.Euler(((LinearDrive)_producer).linearDriveEuler());
+                    basePosition = xzPosition;
+                };
+            }
             actions.beAbsolvedOf = delegate (Cog _producer) {
                 disconnectBackendSockets();
             };

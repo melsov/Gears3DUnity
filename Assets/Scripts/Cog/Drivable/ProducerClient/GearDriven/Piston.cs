@@ -2,7 +2,8 @@
 using System.Collections;
 using System;
 
-public class Piston : GearDrivenMechanism {
+public class Piston : GearDrivenMechanism , LinearDrive
+{
 
     //protected Transform gearMesh;
     protected Transform shaft;
@@ -20,6 +21,7 @@ public class Piston : GearDrivenMechanism {
                 shaft = t;
             } 
         }
+        UnityEngine.Assertions.Assert.IsFalse(shaft == null, "A piston doesn't have a shaft; what gives? (Shaft must be named 'Shaft')");
         pistonHead = GetComponentInChildren<Pegboard>().transform;
         lineSegment = GetComponentInChildren<LineSegment>();
     }
@@ -45,10 +47,24 @@ public class Piston : GearDrivenMechanism {
         return startToHeadSquared / lineSegment.distance.magnitudeSquared;
     }
 
+    public Quaternion linearDriveRotation() {
+        return shaft.transform.rotation;
+    }
+
+    public Vector3 linearDriveEuler() {
+        return shaft.transform.rotation.eulerAngles;
+    }
+
     protected override Transform dragOverrideTarget {
         get {
             return shaft.transform;
         }
     }
 
+}
+
+public interface LinearDrive
+{
+    Quaternion linearDriveRotation();
+    Vector3 linearDriveEuler();
 }

@@ -62,8 +62,8 @@ public class Bopper : Drivable {
         return actions;
     }
 
-    protected override UniqueClientConnectionSiteBoss getUniqueClientSiteConnectionSiteBoss() {
-        return new UniqueClientConnectionSiteBoss(
+    protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        return new UniqueClientContractSiteBoss(
             ExclusionarySiteSetClientPair.fromSocketSet(this, _pegboard.getBackendSocketSet()));
     }
 

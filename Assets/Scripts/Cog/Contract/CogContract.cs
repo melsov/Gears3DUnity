@@ -96,6 +96,10 @@ public class ConnectionSiteAgreement
     public ContractSite producerSite;
     public ContractSite clientSite;
     public ConnektReconstruction connektReconstruction;
+    public Quaternion deltaAngle {
+        get;
+        protected set;
+    }
 
     public ContractSite destination {
         get { return producerIsTraveller ? clientSite : producerSite; }
@@ -136,14 +140,14 @@ public class ConnectionSiteAgreement
     public static ConnektAction doNothing = delegate (ConnectionSiteAgreement csa) { };
     private bool alwaysNothingAction;
 
-    public static ConnektAction alignTarget(UnityEngine.Transform transform) {
+    public static ConnektAction alignTarget(Transform transform) {
         return delegate (ConnectionSiteAgreement csa) {
             Debug.LogError(csa.traveller.transform.name + " of " + transform.name + " aligning to " + csa.destination.transform.name);
             LocatableContractSite.align(csa.traveller.transform, csa.destination.transform, transform);
         };
     }
 
-    public static ConnektAction alignAndPushYLayer(UnityEngine.Transform transform) {
+    public static ConnektAction alignAndPushYLayer(Transform transform) {
         return delegate (ConnectionSiteAgreement csa) {
             LocatableContractSite.alignAndPushYLayer(csa.traveller.transform, csa.destination.transform, transform);
         };
@@ -162,7 +166,12 @@ public class ConnectionSiteAgreement
         return csa;
     }
 
+    private void setDeltaAngle() {
+        deltaAngle = clientSite.transform.rotation * Quaternion.Inverse(producerSite.transform.rotation);
+    }
+
     public void connect() {
+        setDeltaAngle();
         connektAction(this);
     }
 }
