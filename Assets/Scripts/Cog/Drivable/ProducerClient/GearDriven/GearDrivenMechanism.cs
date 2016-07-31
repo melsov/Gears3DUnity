@@ -9,6 +9,7 @@ public abstract class GearDrivenMechanism : Gear {
         foreach(Transform t in GetComponentsInChildren<Transform>()) {
             if (t.name.Equals("GearMesh")) {
                 gearMesh = t;
+                break;
             }
         }
         base.awake();

@@ -25,7 +25,15 @@ public class Angles {
     }
 
     public static VectorXZ UnitVectorAt(float angRadians) {
-        return new VectorXZ(Mathf.Cos(angRadians), Mathf.Sin(angRadians));
+        return Quaternion.Euler(new Vector3(0f, Mathf.Rad2Deg * angRadians, 0f)) * Vector3.right;// new VectorXZ(Mathf.Cos(angRadians), Mathf.Sin(angRadians));
+    }
+
+    public static Quaternion rightPointsTowards(VectorXZ rel) {
+        return Quaternion.Euler(new Vector3(0f, -Angles.VectorXZToDegrees(rel), 0f));
+    }
+
+    public static Quaternion zPosPointsTowards(VectorXZ rel) {
+        return Quaternion.Euler(new Vector3(0f, -Angles.VectorXZToDegrees(rel) + 90f, 0f));
     }
 
     public static float VectorXZToRadians(VectorXZ v) {

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Assertions;
 using System.Collections.Generic;
+using System;
 
 public class LineSegment : MonoBehaviour {
 
@@ -55,6 +56,10 @@ public class LineSegment : MonoBehaviour {
         return startXZ + normalized * normalized.dot(global - startXZ);
     }
 
+    public float dotWithNormalized(VectorXZ v) {
+        return v.dot(normalized);
+    }
+
     public VectorXZ closestPointOnSegment(VectorXZ global) {
         VectorXZ result = closestPointOnLine(global);
         VectorXZ dif = result - startXZ;
@@ -71,6 +76,16 @@ public class LineSegment : MonoBehaviour {
 
     public bool sympatheticDirection(VectorXZ dir) {
         return distance.dot(dir) > 0f;
+    }
+
+    public Vector3 sympatheticToNormal(Vector3 v) {
+        return sympatheticToNormal((VectorXZ)v).vector3(v.y);
+    }
+
+    public VectorXZ sympatheticToNormal(VectorXZ v) {
+        VectorXZ norm = normal;
+        if (norm.dot(v) > 0) return v;
+        return (v - 2f * (norm * v.dot(norm)));
     }
 
     public bool isOnSegment(VectorXZ global) {
@@ -177,4 +192,5 @@ public class LineSegment : MonoBehaviour {
         //lr.SetPosition(0, closestPoint(new VectorXZ(start.position + Vector3.right * .2f)).vector3(transform.position.y));
         //lr.SetPosition(1, closestPoint(new VectorXZ(end.position)).vector3(transform.position.y));
     }
+
 }

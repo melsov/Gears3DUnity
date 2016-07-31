@@ -11,8 +11,9 @@ public class Gear : Drivable , GearDrivable
 {
     protected const int MAX_CLIENT_GEARS = 8;
     public int toothCount = 6;
-    public float toothOffset = .25f;
+    public const float toothOffset = .5f;
     public const float ToothDepth = .25f;
+
     protected float toothOffsetAngleRadians {
         get {
             return Mathf.PI * 2 / toothCount;
@@ -21,19 +22,57 @@ public class Gear : Drivable , GearDrivable
     protected float toothOffsetAngleDegrees { get { return toothOffsetAngleRadians * Mathf.Rad2Deg; } }
 
     public virtual float innerRadius {
-        get { return toothOffset / Mathf.Sin(Mathf.PI / toothCount);  }
+        get { return toothOffset / (2f * Mathf.Sin(Mathf.PI / toothCount));  }
+    }
+
+    protected virtual float colliderRadius {
+        get { return innerRadius; }
     }
     public float outerRadius {
         get { return innerRadius + ToothDepth; }
     }
+    public float middleRadius {
+        get { return innerRadius + ToothDepth * .5f; }
+    }
+
+    protected Rigidbody rbGear;
+    private void setupRBGear() {
+        rbGear = gearTransform.GetComponent<Rigidbody>();
+    }
+    public delegate void RotGear(Quaternion global);
+    public RotGear rotGear;
+    private void setupRotGear() {
+        if (gearTransform.GetComponent<Rigidbody>()) {
+            rotGear = delegate (Quaternion global) {
+                rbGear.MoveRotation(global);
+            };
+        } else {
+            rotGear = delegate (Quaternion global) {
+                gearTransform.rotation = global;
+            };
+        }
+    }
 
     protected override void awake() {
         base.awake();
+        setupToothRotationMapFor(this);
+        setupRBGear();
+        setupRotGear();
         CapsuleCollider cc = GetComponent<CapsuleCollider>();
-        cc.radius =  innerRadius; // + ToothDepth;
+        cc.radius = colliderRadius;
         lengthenCollider(cc);
         if (gearTransform != null) {
             gearTransform.gameObject.layer = LayerLookup.GearMesh;
+        }
+        
+        //if (tag.Equals("TestThisGear"))
+        //    StartCoroutine(testClockAngle());
+    }
+    protected override void updateAngleStep() {
+        if (isOnAxel()) {
+            base.updateAngleStep();
+        } else {
+            _angleStep.update(gearTransform.rotation.eulerAngles.y);
         }
     }
 
@@ -89,38 +128,17 @@ public class Gear : Drivable , GearDrivable
         }
     }
 
-    //public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
-    //    ProducerActions actions = ProducerActions.getDoNothingActions();
-    //    if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
-    //        actions.initiate = delegate (Cog cog) {
-    //            addDrivable((Drivable)cog);
-    //        };
-    //        actions.dissolve = delegate (Cog cog) {
-    //            while(drivables.Contains((Drivable)cog)) {
-    //                drivables.Remove((Drivable)cog);
-    //            }
-    //        };
-    //        actions.fulfill = conveyDrive;
-    //    }
-    //    return actions;
-    //}
-
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         ClientActions actions = ClientActions.getDoNothingActions();
         if (specification.contractType == CogContractType.DRIVER_DRIVEN) {
             actions.receive = delegate (Cog cog) {
-                //_driver = (Drivable)cog;
-                //positionRelativeTo(_driver);
-                //adjustForCrowding(); // * see connktAction
+                
             };
             actions.beAbsolvedOf = delegate (Cog cog) {
-                print(name + " get absovled from contract");
                 disconnectFromDriver();
             };
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
             actions.receive = delegate (Cog _producer) {
-                print("gear ParentChild receive action with: " + _producer.name);
-                //setSocketClosestToAxel(getAxel(_producer)); // * see connektAction
             };
             actions.beAbsolvedOf = delegate (Cog _producer) {
                 disconnectBackendSockets();
@@ -160,6 +178,7 @@ public class Gear : Drivable , GearDrivable
             return delegate (ConnectionSiteAgreement csa) {
                 gearPositionRelativeTo((Drivable)csa.destination.cog, csa.connektReconstruction);
                 adjustForCrowding();
+                
             };
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
             return delegate (ConnectionSiteAgreement csa) {
@@ -197,15 +216,105 @@ public class Gear : Drivable , GearDrivable
 
 //CONSIDER: if needed this could be improved by replacing conditional with a delegate, set at contract receive time
     protected float rotationDeltaY(Drive drive) {
-        if (drive.sourceIsType(typeof(RackGear))) {
-            return -Mathf.Rad2Deg * drive.amount / innerRadius;
+        if (drive.sourceIsType(typeof(RackGear))) { //NOTE: no need for this condition atm.
+            return rackGearDriver.toothPosition(gearTransform.position) * toothOffsetAngleDegrees; // rackGearDeltaYDegrees(drive.amount); //-1f * Mathf.Rad2Deg * drive.amount / innerRadius;
         } else {
             return drive.amount * -1f * toothOffsetAngleRadians;
         }
     }
 
+    protected RackGear rackGearDriver {
+        get {
+            return (RackGear)uniqueContractSiteAgreement.producerSite.cog;
+        }
+    }
+
+    #region tooth-rotation-map
+    protected class ToothRotationMap
+    {
+        public struct GearInfo
+        {
+            public readonly int toothCount;
+            public readonly float toothOffsetAngleDegrees;
+
+            public GearInfo(int toothCount, float toothOffsetAngleDegrees) {
+                this.toothCount = toothCount;
+                this.toothOffsetAngleDegrees = toothOffsetAngleDegrees;
+            }
+
+            public static GearInfo fromGear(Gear gear) {
+                GearInfo gi = new GearInfo(
+                    gear.toothCount, gear.toothOffsetAngleDegrees);
+                return gi;
+            }
+        }
+
+        private Dictionary<int, Quaternion> llookup = new Dictionary<int, Quaternion>();
+        protected GearInfo gearInfo;
+
+        private const int divisions = 40;
+        private float divisionsF { get { return divisions; } }
+
+        public ToothRotationMap(GearInfo gearInfo) {
+            this.gearInfo = gearInfo;
+            float theta = 90f;
+            for(int i = 0; i <= gearInfo.toothCount; ++i) {
+                Quaternion current = Quaternion.Euler(0f, theta, 0f);
+                Quaternion next = Quaternion.Euler(0f, theta + gearInfo.toothOffsetAngleDegrees, 0f);
+                for (int j = 0; j < divisions; ++j) {
+                    llookup.Add(i * divisions + j, Quaternion.Slerp(current, next, j / divisionsF));
+                }
+                theta += gearInfo.toothOffsetAngleDegrees;
+            }
+        }
+
+        public Quaternion rotationFor(float normalizedToothScale) {
+            if(normalizedToothScale < 0f) {
+                return llookup[0];
+            }
+            normalizedToothScale = Angles.FloatModSigned(normalizedToothScale, (float)gearInfo.toothCount) * divisionsF;
+            int floor = Mathf.FloorToInt(normalizedToothScale);
+            int ceil = Mathf.CeilToInt(normalizedToothScale);
+            float t = normalizedToothScale - (float)floor;
+            return Quaternion.Slerp(rotationAt(floor), rotationAt(ceil), t);
+        }
+        private Quaternion rotationAt(int i) {
+            return llookup[i];
+        }
+    }
+
+    private static Dictionary<int, ToothRotationMap> _toothRotationMaps = new Dictionary<int, ToothRotationMap>();
+    private static void setupToothRotationMapFor(Gear gear) {
+        if (!_toothRotationMaps.ContainsKey(gear.toothCount)) {
+            _toothRotationMaps[gear.toothCount] = new ToothRotationMap(ToothRotationMap.GearInfo.fromGear(gear));
+            gear.getTRM = delegate () {
+                return _toothRotationMaps[gear.toothCount];
+            };
+        }
+    }
+    private delegate ToothRotationMap GetTRM();
+    private GetTRM getTRM;
+    private ToothRotationMap toothRotationMap {
+        get {
+            return getTRM();
+        }
+    }
+    #endregion
+
     public override Drive receiveDrive(Drive drive) {
-        gearTransform.eulerAngles += new Vector3(0f, rotationDeltaY(drive), 0f);
+        // ****** TEST
+        //return drive; // isolating connect to rack gear
+        //TEST
+        if (drive.sourceIsType(typeof(RackGear))) {
+            rotGear(toothRotationMap.rotationFor(rackGearDriver.toothPosition(gearTransform.position)));
+            //rotGear(Quaternion.Euler(new Vector3(0f, baseYEuler + rotationDeltaY(drive), 0f))); // <<<<--Wanttt
+
+            //rotGear(Quaternion.Euler(gearTransform.eulerAngles + new Vector3(0f, rotationDeltaY(drive), 0f)));
+        } else {
+            rotGear(Quaternion.Euler(gearTransform.eulerAngles + new Vector3(0f, rotationDeltaY(drive), 0f)));
+        }
+
+        //rotGear(Quaternion.Euler(gearTransform.eulerAngles + new Vector3(0f, rotationDeltaY(drive), 0f))); //OLD WAY
         return drive;
     }
 
@@ -232,7 +341,26 @@ public class Gear : Drivable , GearDrivable
     protected float positiveClockAngle(VectorXZ rel) {
         return Angles.PositiveAngleDegrees(Angles.VectorXZToDegrees(rel));
     }
+    
+    protected IEnumerator testClockAngle() {
+        Quaternion q = Angles.zPosPointsTowards(Vector3.up * -1f);
+        transform.rotation = q;
+        
+        int wedges = 12;
+        float theta = Mathf.PI / 2f;
+        float incr = Mathf.PI * 2 / ((float)wedges);
+        foreach(VectorXZ dir in Angles.UnitVectors(wedges)) { 
+            yield return new WaitForSeconds(1f);
 
+            //float clock = Angles.VectorXZToDegrees(dir); // positiveClockAngle(dir);
+            //print(clock + " : " + dir.ToString());
+            //Vector3 euler = new Vector3(0f, clock, 0f);
+            transform.rotation = Angles.zPosPointsTowards(dir);
+            //transform.eulerAngles = euler;
+            BugLine.Instance.drawFrom(transform.position + Vector3.up * 2f, dir);
+            theta += incr;
+        }
+    }
     protected float closestToothAngleCW(VectorXZ rel) {
         float clockAngle = Angles.VectorXZToDegrees(rel);
         clockAngle += rot;
@@ -280,12 +408,12 @@ public class Gear : Drivable , GearDrivable
     protected virtual Transform gearTransform {
         get { return transform; }
     }
-
+    /* TODO: devine the mysteries...*/
     protected Vector3 eulersRelativeToGear(Gear gear) {
         Vector3 euler = startEulerAnglesForAligningTeeth;
         VectorXZ relXZ = new VectorXZ(transform.position - gear.transform.position);
         if (gear is RackGear) {
-            relXZ = xzPosition - ((RackGear)gear).closestPointOnLine(xzPosition);
+            return toothRotationMap.rotationFor(((RackGear)gear).toothPosition(gearTransform.position)).eulerAngles;
         }
         float normalizedOther = gear.proportionalCWToothOffsetFromAbsPosition(xzPosition);
         float closestOffset = cwToothOffsetFrom(relXZ * -1f);
@@ -300,6 +428,9 @@ public class Gear : Drivable , GearDrivable
             refPoint = rackGear.closestPointOnLine(new VectorXZ(gearTransform.position)).vector3(rackGear.transform.position.y);
         }
         Vector3 relPos = cr ? cr.relativePosition : gearTransform.position - refPoint;
+        if (gear is RackGear) {
+            relPos = ((RackGear) gear).sympatheticToNormal(relPos);
+        }
         /* First time ? store the rel pos we found */
         if (!cr) {
             cr = new ConnektReconstruction();

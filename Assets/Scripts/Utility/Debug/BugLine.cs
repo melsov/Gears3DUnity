@@ -8,18 +8,33 @@ using System;
 public class BugLine : Singleton<BugLine> {
 
     protected BugLine() { }
-
-    private LineRenderer lineRenderer;
+    private LineRenderer _lineRenderer;
+    private LineRenderer lineRenderer {
+        get {
+            if (!_lineRenderer) {
+                _lineRenderer = GetComponent<LineRenderer>();
+                _lineRenderer.SetWidth(.1f, .2f);
+                _lineRenderer.SetVertexCount(vertices);
+                // Setting all vertex positions after setting vertex count prevents the scary AABB errors
+                for (int i = 0; i < vertices; ++i) {
+                    _lineRenderer.SetPosition(i, Vector3.zero);
+                }
+            }
+            return _lineRenderer;
+        }
+    }
     private int vertices = 25;
-    Transform pointMarker;
-    List<Transform> markers;
-    Color[] colors;
-
-    private Dictionary<VecPair, GameObject> lines;
-    private bool drawOnKeyPress;
-
-    void Awake() {
-        colors = new Color[] {
+    private Transform _pointMarker;
+    private Transform pointMarker {
+        get {
+            if (!_pointMarker) {
+                _pointMarker = GameObject.FindGameObjectWithTag("DebugMarker").transform;
+            }
+            return _pointMarker;
+        }
+    }
+    List<Transform> markers = new List<Transform>();
+    Color[] colors = new Color[] {
             Color.red,
             new Color(.9f, .5f, .3f),
             Color.yellow, 
@@ -31,16 +46,12 @@ public class BugLine : Singleton<BugLine> {
             Color.gray,
             Color.black,
         };
-        lines = new Dictionary<VecPair, GameObject>();
-        lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.SetWidth(.1f, .2f);
-        lineRenderer.SetVertexCount(vertices);
-        // Setting all vertex positions after setting vertex count prevents the scary AABB errors
-        for(int i = 0; i < vertices; ++i) {
-            lineRenderer.SetPosition(i, Vector3.zero);
-        }
-        pointMarker = GameObject.FindGameObjectWithTag("DebugMarker").transform;
-        markers = new List<Transform>();
+
+    private Dictionary<VecPair, GameObject> lines = new Dictionary<VecPair, GameObject>();
+    private bool drawOnKeyPress;
+
+    public void Awake() {
+       
     }
 
     void Update() {
@@ -88,7 +99,7 @@ public class BugLine : Singleton<BugLine> {
     }
 
     public void drawFrom(VectorXZ origin, VectorXZ direction) {
-        createAndDraw(origin.vector3(), direction.vector3());
+        createAndDraw(origin.vector3(), origin.vector3() + direction.normalized.vector3());
     }
 
     public void drawFrom(Vector3 origin, Vector3 direction) {
@@ -97,6 +108,9 @@ public class BugLine : Singleton<BugLine> {
 
     public void drawFromTo(Vector3 origin, Vector3 destination) {
         createAndDraw(origin, destination);
+    }
+    public void drawFromToBumpUp(Vector3 origin, Vector3 destination) {
+        createAndDraw(origin + Vector3.up, destination + Vector3.up);
     }
     private void createAndDraw(Vector3 origin, Vector3 destination) {
         createAndDraw(origin, destination, null);

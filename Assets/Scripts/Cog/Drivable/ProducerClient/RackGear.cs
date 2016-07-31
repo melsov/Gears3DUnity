@@ -6,45 +6,64 @@ using System.Collections.Generic;
 public class RackGear : Gear {
     protected LineSegment lineSegment;
     protected const float ToothBaseHeight = ToothDepth * 2.7f;
+    private VectorXZ baseToToothBaseHeight = new VectorXZ(0f, .684f);
+    protected static readonly Vector3 vToothCountPositive = Vector3.right;
 
     protected VectorXZ basePosition;
-    protected VectorXZ baseDirection;
     protected Transform anchor;
+    protected float length;
 
-    protected float toothWidth { get { return toothOffset * 2f; } } //TODO: difference btwn toothWidth and toothOffest? why is there one?
+    //protected float toothWidth { get { return toothOffset * 2f; } } //TODO: difference btwn toothWidth and toothOffest? why is there one?
 
     protected VectorXZ offset {
         get { return (xzPosition - basePosition); }
     }
-    protected float offsetDirection {
+    
+    protected float offsetScalar {
         get {
-            float r = offset.dot(new VectorXZ(transform.rotation * Vector3.right));
-            if (r < 0f) return -1f;
-            return 1f;
+            return offset.dot(new VectorXZ(transform.rotation * vToothCountPositive));
         }
     }
+    public VectorXZ normal {
+        get { return lineSegment.normal; }
+    }
+    public VectorXZ normalized {
+        get { return lineSegment.normalized; }
+    }
+    private VectorXZ toothStartPos { get { return lineSegment.startXZ; } }
 
     protected override void updateAngleStep() {
-        //if (!isDriven()) {
-        //    return;
-        //}
-        _angleStep.update(offset.magnitude * offsetDirection);
+        _angleStep.update(linearOffset);
     }
+    public float linearOffset {
+        get { return offsetScalar / toothOffset; }
+    }
+
+    public float toothPosition(Vector3 global) {
+        return Mathf.Clamp((global - toothStartPos).dot(gearTransform.rotation * vToothCountPositive), 0f, length + toothOffset * 1.75f) / toothOffset;
+    }
+
     public override bool isDriven() {
         if (base.isDriven()) { return true; }
         return anchor != null;
     }
-//TODO: purge RackGear and any others of '_driver'
-    
-    public override float innerRadius {
+    protected override float colliderRadius {
         get {
             return ToothBaseHeight;
+        }
+    }
+    public override float innerRadius {
+        get {
+            return 0f; // ToothBaseHeight;
         }
     }
     protected override void awake() {
         base.awake();
         lineSegment = GetComponent<LineSegment>();
+        basePosition = xzPosition;
+        length = lineSegment.distance.magnitude;
     }
+
 
     #region contract
 
@@ -191,11 +210,6 @@ public class RackGear : Gear {
         public RackGearConnection(Drivable _drivable) : base(_drivable) { }
     }
 
-    //protected override bool vConnectTo(Collider other) {
-    //    DrivableConnection dc = getDrivableConnection(other);
-    //    return dc.connect();
-    //}
-
     protected bool makeConnectionWithLinearMotionDrivable(DrivableConnection dc) {
         RackGearConnection rgc = (RackGearConnection)dc;
         if (rgc.peg == null) {
@@ -236,7 +250,8 @@ public class RackGear : Gear {
         return false;
     }
     public override float driveScalar() {
-        return _angleStep.deltaAngle;
+        return _angleStep.getAngle();
+        //return _angleStep.deltaAngle;
     }
 
     public override Drive receiveDrive(Drive drive) {
@@ -252,40 +267,64 @@ public class RackGear : Gear {
     public VectorXZ closestPointOnLine(VectorXZ p) {
         return lineSegment.closestPointOnLine(p);
     }
-    public VectorXZ closestPointOnSetment(VectorXZ p) { return lineSegment.closestPointOnSegment(p); }
+    public VectorXZ closestPointOnSegment(VectorXZ p) { return lineSegment.closestPointOnSegment(p); }
+
+    public Vector3 sympatheticToNormal(Vector3 v) { return lineSegment.sympatheticToNormal(v); }
 
     protected override VectorXZ getConnectionPoint(Collider other) {
         return lineSegment.closestPointOnSegment(new VectorXZ(other.transform.position));
     }
 
-    protected int closestToothOrdinal(VectorXZ other) {
-        VectorXZ online = lineSegment.closestPointOnLine(other);
+    protected int closestToothOrdinal(VectorXZ global) {
+        VectorXZ online = lineSegment.closestPointOnLine(global);
         VectorXZ dif = online - lineSegment.startXZ;
         int tooth;
         if (lineSegment.sympatheticDirection(dif)) {
-            tooth = Mathf.FloorToInt(dif.magnitude / toothWidth);
+            return Mathf.FloorToInt(dif.magnitude / toothOffset);
         } else {
-            tooth = Mathf.CeilToInt(dif.magnitude / toothWidth);
+            return Mathf.CeilToInt(dif.magnitude / toothOffset); 
         }
-        return tooth;
     }
-    protected VectorXZ closestTooth(VectorXZ other) {
-        return closestTooth(other, false);
-    }
-    protected VectorXZ closestTooth(VectorXZ other, bool wantVirtual) {
-        VectorXZ online = lineSegment.closestPointOnLine(other);
-        VectorXZ dif = online - lineSegment.startXZ;
-        int tooth = closestToothOrdinal(other); 
-        if (wantVirtual && !lineSegment.isOnSegment(online)) {
+
+    protected int closestToothOrdinal(VectorXZ global, bool wantVirtual) {
+        int tooth = closestToothOrdinal(global); 
+        if (!wantVirtual) { return tooth; }
+        VectorXZ online = lineSegment.closestPointOnLine(global);
+        if (!lineSegment.isOnSegment(online)) {
+            VectorXZ dif = online - lineSegment.startXZ;
             if (lineSegment.sympatheticDirection(dif)) { //beyond line end
                 tooth = toothCount;
             } else {
                 tooth = 0;
             }
         }
-        float toothDist = tooth * toothWidth;
-        return lineSegment.startXZ + lineSegment.normalized * toothDist;
+        return tooth;
     }
+
+    protected VectorXZ closestTooth(VectorXZ other) {
+        return closestTooth(other, false);
+    }
+
+    protected VectorXZ closestTooth(VectorXZ global, bool wantVirtual) {
+        //VectorXZ online = lineSegment.closestPointOnLine(global);
+        //VectorXZ dif = online - lineSegment.startXZ;
+        //int tooth = closestToothOrdinal(global); 
+        //if (wantVirtual && !lineSegment.isOnSegment(online)) {
+        //    if (lineSegment.sympatheticDirection(dif)) { //beyond line end
+        //        tooth = toothCount;
+        //    } else {
+        //        tooth = 0;
+        //    }
+        //}
+        int tooth = closestToothOrdinal(global, wantVirtual);
+        return lineSegment.startXZ + lineSegment.normalized * (tooth * toothOffset);
+    }
+    protected VectorXZ closestInterstice(VectorXZ global) {
+        int tooth = closestToothOrdinal(global, true);
+        return lineSegment.startXZ + lineSegment.normalized * ((tooth + .5f) * toothOffset);
+    }
+
+    
 
     protected override void setDistanceFrom(Gear gear, ConnektReconstruction cr) {
         transform.position += TransformUtil.distanceToTangentPointAbsoluteNormalDirection(
@@ -295,11 +334,17 @@ public class RackGear : Gear {
             true).vector3(gear.transform.position.y);
     }
 
+    public VectorXZ closestIntersticeFrom(VectorXZ global) {
+        return closestTooth(global); // + transform.rotation * baseToToothBaseHeight.vector3();
+    }
     public override float proportionalCWToothOffsetFromAbsPosition(VectorXZ global) {
         VectorXZ virtualTooth = closestTooth(global, true);
         VectorXZ online = lineSegment.closestPointOnLine(global);
+
+        BugLine.Instance.drawFromToBumpUp(virtualTooth.vector3(), online.vector3());
+
         VectorXZ dif = online - virtualTooth;
-        return dif.magnitude / toothWidth;
+        return dif.magnitude / toothOffset;
     }
 
     public override void gearPositionRelativeTo(Drivable _someDriver, ConnektReconstruction cr) {
@@ -315,7 +360,7 @@ public class RackGear : Gear {
             VectorXZ closest = lineSegment.closestPointOnLine(gearXZ);
 
             float normalizedOther = gear.normalizedCWToothOffsetFrom(closest - gearXZ);
-            float nudge =  toothWidth * (normalizedOther + .5f);
+            float nudge =  toothOffset * (normalizedOther + .5f);
             VectorXZ toothPos = closestTooth(gearXZ);
             VectorXZ n = closest - toothPos + lineSegment.normalized * nudge; 
             transform.position += n.vector3() ;

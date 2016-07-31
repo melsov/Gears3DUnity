@@ -57,7 +57,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         get { return  GetComponent<CapsuleCollider>().radius * transform.localScale.x; }
     }
 
-    protected VectorXZ xzPosition { get { return new VectorXZ(transform.position); } }
+    
     
     protected override void awake() {
         base.awake();
@@ -68,7 +68,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         setupSocketDelegates();
         setupPrefabPegs();
     }
- 
 
     private void setupPrefabPegs() {
         foreach(Peg p in Resources.LoadAll<Peg>("Prefabs/Cog")) {
@@ -121,7 +120,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
                     ((Drivable)cog).uniqueContractSiteAgreement.producerSite.transform,
                     ((Drivable)cog).uniqueContractSiteAgreement.clientSite.transform.position,
                     ((Drivable)cog).uniqueContractSiteAgreement.deltaAngle,
-                    cog.transform
+                    cog
                     );
             };
         }
@@ -212,25 +211,17 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         return radius;
     }
 
-	void Update () {
+	public void FixedUpdate () {
         update();
 	}
 
     protected virtual void update() {
-        updateAngleStep();
 
         foreach(CogContract cc in contractPortfolio.contractsWithClients()) {
             cc.producerActions.fulfill(cc.client.cog);
         }
+        updateAngleStep();
 
-        //for (int i=0; i < drivables.Count; ++i) {
-        //    Drivable dr = drivables[i];
-        //    if (dr == null) {
-        //        drivables.RemoveAt(i--);
-        //        continue;
-        //    }
-        //    dr.receiveDrive(new Drive(driveScalar()));
-        //}
     }
 
     

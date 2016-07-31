@@ -8,6 +8,8 @@ public struct VectorXZ  {
     public static VectorXZ maxValue = new VectorXZ(new Vector3(float.MaxValue, float.MaxValue, float.MaxValue));
     public static Vector3 maxVector3 = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
     public static VectorXZ fakeNull = new VectorXZ(float.MaxValue - 14, float.MaxValue - 6); // maxValue;
+    internal static VectorXZ right = new VectorXZ(1f, 0f);
+
     public bool isFakeNull() {
         return this == fakeNull;
     }
@@ -92,6 +94,9 @@ public struct VectorXZ  {
         return a.v != b.v;
     }
     public static VectorXZ operator *(VectorXZ a, float b) {
+        return new VectorXZ(a.v * b);
+    }
+    public static VectorXZ operator *(float b, VectorXZ a) {
         return new VectorXZ(a.v * b);
     }
 

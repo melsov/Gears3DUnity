@@ -34,7 +34,7 @@ public class PairCTARSiteSet
     public static PairCTARSiteSet fromSocketSet(Cog cog, SocketSet socketSet, RigidRelationshipConstraint rrc) {
         if (socketSet.sockets.Length == 0) { Debug.LogError("CSB returning empty pair for: " + cog.name); return emptyPair(); }
         SiteOrientation ori = SiteOrientation.fromRigidRelationshipConstraint(rrc);
-        // ermmmmm...how to deal with rotation mode???? (don't allow free rotations any more? and just make hinge joints into full-fledged cogs? <-- like)
+        // ermmmmm...how to deal with rotation mode? (don't allow free rotations any more? and, instead, turn hinge joints into full-fledged cogs? <-- like)
         CTARSet tar = new CTARSet(new ContractTypeAndRole(
             CogContractType.PARENT_CHILD,
             rrc == RigidRelationshipConstraint.CAN_ONLY_BE_CHILD ? RoleType.CLIENT : RoleType.PRODUCER));

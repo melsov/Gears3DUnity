@@ -11,21 +11,19 @@ public class TransformUtil : MonoBehaviour
         child.transform.SetParent(parent, true);
     }
 
-    public static void FixedJointAndAlignXZ(Rigidbody child, Rigidbody parent) {
-        AlignXZ(child.transform, parent.transform, null);
 
-        FixedJoint fj = child.GetComponent<FixedJoint>();
-        if (fj == null) {
-            fj = child.gameObject.AddComponent<FixedJoint>();
-        }
-        fj.connectedBody = parent;
-    }
-
-//TODO: we need the parent cog's rotation here also? because front's rotation isn't going to be representative? or is it.....??
-    public static void AlignXZPushRotation(Transform front, Vector3 back, Quaternion deltaQuaternion, Transform target) {
+    /*
+     * Move target to align back with front.
+     * Rotate target to match front's rotation, offset by delta
+     * */
+    public static void AlignXZPushRotation(Transform front, Vector3 back, Quaternion delta, Cog target) {
+        target.move(target.transform.position + new VectorXZ(front.position - back).vector3());
+        target.rotate(front.rotation * delta);
+/* ** old way
         target.position += new VectorXZ(front.position - back).vector3();
         //TODO / CONSIDER: would it help to set the target's rotation pivot point (not here but during setup of PARENT_CHILD contracts)?
         target.rotation = front.rotation * deltaQuaternion;
+*/ 
     }
 
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
@@ -45,7 +43,7 @@ public class TransformUtil : MonoBehaviour
     }
 
     public static void PositionOnYLayer(Transform trans) {
-        System.Type type = typeof(Drivable);
+        Type type = typeof(Drivable);
         Drivable drivable = trans.GetComponent<Drivable>();
         if (drivable != null) {
             type = drivable.GetType();

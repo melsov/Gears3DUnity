@@ -6,11 +6,11 @@ public class Placeable : Drivable {
 
     #region contract
 
-    protected override ContractNegotiator getContractNegotiator() { return new DuctContractNegotiator(this); }
+    protected override ContractNegotiator getContractNegotiator() { return new PlaceableContractNegotiator(this); }
 
-    public class DuctContractNegotiator : ContractNegotiator
+    public class PlaceableContractNegotiator : ContractNegotiator
     {
-        public DuctContractNegotiator(Cog cog_) : base(cog_) { }
+        public PlaceableContractNegotiator(Cog cog_) : base(cog_) { }
 
         protected override List<ContractSpecification> orderedContractPreferencesAsOfferer(Cog cogForTypeWorkaround) {
             List<ContractSpecification> result = new List<ContractSpecification>();
@@ -19,11 +19,11 @@ public class Placeable : Drivable {
         }
     }
 
-    protected override ViableContractLookup getViableContractLookup() { return new ViableDuctContractLookup(this); }
+    protected override ViableContractLookup getViableContractLookup() { return new ViablePlaceableContractLookup(this); }
 
-    public class ViableDuctContractLookup : ViableContractLookup
+    public class ViablePlaceableContractLookup : ViableContractLookup
     {
-        public ViableDuctContractLookup(Cog cog_) : base(cog_) { }
+        public ViablePlaceableContractLookup(Cog cog_) : base(cog_) { }
 
         protected override void setupLookups() {
             asClientLookup.Add(CogContractType.PARENT_CHILD, yup);
@@ -53,8 +53,15 @@ public class Placeable : Drivable {
     }
 
     protected override UniqueClientContractSiteBoss getUniqueClientSiteConnectionSiteBoss() {
+        Dictionary<CTARSet, SiteSet> otherSites = new Dictionary<CTARSet, SiteSet>();
+        /* Add front sockets as sites, if any */
+        if (_pegboard.getFrontendSocketSet().sockets.Length > 0) {
+            KeyValuePair<CTARSet, SiteSet> sitesPair = PairCTARSiteSet.fromSocketSet(this, _pegboard.getFrontendSocketSet(), RigidRelationshipConstraint.CAN_ONLY_BE_PARENT);
+            otherSites.Add(sitesPair.Key, sitesPair.Value);
+        }
         return new UniqueClientContractSiteBoss(
-            ExclusionarySiteSetClientPair.fromSocketSet(this, _pegboard.getBackendSocketSet())
+            ExclusionarySiteSetClientPair.fromSocketSet(this, _pegboard.getBackendSocketSet()),
+            otherSites
         );
     }
 

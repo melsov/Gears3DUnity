@@ -80,6 +80,52 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         return new ViableContractLookup(this);
     }
 
+    #region move-rotate
+    public Rigidbody rb;
+    private void setupRB() {
+        rb = GetComponent<Rigidbody>();
+        if (!rb) {
+            if (GetComponentInChildren<Rigidbody>()) {
+                Debug.LogError(name + " has a child rigidbody but no top level rigidbody. This makes moving it problematic. \n DW: we'll just add one here");
+                rb = gameObject.AddComponent<Rigidbody>();
+                rb.isKinematic = true;
+                rb.useGravity = false;
+            }
+        }
+    }
+    public delegate void Move(Vector3 global);
+    public Move move;
+    public delegate void Rotate(Quaternion global);
+    public Rotate rotate;
+    private delegate VectorXZ GetXZPosition();
+    private GetXZPosition getXZPosition;
+    private void setupMoveAndRotate() {
+        if (GetComponent<Rigidbody>()) {
+            move = delegate (Vector3 global) {
+                rb.MovePosition(global);
+            };
+            rotate = delegate (Quaternion global) {
+                rb.MoveRotation(global);
+            };
+            getXZPosition = delegate () {
+                return new VectorXZ(rb.position);
+            };
+        } else {
+            move = delegate (Vector3 global) {
+                transform.position = global;
+            };
+            rotate = delegate (Quaternion global) {
+                transform.rotation = global;
+            };
+            getXZPosition = delegate () {
+                return new VectorXZ(transform.position);
+            };
+        }
+    }
+
+    protected VectorXZ xzPosition { get { return getXZPosition(); } }
+
+    #endregion
     protected ColliderSet colliderSet;
     protected NeighborColliderLookup neighborColliderLookup;
 
@@ -88,6 +134,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
     }
 
     protected virtual void awake() {
+        setupRB();
+        setupMoveAndRotate();
         if (!colliderSet) {
             colliderSet = gameObject.AddComponent<ColliderSet>();
         }
@@ -192,13 +240,12 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             return ContractSpecification.NonExistant();
         }
 
-//CONSIDER?TODO: make negotiation for only one site on offeree side?
         protected virtual ContractSpecification amenable(Cog other, ContractSpecification specification) {
             return negotiator.amenable(other, specification);
         }
         
         /*
-        * Caller makes contract with itself as producer
+        * Setup a contract. 
         *  */
         public void setup(ContractManager client, ContractSpecification specification) {
             if (!specification.offererIsProducer) {
@@ -230,7 +277,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         }
 
         public static void initiateContract(CogContract cc) {
-            Debug.LogError("Prod: " + cc.producer.cog.name + " Cli: " + cc.client.cog.name);
+            Debug.Log("Prod: " + cc.producer.cog.name + " Cli: " + cc.client.cog.name);
             cc.clientActions.receive(cc.producer.cog);
             cc.producerActions.initiate(cc.client.cog);
             cc.connectionSiteAgreement.connect();
@@ -365,9 +412,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             return pa;
         }
 
-        public static ProducerAction getParentChildFulfillAction(Transform frontEnd, Transform childBackEnd, Quaternion deltaQuat, Transform child) {
+        public static ProducerAction getParentChildFulfillAction(Transform frontEnd, Transform childBackEnd, Quaternion deltaQuat) {
             return delegate (Cog _cog) {
-                TransformUtil.AlignXZPushRotation(frontEnd, childBackEnd.position, deltaQuat, child);
+                TransformUtil.AlignXZPushRotation(frontEnd, childBackEnd.position, deltaQuat, _cog);
             };
         }
 
@@ -492,7 +539,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         ConnectionSiteAgreement csa = ConnectionSiteAgreement.NoConnektActionConnectionSiteAgreement(parentSite, childSite);
         ContractSpecification fakeishSpecification = new ContractSpecification(cct, RoleType.PRODUCER);
         ProducerActions prodActions = producerActionsFor(child, fakeishSpecification);
-        prodActions.fulfill = ProducerActions.getParentChildFulfillAction(parentSite.transform, childSite.transform, Quaternion.identity, child.transform);
+        prodActions.fulfill = ProducerActions.getParentChildFulfillAction(parentSite.transform, childSite.transform, Quaternion.identity);
         ClientActions cliActions = child.clientActionsFor(this, fakeishSpecification);
         CogContract cc = new CogContract(
             contractManager, 
@@ -544,9 +591,10 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
 
     protected class DragHistory
     {
-        public Vector3 start;
-        public VectorXZ cursorStart;
-        public VectorXZ lastCursor;
+        public readonly Vector3 start;
+        public readonly VectorXZ cursorStart;
+        public readonly VectorXZ cursorRelative;
+        //public VectorXZ lastCursor;
         public const float DisconnectRadius = 2f;
         public bool beyond(VectorXZ pos) {
             return DisconnectRadius * DisconnectRadius < (pos - cursorStart).magnitudeSquared;
@@ -558,7 +606,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         public DragHistory(Vector3 start, VectorXZ cursorStart) {
             this.start = start;
             this.cursorStart = cursorStart;
-            lastCursor = cursorStart;
+            cursorRelative = cursorStart - start;
+            //lastCursor = cursorStart;
         }
 
         public VectorXZ relativeToStart(VectorXZ global) {
@@ -569,10 +618,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             return global - cursorStart;
         }
 
-        public VectorXZ updateLastCursorGetRelative(VectorXZ nextCursorGlobal) {
-            VectorXZ result = nextCursorGlobal - lastCursor;
-            lastCursor = nextCursorGlobal;
-            return result;
+        public VectorXZ updateLastCursorGetRelative(Vector3 cogPos, VectorXZ cursorGlobal) {
+            VectorXZ result = cursorGlobal - cursorRelative;
+            return result - cogPos;
         }
 
     }
@@ -625,7 +673,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
            dragHistory.startedDisconnect = true;
            vDisconnect(); 
         }
-        clientTree.moveRelative(dragHistory.updateLastCursorGetRelative(cursorPos).vector3());
+        clientTree.moveRelative(dragHistory.updateLastCursorGetRelative(transform.position, cursorPos).vector3());
     }
 
     public void normalDragEnd(VectorXZ cursorPos) {

@@ -116,7 +116,7 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     private void connectToColliders(ColliderDropper dropper) {
-        Bug.contractLog("connect to colliders with this many colliders: " + dropper.colliders.Count);
+        if (dropper.colliders.Count == 0) { Bug.contractLog("dropper has this many: " + dropper.colliders.Count); } //DBUG
         if (dropper == null) {
             return;
         }

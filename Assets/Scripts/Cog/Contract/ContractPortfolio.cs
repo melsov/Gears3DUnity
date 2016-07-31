@@ -209,7 +209,8 @@ public class ContractPortfolio : IEnumerable<CogContract>
         private void moveRelative(Vector3 nudge, bool excludeRoot) {
             foreach(Node node in root.children()) {
                 if (excludeRoot && node == root) { continue; }
-                node.portfolio.cog.transform.position += nudge;
+                //node.portfolio.cog.transform.position += nudge;
+                node.portfolio.cog.move(node.portfolio.cog.transform.position + nudge);
             }
         }
 

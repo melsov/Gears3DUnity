@@ -36,9 +36,10 @@ public struct AngleStep
 {
     public float deltaAngle {
         get {
-            return Angles.adjustedDeltaAngleDegrees(angle - lastAngle);
+            return Angles.adjustedDeltaAngleDegrees(angle_ - lastAngle);
         }
     }
+
     public float deltaTime {
         get { return timestamp; }
     }
@@ -51,18 +52,18 @@ public struct AngleStep
 
     private float timestamp;
     private float lastAngle;
-    private float angle;
-    public float getAngle() { return angle; }
+    private float angle_;
+    public float getAngle() { return angle_; }
 
-    public AngleStep(float _angle) {
-        lastAngle = 0f;
-        timestamp = Time.fixedTime; angle = _angle;
-    }
+    //public AngleStep(float _angle) {
+    //    lastAngle = 0f;
+    //    timestamp = Time.fixedTime; angle = _angle;
+    //}
 
     public void update(float nextAngle) {
-        lastAngle = angle;
+        lastAngle = angle_;
         timestamp = Time.deltaTime;
-        angle = nextAngle;
+        angle_ = nextAngle;
     }
 
     public void debug() {
