@@ -6,7 +6,7 @@ public class Switch : ControllerAddOn  {
 
     public bool isReverseSwitch;
 
-    protected OnOffIndicator onOffIndicator;
+    protected OnOffReverseIndicator onOffIndicator;
     private RaycastHit rch;
 
     protected ISwitchStateToggle on;
@@ -19,7 +19,7 @@ public class Switch : ControllerAddOn  {
         } else {
             on = new OnOffSwitchState(SwitchState.ON);
         }
-        onOffIndicator = GetComponentInChildren<OnOffIndicator>();
+        onOffIndicator = GetComponentInChildren<OnOffReverseIndicator>();
     }
 
     public override bool connectToClient(Cog cog) {
@@ -37,7 +37,7 @@ public class Switch : ControllerAddOn  {
         if (underCursor == null) {
             return;
         }
-        OnOffIndicator ooi = underCursor.GetComponent<OnOffIndicator>();
+        OnOffReverseIndicator ooi = underCursor.GetComponent<OnOffReverseIndicator>();
         if (ooi == onOffIndicator) {
             toggle();
         }

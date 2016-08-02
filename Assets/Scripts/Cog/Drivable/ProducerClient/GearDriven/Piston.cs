@@ -11,7 +11,7 @@ public class Piston : GearDrivenMechanism , LinearDrive
     protected LineSegment lineSegment;
 
     [SerializeField]
-    protected float headSpeed = .1f;
+    protected float headSpeed = .03f;
     private float progressor = 0f;
 
     protected override void awake() {
@@ -23,7 +23,7 @@ public class Piston : GearDrivenMechanism , LinearDrive
         }
         UnityEngine.Assertions.Assert.IsFalse(shaft == null, "A piston doesn't have a shaft; what gives? (Shaft must be named 'Shaft')");
         pistonHead = GetComponentInChildren<Pegboard>().transform;
-        lineSegment = GetComponentInChildren<LineSegment>();
+        lineSegment = GetComponent<LineSegment>();
     }
 
     public VectorXZ direction {

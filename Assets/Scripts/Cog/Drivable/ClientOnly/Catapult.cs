@@ -1,29 +1,37 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
-public class Catapult : Cog {
-    public void Awake() {
-        HingeJoint hj = GetComponentInChildren<FreeRotationPeg>().getHinge().getHingeJoint();
+//TODO: catapult extends Dispenser. dispenses catapult action
+public class Catapult : Dispenser {
+
+    [SerializeField]
+    private float useMotorSeconds = 1.5f;
+    protected HingeJoint hj;
+    protected Rigidbody hingeRB;
+    protected override void awake() {
+        base.awake();
+        hj = GetComponentInChildren<HingeJoint>(); // GetComponentInChildren<FreeRotationPeg>().getHinge().getHingeJoint();
         hj.useSpring = true;
         JointSpring js = hj.spring;
-        js.targetPosition = 15f;
+        js.targetPosition = -10f;
         js.spring = 80f;
         hj.spring = js;
+        hj.useLimits = true;
+        JointLimits jl = hj.limits;
+        jl.min = -10f;
+        jl.max = 120f;
+        hingeRB = hj.GetComponent<Rigidbody>();
     }
 
-    public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
-        throw new NotImplementedException();
+    protected override void dispense() {
+        print("dispense");
+        StartCoroutine(motorOnOff());
     }
 
-    public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
-        throw new NotImplementedException();
-    }
-
-    public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
-        throw new NotImplementedException();
-    }
-
-    protected override ContractSiteBoss getContractSiteBoss() {
-        throw new NotImplementedException();
+    private IEnumerator motorOnOff() {
+        hj.useMotor = true;
+        yield return new WaitForSeconds(useMotorSeconds);
+        hj.useMotor = false;
     }
 }

@@ -10,7 +10,7 @@ public class Motor : Drivable
     protected float leverMultiplier;
     protected float leverMax = 10f;
     protected Handle lever { get { return handleSet.handles[0]; } }
-    protected OnOffIndicator onOffIndicator;
+    protected OnOffReverseIndicator onOffIndicator;
     protected Counter counter;
 
     public float maxAngularVelocity = 10f;
@@ -209,7 +209,7 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         handleSet = GetComponentInChildren<HandleSet>();
         leverLimits = GetComponentInChildren<LeverLimits>();
         leverLimits.increments = 9;
-        onOffIndicator = GetComponentInChildren<OnOffIndicator>();
+        onOffIndicator = GetComponentInChildren<OnOffReverseIndicator>();
         counter = GetComponentInChildren<Counter>();
         setLeverPositon((int)leverMultiplier);
 	}

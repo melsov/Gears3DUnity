@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class LightSwitchIndicator : OnOffIndicator {
+public class LightSwitchIndicator : OnOffReverseIndicator {
 
     public Vector3 spanEulerAngles = new Vector3(0f, 90f, 0f);
 

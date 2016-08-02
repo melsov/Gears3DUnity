@@ -27,11 +27,12 @@ public class Placeable : Drivable {
 
         protected override void setupLookups() {
             asClientLookup.Add(CogContractType.PARENT_CHILD, yup);
+            asProducerLookup.Add(CogContractType.PARENT_CHILD, yup);
         }
     }
 
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
-        return ProducerActions.getDoNothingActions();
+        return base.producerActionsFor(client, specification);
     }
 
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {

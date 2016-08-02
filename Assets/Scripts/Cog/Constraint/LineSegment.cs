@@ -88,9 +88,13 @@ public class LineSegment : MonoBehaviour {
         return (v - 2f * (norm * v.dot(norm)));
     }
 
-    public bool isOnSegment(VectorXZ global) {
+    public bool withinSegmentDomain(VectorXZ global) {
+        return sympatheticDirection(global - startXZ) && !sympatheticDirection(global - endXZ);
+        /* pepperoni
+         * 
         VectorXZ dif = closestPointOnLine(global) - startXZ;
         return dif.dot(distance) > 0f && dif.dot(distance) < distance.magnitudeSquared;
+        */
     }
 
     public float slopeXZ {
@@ -114,7 +118,7 @@ public class LineSegment : MonoBehaviour {
         try {
             if (p == default(VectorXZ)) { return; }
             p = closestPointOnLine(p);
-            if (isOnSegment(p)) { return; }
+            if (withinSegmentDomain(p)) { return; }
             VectorXZ dif = p - startXZ;
             if (dif.dot(distance) > 0f) {
                 end.position = p.vector3(end.position.y);

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class OnOffIndicator : Indicator {
+public class OnOffReverseIndicator : Indicator {
 
     protected SwitchState _state;
     protected IOnOffIndicatorProxy proxy;

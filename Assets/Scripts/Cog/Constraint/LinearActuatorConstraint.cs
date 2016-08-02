@@ -146,8 +146,8 @@ public class LinearActuatorConstraint : Constraint
         VectorXZ[] points = new VectorXZ[2];
         bool intersected = intersectionPoints(ref points, constraintTarget.reference.position, constraintTarget.altReference.position, constraintTarget.lineSegmentReference);
         int result = -1;
-        bool zedOnSeg = constraintTarget.lineSegmentReference.isOnSegment(points[0]);
-        bool oneOneSeg = constraintTarget.lineSegmentReference.isOnSegment(points[1]);
+        bool zedOnSeg = constraintTarget.lineSegmentReference.withinSegmentDomain(points[0]);
+        bool oneOneSeg = constraintTarget.lineSegmentReference.withinSegmentDomain(points[1]);
         if (zedOnSeg && oneOneSeg) {
             result = 2;
         } else if (zedOnSeg) {

@@ -272,15 +272,12 @@ public class Gear : Drivable , GearDrivable
             if(normalizedToothScale < 0f) {
                 return llookup[0];
             }
-            normalizedToothScale = Angles.FloatModSigned(normalizedToothScale, (float)gearInfo.toothCount) * divisionsF;
+            normalizedToothScale = Angles.FloatModSigned(normalizedToothScale, gearInfo.toothCount) * divisionsF;
             int floor = Mathf.FloorToInt(normalizedToothScale);
             int ceil = Mathf.CeilToInt(normalizedToothScale);
-            float t = normalizedToothScale - (float)floor;
-            return Quaternion.Slerp(rotationAt(floor), rotationAt(ceil), t);
+            return Quaternion.Slerp(llookup[floor], llookup[ceil], normalizedToothScale - floor);
         }
-        private Quaternion rotationAt(int i) {
-            return llookup[i];
-        }
+
     }
 
     private static Dictionary<int, ToothRotationMap> _toothRotationMaps = new Dictionary<int, ToothRotationMap>();
