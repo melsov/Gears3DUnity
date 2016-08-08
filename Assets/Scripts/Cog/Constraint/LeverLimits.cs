@@ -7,6 +7,8 @@ public class LeverLimits : MonoBehaviour {
     protected Transform _min;
     [SerializeField]
     protected Transform _max;
+    [SerializeField]
+    protected bool xAxisOriented; //TODO
 
     protected float _increments = 10f;
     public int increments {
@@ -21,13 +23,11 @@ public class LeverLimits : MonoBehaviour {
 	}
 
     protected void setupMinMax() {
-        foreach (Transform t in GetComponentInChildren<Transform>()) {
-            print(t.name);
-            if (t == transform) { continue; }
+        foreach(Transform t in transform) {
             if (_min == null) {
                 _min = t;
             } else {
-                if (t.position.z < _min.position.x) {
+                if (t.position.z < _min.position.z) {
                     _max = _min;
                     _min = t;
                 } else {

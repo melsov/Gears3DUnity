@@ -67,6 +67,9 @@
     <Reference Include="UnityEditor.iOS.Extensions.Common">
       <HintPath>Library\UnityAssemblies\UnityEditor.iOS.Extensions.Common.dll</HintPath>
     </Reference>
+    <Reference Include="Vectrosity_Unity3">
+      <HintPath>Assets\Vectrosity\Vectrosity_Unity3.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-UnityScript-firstpass">
       <HintPath>Library\ScriptAssemblies\Assembly-UnityScript-firstpass.dll</HintPath>
     </Reference>
@@ -78,6 +81,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\ExampleScenes\PenningTrapTutorialAssets\ExternalFieldElectricQuadrupoleScript.cs" />
+    <Compile Include="Assets\ExampleScenes\VanDeGraaffExampleAssets\TurnOnTurnOff.cs" />
+    <Compile Include="Assets\ExampleScenes\WrenchesTutorialAssets\TurnOnMagnet.cs" />
+    <Compile Include="Assets\ExampleScenes\WrenchesTutorialAssets\TurnOnMagnetCaller.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ElectromagneticFieldControllerScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ExternalFieldConstantScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ExternalFieldSolenoidScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ExternalFieldTemplateScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\FieldLineScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\MagneticDipoleScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\StaticChargeScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\SuperconductorInfinitePlaneScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\SuperconductorSmallSphereScript.cs" />
+    <Compile Include="Assets\Magnetodynamics\ScriptsToEnhanceExistingObjects\MagnetizableMaterial.cs" />
+    <Compile Include="Assets\Magnetodynamics\ScriptsToEnhanceExistingObjects\PlasmaIonizedGas.cs" />
     <Compile Include="Assets\Scripts\Animation\OpenCloseAnimationHandler.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioEntity.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioLibrary.cs" />
@@ -88,6 +106,8 @@
     <Compile Include="Assets\Scripts\Cog\AddOn\AddOnConnector.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ProxySwitch.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Scale.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Spring.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Switch.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ToggleButton.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\Counter.cs" />
@@ -114,10 +134,14 @@
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Funnel.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\OneWayElbowTube.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\OneWayTube.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Polarizable\PolarizableTube.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Polarizable\TubeAccess.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Tube.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\TubeEntrance.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\TubeExit.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Extendable\Extendable.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\HingeMagnet.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\Magnet.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
@@ -163,6 +187,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\DrivenDrivable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\HingeJointPlaceable.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\MagneticPlaceable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\Placeable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\DriverDriven.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Gear.cs" />
@@ -272,6 +297,8 @@
     <None Include="Assets\TSF\Shaders\TSFOutline.shader" />
     <None Include="Assets\Temp\hi.txt" />
     <None Include="Assets\Textures\grids\readme.txt" />
+    <None Include="Assets\Vectrosity\Documentation\Vectrosity Upgrade Guide.txt" />
+    <None Include="Assets\Vectrosity\Documentation\Vectrosity changelog.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

@@ -1,6 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/*
+ * TODO: Scale. Combinables have a weight (mass of rb)
+* */
+
 public abstract class Combinable : MonoBehaviour {
 
     public Sprite sprite;
@@ -9,11 +13,7 @@ public abstract class Combinable : MonoBehaviour {
     }
     protected Renderer renderr {
         get {
-            Renderer r = GetComponent<Renderer>();
-            if (r == null) {
-                r = GetComponentInChildren<Renderer>();
-            }
-            return r;
+            return GetComponentInChildren<Renderer>();
         }
     }
 
@@ -33,13 +33,21 @@ public abstract class Combinable : MonoBehaviour {
         GetComponent<Collider>().enabled = false;
         rb.useGravity = false;
         rb.isKinematic = true;
-        renderr.enabled = false;
+        beInvisible(true);
     }
     
     public void enable() {
         rb.useGravity = true;
         GetComponent<Collider>().enabled = true;
         rb.isKinematic = false;
-        renderr.enabled = true;
+        beInvisible(false);
+    }
+    
+    private void beInvisible(bool yes) {
+        foreach (Transform t in GetComponentsInChildren<Transform>()) {
+            if(t.GetComponent<Renderer>()) {
+                t.GetComponent<Renderer>().enabled = !yes;
+            }
+        }
     }
 }

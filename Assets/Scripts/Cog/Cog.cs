@@ -652,7 +652,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         Vector3 before = transform.position;
         bool result = vConnectTo(other);
         if (result) {
-            StartCoroutine(clientTree.testSlowActionOnClients(delegate(CogContract cc) { 
+            StartCoroutine(clientTree.perMaxFixedFrameActionOnClients(delegate(CogContract cc) { 
                 ContractManager.initiateContract(cc);
             }));
         }

@@ -35,10 +35,14 @@ public class Placeable : Drivable {
         return base.producerActionsFor(client, specification);
     }
 
+    protected virtual void onReceiveProducer(Cog producer, ContractSpecification specification) { }
+    protected virtual void onBeAbsolvedOfProducer(Cog producer, ContractSpecification specification) { }
+
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         ClientActions actions = ClientActions.getDoNothingActions();
         if (specification.contractType == CogContractType.PARENT_CHILD) {
-            actions.receive = delegate (Cog cog) { };
+            actions.receive = delegate (Cog cog) {
+            };
             actions.beAbsolvedOf = delegate (Cog cog) {
                 transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType())); //TODO: deal with tubes being elevated to higher Ys
             };

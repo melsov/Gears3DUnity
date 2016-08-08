@@ -88,7 +88,8 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
             pas.dissolve = delegate (Cog _client) { };
             pas.fulfill = delegate (Cog _client) {
                 if (_client is Gear) { // assume socket at center
-                    _client.transform.rotation = axel.transform.rotation;
+                    ((Gear)_client).rotGear(axel.transform.rotation);
+                    //_client.transform.rotation = axel.transform.rotation;
                 } else {
                     //TODO: set cog rotation to axel's rotation
                 }

@@ -39,6 +39,13 @@ public class CombinerSlot : MonoBehaviour {
         _combiner = new WeakReference(GetComponentInParent<Combiner>());
         icon = GetComponentInChildren<SpriteRenderer>();
         emptySprite = icon.sprite;
+        boxColliderToDispensableLayer();
+    }
+
+    private void boxColliderToDispensableLayer() {
+        BoxCollider bc = GetComponent<BoxCollider>();
+        if (!bc) { throw new Exception("Combiner slot needs a box collider. What gives."); }
+        bc.center = TransformUtil.SetY(bc.center, YLayer.dispenseable);
     }
 
     public virtual void addCombinable(Combinable combinable) {

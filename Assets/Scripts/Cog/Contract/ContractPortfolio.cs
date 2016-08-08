@@ -170,7 +170,7 @@ public class ContractPortfolio : IEnumerable<CogContract>
             //}
         }
 
-        public IEnumerator testSlowActionOnClients(ContractAction contractAction) {
+        public IEnumerator perMaxFixedFrameActionOnClients(ContractAction contractAction) {
             foreach (Node node in root.orderedChildrenBredthFirst()) {
                 foreach (CogContract cc in node.portfolio.contractsWithClients()) {
                     Debug.LogError("cog: " + cc.producer.cog.name);

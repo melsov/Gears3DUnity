@@ -7,4 +7,11 @@ using System.Collections.Generic;
 public class Duct : MonoBehaviour
 {
 
+    public void Awake() {
+        awake();
+    }
+
+    protected virtual void awake() {
+        transform.position = TransformUtil.SetY(transform.position, YLayer.dispenseable);
+    }
 }

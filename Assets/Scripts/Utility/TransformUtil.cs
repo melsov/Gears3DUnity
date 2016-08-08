@@ -52,7 +52,7 @@ public class TransformUtil : MonoBehaviour
     }
 
     public static Transform FindChildWithName(Transform parent, string _name) {
-        foreach(Transform child in parent.GetComponentsInChildren<Transform>()) {
+        foreach(Transform child in parent) {
             if (child.name.Equals(_name)) {
                 return child;
             }

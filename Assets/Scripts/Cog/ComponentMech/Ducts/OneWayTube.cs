@@ -4,16 +4,24 @@ using System.Collections;
 public class OneWayTube : Duct {
 
     public float strength = 300f;
-    protected Transform entrance;
-    protected Transform exit;
-
-    void Awake() {
-        awake();
+    private Transform _entrance;
+    private Transform _exit;
+    protected virtual Transform entrance {
+        get { return _entrance; }
+        set { _entrance = value; }
+    }
+    protected virtual Transform exit {
+        get { return _exit; }
+        set { _exit = value; }
     }
 
-    protected virtual void awake() {
-        entrance = GetComponentInChildren<TubeEntrance>().transform;
-        exit = GetComponentInChildren<TubeExit>().transform;
+    protected override void awake() {
+        base.awake();
+        TubeEntrance te = GetComponentInChildren<TubeEntrance>();
+        if (te) { entrance = te.transform; }
+        TubeExit tex = GetComponentInChildren<TubeExit>();
+        if (tex) { exit = tex.transform; }
+        if (!te || !tex) { entrance = exit = transform; } //sort of give up
     }
 
     protected virtual Vector3 down {
@@ -28,19 +36,18 @@ public class OneWayTube : Duct {
         get { return entrance.position - exit.transform.position; }
     }
 
-    void OnTriggerEnter(Collider other) {
-        pullThrough(other);
+    public void OnTriggerEnter(Collider other) {
+        //pullThrough(other);
     }
 
-    void OnTriggerStay(Collider other) {
+    public virtual void OnTriggerStay(Collider other) {
         pullThrough(other);
     }
     
-    void OnTriggerExit(Collider other) {
-        pullThrough(other);
+    public void OnTriggerExit(Collider other) {
+        //pullThrough(other);
     }
 
-//TODO: either way tubes
     protected virtual Vector3 isEntering(Transform t) {
         Vector3 towards = entrance.position - t.position;
         if(towards.sqrMagnitude > .1f && Vector3.Dot(awayFromEntrance, towards) < 0f) {

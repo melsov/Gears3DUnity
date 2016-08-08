@@ -6,7 +6,8 @@ using System.Collections.Generic;
 public class Dispenser : Drivable { 
 
     public Dispensable item;
-    public Transform spawnPlatform;
+    [SerializeField]
+    protected Transform spawnPlatform;
     public float fireRate = .5f;
     public float ejectForce = 4f;
     protected bool shouldDispense;
@@ -16,10 +17,25 @@ public class Dispenser : Drivable {
     protected override void awake() {
         base.awake();
         ControllerAddOn cao = GetComponentInChildren<ControllerAddOn>();
-        if (cao != null) {
+        if (cao) {
             cao.connectTo(GetComponent<Collider>());
             hasBuiltInButton = true;
             //enterPermanentContractWith(cao);
+        }
+        if (spawnPlatform) {
+            spawnPlatform.position = TransformUtil.SetY(spawnPlatform.position, YLayer.dispenseable);
+        }
+        if (autoDispenseTest) {
+            StartCoroutine(testDi());
+        }
+    }
+
+    [SerializeField]
+    private bool autoDispenseTest;
+    private IEnumerator testDi() {
+        while (true) {
+            yield return new WaitForSeconds(5f);
+            dispense();
         }
     }
 
@@ -157,7 +173,7 @@ public class Dispenser : Drivable {
     }
     
     protected virtual void dispense() {
-        Dispensable d = Instantiate<Dispensable>(item);
+        Dispensable d = Instantiate(item);
         d.enabled = true;
         d.transform.position = spawnPlatform.position;
         d.GetComponent<Rigidbody>().AddForce(dispenseDirection * ejectForce, ForceMode.Impulse);

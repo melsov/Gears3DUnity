@@ -9,11 +9,8 @@ public class Tube : Duct {
     protected HashSet<Rigidbody> occupants;
     protected float width;
 
-    void Awake() {
-        awake();
-    }
-
-    protected virtual void awake() {
+    protected override void awake() {
+        base.awake();
         occupants = new HashSet<Rigidbody>();
         //entrance = GetComponentInChildren<TubeEntrance>().transform;
         //exit = GetComponentInChildren<TubeExit>().transform;

@@ -40,6 +40,7 @@ public class ConveyorBelt : GearDrivenMechanism , ICollisionProxyClient // Driva
         lineSegment = GetComponentInChildren<LineSegment>();
         rotationIndicators = GetComponentsInChildren<RotationIndicator>();
         if (rotationIndicators == null) { rotationIndicators = new RotationIndicator[0]; }
+        beltTransform.position = TransformUtil.SetY(beltTransform.position, YLayer.dispenseable);
     }
 
     protected override void updateMechanism(Drive drive) {

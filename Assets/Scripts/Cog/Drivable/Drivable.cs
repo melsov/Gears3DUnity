@@ -171,7 +171,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 
     protected override void suspendOnDragStart() {
         if (uniqueClientConnectionSiteBoss.isInContractWithProducer) {
-            Bug.contractLog(name + " suspends contract with uniq producer ");
+            Bug.contractLog(name + " %%%^^^%%%% suspends contract with uniq producer ");
             uniqueClientConnectionSiteBoss.producerSiteOfUniqueClientContractSite.contract.suspend();
         }
     }

@@ -182,6 +182,7 @@ public class Gear : Drivable , GearDrivable
             };
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
             return delegate (ConnectionSiteAgreement csa) {
+                Debug.LogError(name + " set socket to axel");
                 setSocketClosestToAxel(getAxel(csa.destination.cog));
             };
         }

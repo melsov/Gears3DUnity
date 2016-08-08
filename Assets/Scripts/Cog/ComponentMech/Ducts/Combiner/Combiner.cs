@@ -9,9 +9,12 @@ using System;
  *  */
  
 public class Combiner : Cog {
-
-    public Transform outTube;
-    public Transform ejectArea;
+    [SerializeField]
+    protected Transform outTube;
+    [SerializeField]
+    protected Transform inTube;
+    [SerializeField]
+    protected Transform ejectArea;
     public Collider _mainCollider;
     protected Combinable defaultRock;
     protected CombinerMultiSlot multiSlot;
@@ -22,11 +25,13 @@ public class Combiner : Cog {
         base.awake();
         defaultRock = Resources.LoadAll<Rock>("Prefabs/Dispensables")[0];
         multiSlot = GetComponentInChildren<CombinerMultiSlot>();
+
+        inTube.position = TransformUtil.SetY(inTube.position, YLayer.dispenseable);
 	}
 
     protected void combine(Transform combined) {
         Transform result = Instantiate<Transform>(combined);
-        result.position = outTube.position;
+        YLayer.moveToDispensableLayer(result);
         AudioManager.Instance.play(this, AudioLibrary.CombinerSoundName);
     }
 

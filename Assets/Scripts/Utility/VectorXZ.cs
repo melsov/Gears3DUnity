@@ -46,6 +46,20 @@ public struct VectorXZ  {
         get { return v.magnitude; }
     }
 
+    public VectorXZ invertedMagnitudeSafe {
+        get { return  this / Mathf.Max(.01f, dot(this)); }
+    }
+
+    public static VectorXZ max(VectorXZ a, VectorXZ b) {
+        return new VectorXZ(a.x > b.x ? a.x : b.x, a.z > b.z ? a.z : b.z);
+    }
+
+    public static VectorXZ min(VectorXZ a, VectorXZ b) {
+        return new VectorXZ(a.x < b.x ? a.x : b.x, a.z < b.z ? a.z : b.z);
+    }
+
+    public VectorXZ sign() { return new VectorXZ(Mathf.Sign(x), Mathf.Sign(z)); }
+
     public VectorXZ normalized {
         get { return new VectorXZ(v.normalized); }
     }
@@ -99,8 +113,11 @@ public struct VectorXZ  {
     public static VectorXZ operator *(float b, VectorXZ a) {
         return new VectorXZ(a.v * b);
     }
+    public static VectorXZ operator /(VectorXZ v, float f) {
+        return new VectorXZ(v.x / f, v.z / f);
+    }
 
-    public static implicit operator VectorXZ (Vector3 v) { return new VectorXZ(v); }
+        public static implicit operator VectorXZ (Vector3 v) { return new VectorXZ(v); }
     public static implicit operator bool (VectorXZ v) { return !v.isFakeNull(); }
 
     public override bool Equals(object obj) {
@@ -112,6 +129,19 @@ public struct VectorXZ  {
 
     public override string ToString() {
         return string.Format("VecXZ {0} , {1}", x, z);
+    }
+
+    public static bool DebugContainsNaNCheck(params VectorXZ[] vs) {
+        int nans = 0;
+        foreach(VectorXZ v in vs) {
+            if (v.containsNaN()) { nans++; }
+        }
+        if (nans > 0) { Debug.Log(string.Format("{0} were NaN", nans)); }
+        return nans > 0;
+    }
+
+    public bool containsNaN() {
+        return float.IsNaN(x) || float.IsNaN(z);
     }
 
 }
