@@ -81,21 +81,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ExampleScenes\PenningTrapTutorialAssets\ExternalFieldElectricQuadrupoleScript.cs" />
-    <Compile Include="Assets\ExampleScenes\VanDeGraaffExampleAssets\TurnOnTurnOff.cs" />
-    <Compile Include="Assets\ExampleScenes\WrenchesTutorialAssets\TurnOnMagnet.cs" />
-    <Compile Include="Assets\ExampleScenes\WrenchesTutorialAssets\TurnOnMagnetCaller.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ElectromagneticFieldControllerScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ExternalFieldConstantScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ExternalFieldSolenoidScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\ExternalFieldTemplateScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\FieldLineScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\MagneticDipoleScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\StaticChargeScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\SuperconductorInfinitePlaneScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ObjectsToPlaceInYourScene\_ScriptsThatMakeThemWork\SuperconductorSmallSphereScript.cs" />
-    <Compile Include="Assets\Magnetodynamics\ScriptsToEnhanceExistingObjects\MagnetizableMaterial.cs" />
-    <Compile Include="Assets\Magnetodynamics\ScriptsToEnhanceExistingObjects\PlasmaIonizedGas.cs" />
     <Compile Include="Assets\Scripts\Animation\OpenCloseAnimationHandler.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioEntity.cs" />
     <Compile Include="Assets\Scripts\Audio\AudioLibrary.cs" />
@@ -105,6 +90,9 @@
     <Compile Include="Assets\Scripts\Cog\AddOn\AddOn.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\AddOnConnector.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ControllerAddOn.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Extension\ExtensionControllerAddOn.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Extension\NotGate.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Extension\SwitchExtension.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\ProxySwitch.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Scale.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Controller\Spring.cs" />
@@ -115,6 +103,10 @@
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\LightSwitchIndicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffFlag.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffReverseIndicator.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffReverseLight.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator\RangeIndicator.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator\ValueDisplay.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RotationIndicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Receiver\ReceiverAddOn.cs" />
     <Compile Include="Assets\Scripts\Cog\Adjuncts\BoundsXZ.cs" />
@@ -124,6 +116,7 @@
     <Compile Include="Assets\Scripts\Cog\Adjuncts\SegmentXZ.cs" />
     <Compile Include="Assets\Scripts\Cog\Cog.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Bucket.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\CurvyLine.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Combiner\Combiner.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Combiner\CombinerMultiSlot.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\Combiner\CombinerSlot.cs" />
@@ -142,6 +135,8 @@
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Extendable\Extendable.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\HingeMagnet.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Magnet.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\RailMagnet.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\StretchyPole.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\FreeRotationPeg.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\FrontendSocket.cs" />
@@ -189,7 +184,9 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\HingeJointPlaceable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\MagneticPlaceable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\Placeable.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Activatable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\DriverDriven.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Electromagnet.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Gear.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\GearDriven\GearDrivenMechanism.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\GearDriven\GearSwitch.cs" />
@@ -200,6 +197,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Motor.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\Pole.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\RackGear.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\ProducerClient\RotateOffMotor.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\ProducerOnly\HandCrank.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Rope\ChainLink.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Rope\Chainn.cs" />
@@ -210,6 +208,10 @@
     <Compile Include="Assets\Scripts\Cog\Feedback\Chime.cs" />
     <Compile Include="Assets\Scripts\Cog\Feedback\Instrument.cs" />
     <Compile Include="Assets\Scripts\Cog\Feedback\Percussion.cs" />
+    <Compile Include="Assets\Scripts\Cog\GenericCog\SelfContainedTetheredPair.cs" />
+    <Compile Include="Assets\Scripts\Cog\GenericCog\TetheredInput.cs" />
+    <Compile Include="Assets\Scripts\Cog\GenericCog\TetheredOutput.cs" />
+    <Compile Include="Assets\Scripts\Cog\GenericCog\TetheredPair.cs" />
     <Compile Include="Assets\Scripts\Cog\Pairing\Partner\ClientPartner.cs" />
     <Compile Include="Assets\Scripts\Cog\Pairing\Partner\ContributingPartner.cs" />
     <Compile Include="Assets\Scripts\Cog\Pairing\Partner\JealousProducerPartner.cs" />
@@ -219,7 +221,8 @@
     <Compile Include="Assets\Scripts\Cog\Proxy\CollisionProxy.cs" />
     <Compile Include="Assets\Scripts\Cog\Proxy\TriggerProxy.cs" />
     <Compile Include="Assets\Scripts\Cog\Sticker\Sticker.cs" />
-    <Compile Include="Assets\Scripts\Cog\Test\TestCog.cs" />
+    <Compile Include="Assets\Scripts\Cog\Test\TestAddForce.cs" />
+    <Compile Include="Assets\Scripts\Collections\RingBuffer.cs" />
     <Compile Include="Assets\Scripts\EditorActions\UpdateChimes.cs" />
     <Compile Include="Assets\Scripts\Interaction\ColliderDropper.cs" />
     <Compile Include="Assets\Scripts\Interaction\CursorAgent.cs" />
@@ -274,9 +277,12 @@
     <Compile Include="Assets\Scripts\Utility\Debug\Bug.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLine.cs" />
     <Compile Include="Assets\Scripts\Utility\Debug\BugLineComponent.cs" />
+    <Compile Include="Assets\Scripts\Utility\Debug\DebugIndicatorCube.cs" />
     <Compile Include="Assets\Scripts\Utility\EnvironmentSettings.cs" />
     <Compile Include="Assets\Scripts\Utility\LayerLookup.cs" />
     <Compile Include="Assets\Scripts\Utility\MathVector3.cs" />
+    <Compile Include="Assets\Scripts\Utility\ObservableValue\ObservableFloat.cs" />
+    <Compile Include="Assets\Scripts\Utility\ObservableValue\ObservableTransform.cs" />
     <Compile Include="Assets\Scripts\Utility\RayCastUtil.cs" />
     <Compile Include="Assets\Scripts\Utility\Singleton\Singleton.cs" />
     <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />

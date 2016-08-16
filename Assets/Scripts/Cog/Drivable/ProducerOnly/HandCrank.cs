@@ -12,10 +12,10 @@ public class HandCrank : Motor {
         get { return handleSet.handles[0].widget; }
     }
 
-    protected override void vDragOverride(VectorXZ cursorGlobal) {
+    protected override void vDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal) {
         // rotate around the pivot
         Vector3 current = _cursorRotationHandle.position - _cursorRotationPivot.position;
-        Vector3 target = cursorGlobal.vector3(_cursorRotationPivot.position.y) - _cursorRotationPivot.position;
+        Vector3 target = ci.current.vector3(_cursorRotationPivot.position.y) - _cursorRotationPivot.position;
         handleSet.transform.RotateAround(_cursorRotationPivot.position, EnvironmentSettings.towardsCameraDirection, Quaternion.FromToRotation(current, target).eulerAngles.y);
         angle = handleSet.transform.rotation.eulerAngles.y;
     }

@@ -3,27 +3,34 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Motor : Drivable
+public class Motor : Drivable , IObservableSwitchStateProvider
 {
     protected HandleSet handleSet;
     protected LeverLimits leverLimits;
     protected float leverMultiplier;
-    protected float leverMax = 10f;
     protected Handle lever { get { return handleSet.handles[0]; } }
     protected OnOffReverseIndicator onOffIndicator;
     protected Counter counter;
 
     public float maxAngularVelocity = 10f;
-    protected float _power = 1f;
+    protected ObservablePerFloatSwitchState _power = new ObservablePerFloatSwitchState(1f, SwitchState.ON); // float _power = 1f;
+    public ObservableSwitchState getObservableSwitchState() {
+        return _power;
+    }
     public virtual float power {
-        get { return _power * _isPaused * leverMultiplier; }
+        get { return _power.Value * _isPaused * leverMultiplier; }
         set {
-            _power = Mathf.Clamp(value, -1f, 1f);
-            if(onOffIndicator != null) {
-                onOffIndicator.state = SwitchStateHelper.stateFor(_power);
-            }
+            _power.Value = Mathf.Clamp(value, -1f, 1f);
+            //if(onOffIndicator) {
+            //    onOffIndicator.state = SwitchStateHelper.stateFor(_power);
+            //}
             updateAudio();
         }
+    }
+
+    protected void updateAudio() {
+        if (Angles.VerySmall(power)) { AudioManager.Instance.stop(this, AudioLibrary.GearSoundName); }
+        else { AudioManager.Instance.play(this, AudioLibrary.GearSoundName); }
     }
 
     #region contract
@@ -105,10 +112,10 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
             cas.receive = delegate (Cog _producer) {
                 print("receiving addOn contract");
                 controllerAddOn = (ControllerAddOn) findAddOn(_producer);
-                controllerAddOn.setScalar += handleAddOnScalar;
+                controllerAddOn.addSetScalar(handleAddOnScalar);
             };
             cas.beAbsolvedOf = delegate (Cog _producer) {
-                controllerAddOn.setScalar -= handleAddOnScalar;
+                controllerAddOn.removeSetScalar(handleAddOnScalar);
                 controllerAddOn = null;
                 resetAddOnScalar();
             };
@@ -127,19 +134,10 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         };
         return new UniqueClientContractSiteBoss(clientSitePair, lookup);
     }
-    //protected override ConnectionSiteBoss getConnectionSiteBoss() {
-    //    //Get dictionary with entry for motor's controller add on site
-    //    Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
-    //    //Add an entry for motors axel
-    //    CTARSet parentChildSet = new CTARSet(new ContractTypeAndRole(CogContractType.PARENT_CHILD, RoleType.PRODUCER));
-    //    SiteSet ss = new SiteSet(ConnectionSite.factory(this, SiteOrientation.selfMatchingOrientation(), 1));
-    //    lookup.Add(parentChildSet, ss);
-    //    return new ConnectionSiteBoss(lookup);
-    //}
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
-            return ConnectionSiteAgreement.alignTarget(transform);
+            return ConnectionSiteAgreement.alignCog(this); //transform);
         }
         //CONSIDER: could we be asked to travel to a gear?
         return ConnectionSiteAgreement.doNothing;
@@ -153,11 +151,6 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         dc = getAddOnDrivableConnection(other, dc);
         print("conn was viable ? " + dc.viable);
         return dc;
-    }
-
-    protected void updateAudio() {
-        if (Angles.VerySmall(power)) { AudioManager.Instance.stop(this, AudioLibrary.GearSoundName); }
-        else { AudioManager.Instance.play(this, AudioLibrary.GearSoundName); }
     }
 
     protected float _isPaused = 1f;
@@ -185,7 +178,7 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         base.Serialize(ref data);
         SerializeStorage stor = new SerializeStorage();
         stor.maxAngularVelocity = maxAngularVelocity;
-        stor._power = _power;
+        stor._power = _power.Value;
         stor._leverMultiplier = leverMultiplier;
         SaveManager.Instance.SerializeIntoArray(stor, ref data);
     }
@@ -195,7 +188,7 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         SerializeStorage stor;
         if((stor = SaveManager.Instance.DeserializeFromArray<SerializeStorage>(ref data)) != null) {
             maxAngularVelocity = stor.maxAngularVelocity;
-            _power = stor._power;
+            _power = new ObservablePerFloatSwitchState(stor._power, SwitchState.ON);
             leverMultiplier = stor._leverMultiplier;
             setLeverPositon((int)leverMultiplier);
         }
@@ -241,24 +234,27 @@ btw: use delegate to switch ways of moving (with a rigidbody or without) instead
         power = 1f;
     }
 
-    protected override void vDragOverride(VectorXZ cursorGlobal) {
-        Bug.assertNotNullPause(leverLimits.min);
-        float z = Mathf.Clamp(cursorGlobal.z, leverLimits.min.z, leverLimits.max.z);
-        float gradient = leverLimits.gradientPosition(cursorGlobal.z);
-        int lev = leverLimits.closestLevel(gradient);
+    protected override void vDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal) {
+        int lev = leverLimits.levelFor(ci.current);
         setMultiplier(lev);
         counter.turnTo(lev);
         setLeverPositon(lev);
     }
 
     protected void setLeverPositon(int lev) {
-        Vector3 pos = lever.transform.position;
-        pos.z = leverLimits.globalZPositionForLevel(lev);
-        lever.transform.position = pos;
+        leverLimits.setTarget(lever.transform, lev);
+
+        //lever.positionOnAxis(leverLimits.globalLinearPositionForLevel(lev));
+
+        //Vector3 pos = lever.transform.position;
+        //pos.z = leverLimits.globalZPositionForLevel(lev);
+        //lever.transform.position = pos;
     }
 
     protected void setMultiplier(int lev) {
         leverMultiplier = lev;
         updateAudio();
     }
+
+    
 }

@@ -60,6 +60,8 @@ public struct VectorXZ  {
 
     public VectorXZ sign() { return new VectorXZ(Mathf.Sign(x), Mathf.Sign(z)); }
 
+    public float slope { get { return z / x; } }
+
     public VectorXZ normalized {
         get { return new VectorXZ(v.normalized); }
     }
@@ -112,6 +114,9 @@ public struct VectorXZ  {
     }
     public static VectorXZ operator *(float b, VectorXZ a) {
         return new VectorXZ(a.v * b);
+    }
+    public static VectorXZ operator *(VectorXZ a, VectorXZ b) {
+        return new VectorXZ(a.x * b.x, a.z * b.z);
     }
     public static VectorXZ operator /(VectorXZ v, float f) {
         return new VectorXZ(v.x / f, v.z / f);

@@ -16,11 +16,13 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
 
     //public void disconnect() {
     //}
-
-    public void dragOverride(VectorXZ cursorGlobal) {
+    public void startDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal, Collider dragOverrideCollider) {
     }
 
-    public void endDragOverride(VectorXZ cursorGlobal) {
+    public void dragOverride(CursorInfo ci) { // VectorXZ cursorGlobal) {
+    }
+
+    public void endDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal) {
     }
 
     public Collider mainCollider() {
@@ -38,8 +40,6 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
         return null;
     }
 
-    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
-    }
 
     public void suspendConnection() {
     }

@@ -283,13 +283,13 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         return null;
     }
 
-    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+    public void startDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal, Collider dragOverrideCollider) {
     }
 
-    public void dragOverride(VectorXZ cursorGlobal) {
+    public void dragOverride(CursorInfo ci) {// VectorXZ cursorGlobal) {
     }
 
-    public void endDragOverride(VectorXZ cursorGlobal) {
+    public void endDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal) {
     }
 
     public Collider mainCollider() { return GetComponent<Collider>(); }

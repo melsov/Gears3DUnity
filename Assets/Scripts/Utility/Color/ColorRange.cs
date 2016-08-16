@@ -3,8 +3,8 @@ using System.Collections;
 
 public class ColorRange
 {
-    protected int increments;
-    protected HSBColor start;
+    protected readonly int increments;
+    protected readonly HSBColor start;
 
     public ColorRange(int _increments, Color _startColor) {
         increments = _increments;
@@ -13,9 +13,13 @@ public class ColorRange
 
     public Color this[int index] {
         get {
-            float hue = start.h + index / ((float)increments); // Mathf.Clamp01(index / increments); // Angles.FloatModSigned(start.h + Mathf.Clamp01(index / increments), 1f);
+            float hue = start.h + index / ((float)increments); 
             return new HSBColor(hue, start.s, start.b).ToColor();
         }
+    }
+
+    public Color random() {
+        return this[Random.Range(0, increments)];
     }
 
 }

@@ -128,28 +128,33 @@ public class ConnectionSiteAgreement
     public ConnektAction connektAction {
         get {
             if (alwaysNothingAction) { return doNothing; }
+            MonoBehaviour.print(string.Format("*** con aktn as traveller {0}", ToString()));
             if (producerIsTraveller) {
                 return producerSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(producerSite.cog));
             } else {
-                MonoBehaviour.print("*** client con aktn as traveller for");
                 return clientSite.cog.connektActionAsTravellerFor(contract.regenerateSpecificationForOfferee(clientSite.cog));
             }
         }
     }
 
+    public override string ToString() {
+
+        return string.Format("CSA: client: {0} prod: {1} traveller {2}: ", clientSite.cog.name, producerSite.cog.name, producerIsTraveller ? producerSite.cog.name : clientSite.cog.name);
+    }
+
     public static ConnektAction doNothing = delegate (ConnectionSiteAgreement csa) { };
     private bool alwaysNothingAction;
 
-    public static ConnektAction alignTarget(Transform transform) {
+    public static ConnektAction alignCog(Cog cog) {
         return delegate (ConnectionSiteAgreement csa) {
-            Debug.LogError(csa.traveller.transform.name + " of " + transform.name + " aligning to " + csa.destination.transform.name);
-            LocatableContractSite.align(csa.traveller.transform, csa.destination.transform, transform);
+            LocatableContractSite.align(csa.traveller.transform, csa.destination.transform, cog);
         };
     }
 
-    public static ConnektAction alignAndPushYLayer(Transform transform) {
+    public static ConnektAction alignAndPushYLayer(Cog cog) {
         return delegate (ConnectionSiteAgreement csa) {
-            LocatableContractSite.alignAndPushYLayer(csa.traveller.transform, csa.destination.transform, transform);
+            Bug.contractLog(string.Format("align and push Y i am: {0}", cog.name)); // Cog.FindCog(cog).name));
+            LocatableContractSite.alignAndPushYLayer(csa.traveller.transform, csa.destination.transform, cog); // transform);
         };
     }
 

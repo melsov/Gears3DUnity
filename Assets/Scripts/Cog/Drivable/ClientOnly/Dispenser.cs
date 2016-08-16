@@ -94,10 +94,10 @@ public class Dispenser : Drivable {
             cas.receive = delegate (Cog _producer) {
                 print("dispenser receiving addOn contract");
                 controllerAddOn = (ControllerAddOn) findAddOn(_producer);
-                controllerAddOn.setScalar += handleAddOnScalar;
+                controllerAddOn.addSetScalar(handleAddOnScalar);
             };
             cas.beAbsolvedOf = delegate (Cog _producer) {
-                controllerAddOn.setScalar -= handleAddOnScalar;
+                controllerAddOn.removeSetScalar(handleAddOnScalar);
                 controllerAddOn = null;
                 resetAddOnScalar();
             };
@@ -117,7 +117,7 @@ public class Dispenser : Drivable {
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
-            return ConnectionSiteAgreement.alignTarget(transform);
+            return ConnectionSiteAgreement.alignCog(this); //transform);
         }
         return ConnectionSiteAgreement.doNothing;
     }

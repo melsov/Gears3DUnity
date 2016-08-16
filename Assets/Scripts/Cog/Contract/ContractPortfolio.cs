@@ -77,6 +77,25 @@ public class ContractPortfolio : IEnumerable<CogContract>
         }
     }
 
+    public IEnumerable<Cog> clients() {
+        foreach(CogContract cc in contractsWithClients()) {
+            yield return cc.client.cog;
+        }
+    }
+
+    public IEnumerable<CogContract> contractsWithProducers() {
+        foreach(CogContract cc in this) {
+            if(cc.producer.cog == cog) { continue; }
+            yield return cc;
+        }
+    }
+
+    public IEnumerable<Cog> producers() {
+        foreach(CogContract cc in contractsWithProducers()) {
+            yield return cc.producer.cog;
+        }
+    }
+
     internal bool hasContractWith(Cog cog) {
         foreach(CogContract cc in this) {
             if (cc.isParticipant(cog)) {
@@ -111,10 +130,19 @@ public class ContractPortfolio : IEnumerable<CogContract>
     }
 
     public ContractSpecification accommodatedSpecification(Cog offerer, ContractPortfolio offerersPortfolio, ContractSpecification specification) {
-        Assert.IsTrue(offerer != cog, "oh no, the offeree Cog is supposed to accommodate");
+        Assert.IsTrue(offerer != cog, "oh no, the offeree Cog is supposed to be the one accommodating");
 
         SiteSet ss = contractSiteBoss.getSiteSet(specification.contractTypeAndRoleForOfferee());
         SiteSet offererSiteSet = offerersPortfolio.contractSiteBoss.getSiteSet(specification.toContractTypeAndRoleForOfferer());
+
+        ProvisoPair proviso = SiteSet.Proviso(ss, offererSiteSet);
+        if (proviso) {
+            return createContractSpecificationFrom(specification, proviso.offererSite, proviso.offereeSite);
+        }
+        Debug.Log("** got non existent");
+        return ContractSpecification.NonExistant(); 
+
+        /* pepperoni */
         foreach (ContractSite site in ss) {
             if (site.occupied) { continue; }
             foreach(ContractSite offerersSite in offererSiteSet.sitesOrderedByDistanceFrom(site.transform.position)) { // offerersPortfolio.contractSiteBoss.getSiteSet(specification.toContractTypeAndRoleForOfferer())) { 
@@ -146,7 +174,7 @@ public class ContractPortfolio : IEnumerable<CogContract>
     public class ClientTree
     {
         public Node root;
-        
+
         public ClientTree(Node root) {
             this.root = root;
         }
@@ -161,26 +189,14 @@ public class ContractPortfolio : IEnumerable<CogContract>
 
         public delegate void ContractAction(CogContract cc);
 
-        public void actionOnClientContractsBredthFirst(ContractAction contractAction) {
-            //foreach(Node node in root.orderedChildrenBredthFirst()) {
-            //    foreach(CogContract cc in node.portfolio.contractsWithClients()) {
-            //        Debug.LogError("cog: " + cc.producer.cog.name);
-            //        contractAction(cc);
-            //    }
-            //}
-        }
-
         public IEnumerator perMaxFixedFrameActionOnClients(ContractAction contractAction) {
             foreach (Node node in root.orderedChildrenBredthFirst()) {
                 foreach (CogContract cc in node.portfolio.contractsWithClients()) {
-                    Debug.LogError("cog: " + cc.producer.cog.name);
                     float waitTime = Time.maximumDeltaTime * 1.1f;
-                    Debug.Log(waitTime);
                     yield return new WaitForSeconds(waitTime);
                     contractAction(cc);
                 }
             }
-
         }
 
         public void bredthFirstActionChildrenOnly(CogAction cogAction) {
@@ -199,18 +215,27 @@ public class ContractPortfolio : IEnumerable<CogContract>
         }
 
         public void moveChildrenRelative(Vector3 nudge) {
-            moveRelative(nudge, true);
+            foreach(Node node in root.immediateChildren()) {
+                foreach(Node n in node.children()) {
+                    move(n.portfolio.cog, nudge);
+                }
+            }
         }
 
         public void moveRelative(Vector3 nudge) {
-            moveRelative(nudge, false);
+            foreach(Node node in root.childrenForMoveOperation()) {
+                move(node.portfolio.cog, nudge);
+            } 
         }
 
-        private void moveRelative(Vector3 nudge, bool excludeRoot) {
-            foreach(Node node in root.children()) {
+        private static void move(Cog cog, Vector3 nudge) {
+            cog.move(cog.transform.position + nudge);
+        }
+
+        public void moveRelatedAction(CogAction cogAction, bool excludeRoot) {
+            foreach(Node node in root.childrenForMoveOperation()) {
                 if (excludeRoot && node == root) { continue; }
-                //node.portfolio.cog.transform.position += nudge;
-                node.portfolio.cog.move(node.portfolio.cog.transform.position + nudge);
+                cogAction(node.portfolio.cog);
             }
         }
 
@@ -242,32 +267,47 @@ public class ContractPortfolio : IEnumerable<CogContract>
                 get { return (ContractPortfolio)_portfolio.Target; }
             }
 
-            public Node(ContractPortfolio cp_) {
+            private readonly bool propagatesMoveOperation; // = true;
+
+            public Node(ContractPortfolio cp_) : this(cp_, true) { }
+
+            public Node(ContractPortfolio cp_, bool propagatesMoveOperation) {
                 _portfolio = new WeakReference(cp_);
+                this.propagatesMoveOperation = propagatesMoveOperation;
+            }
+
+            public virtual HashSet<Node> childrenForMoveOperation() {
+                HashSet<Node> result = new HashSet<Node>();
+                childrenForMoveOperation(ref result);
+                return result;
+            }
+
+            public void childrenForMoveOperation(ref HashSet<Node> childNodes) {
+                if (childNodes.Contains(this)) { return; }
+                childNodes.Add(this);
+                if(!propagatesMoveOperation) { return; }
+
+                foreach (CogContract cc in portfolio) {
+                    if (cc == null || cc.client == null || cc.client.cog == null) { continue; }
+                    cc.client.cog.node.childrenForMoveOperation(ref childNodes);
+                }
             }
 
             public HashSet<Node> children() {
                 HashSet<Node> result = new HashSet<Node>();
-                children(ref result, false);
+                children(ref result);
                 return result;
             }
 
-            //public HashSet<Node> nonParentChildChildren() {
-            //    HashSet<Node> result = new HashSet<Node>();
-            //    children(ref result, true, false);
-            //    return result;
-            //}
-
-            private void children(ref HashSet<Node> childNodes, bool excludeParentChildContracts) {
+            private void children(ref HashSet<Node> childNodes) {
                 if (childNodes.Contains(this)) { return; }
                 childNodes.Add(this);
 
                 foreach (CogContract cc in portfolio) {
                     if (cc == null || cc.client == null || cc.client.cog == null) { continue; }
-                    cc.client.cog.node.children(ref childNodes, excludeParentChildContracts);
+                    cc.client.cog.node.children(ref childNodes);
                 }
             }
-
 
             public Queue<Node> orderedChildrenBredthFirst() {
                 Queue<Node> result = new Queue<Node>();
@@ -287,9 +327,28 @@ public class ContractPortfolio : IEnumerable<CogContract>
                 return result;
             }
 
+            public IEnumerable<Node> immediateChildren() {
+                foreach(CogContract cc in portfolio.contractsWithClients()) {
+                    yield return cc.client.cog.node;
+                }
+            }
+
 
         }
     }
 
     #endregion
+}
+
+public struct ProvisoPair
+{
+    public readonly ContractSite offererSite;
+    public readonly ContractSite offereeSite;
+
+    public ProvisoPair(ContractSite offererSite, ContractSite offereeSite) {
+        this.offereeSite = offereeSite;
+        this.offererSite = offererSite;
+    }
+
+    public static implicit operator bool(ProvisoPair p) { return p.offereeSite && p.offererSite; }
 }

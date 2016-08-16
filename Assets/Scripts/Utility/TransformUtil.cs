@@ -60,20 +60,16 @@ public class TransformUtil : MonoBehaviour
         return null;
     }
 
-    public static T FindComponentInThisOrChildren<T>(Transform t) {
-        T result = t.GetComponent<T>();
-        if (result == null) {
-            result = t.GetComponentInChildren<T>();
+    public static T GetComponentOnlyInChildren<T>(Transform t) where T : MonoBehaviour {
+        foreach(Transform child in t) {
+            T found = child.GetComponentInChildren<T>();
+            if (found) { return found; }
         }
-        return result;
+        return null;
     }
 
-    public static T FindComponentInThisOrParent<T>(Transform t) {
-        T result = t.GetComponent<T>();
-        if (result == null) {
-            result = t.GetComponentInParent<T>();
-        }
-        return result;
+    public static T GetComponentOnlyInParents<T>(Transform t) where T : MonoBehaviour {
+        return t.parent.GetComponentInParent<T>();
     }
 
     public static List<T> FindInCogExcludingChildCogs<T>(Cog cog) {
@@ -93,6 +89,14 @@ public class TransformUtil : MonoBehaviour
                     search.Enqueue(child);
                 }
             }
+        }
+        return result;
+    }
+
+    public static T AddComponentIfNot<T>(Transform g) where T : MonoBehaviour {
+        T result = g.GetComponent<T>();
+        if(!result) {
+            result = g.gameObject.AddComponent<T>();
         }
         return result;
     }
@@ -135,4 +139,98 @@ public class TransformUtil : MonoBehaviour
         }
         return pos - closest; 
     }
+
+    #region physics
+    
+    public static float dragCoefficient(Rigidbody rb) {
+        return 1f - Time.fixedDeltaTime * rb.drag;
+    }
+
+    public static Vector3 forceForVelocity(Rigidbody rb, Vector3 targetVel) {
+        return (targetVel / dragCoefficient(rb) - rb.velocity) * rb.mass / Time.fixedDeltaTime;
+    }
+
+    public static Vector3 forceForTargetPosition(Rigidbody rb, Vector3 targetPosition) {
+        Vector3 dist = targetPosition - rb.position;
+        Vector3 targetVel = dist / Time.fixedDeltaTime;
+        return forceForVelocity(rb, targetVel);
+    }
+
+    /* 
+     * Rough accuracy: ~ 1e-03 with force 1e04 and 'large' velocity  */
+    public static Vector3 distanceOneFrameGiven(Rigidbody rb, Vector3 force) {
+        Vector3 vel = (rb.velocity + force * Time.fixedDeltaTime / rb.mass) * dragCoefficient(rb);
+        return vel * Time.deltaTime;
+    }
+    #endregion
 }
+
+public enum Axis
+{
+    X, Y, Z
+};
+
+public class AxisUtil3
+{
+    private delegate Vector3 SetPosition(Vector3 v, float axisPos);
+    private SetPosition setPosition;
+    private delegate float GetAxisPosition(Vector3 v);
+    private GetAxisPosition getAxisPosition;
+    public readonly Axis axis;
+    
+    private static SetPosition GetSetPositionFor(Axis axis) {
+        SetPosition result;
+        switch(axis) {
+            case Axis.X:
+                result = delegate (Vector3 v, float axisPos) {
+                    return new Vector3(axisPos, v.y, v.z);
+                };
+                break;
+            case Axis.Y:
+                result = delegate (Vector3 v, float axisPos) {
+                    return new Vector3(v.x, axisPos, v.z);
+                };
+                break;
+            case Axis.Z:
+            default:
+                result = delegate (Vector3 v, float axisPos) {
+                    return new Vector3(v.x, v.y, axisPos);
+                };
+                break;
+        }
+        return result;
+    }
+
+    private static GetAxisPosition GetGetPositionFor(Axis axis) {
+        GetAxisPosition result;
+        switch(axis) {
+            case Axis.X:
+                result = delegate (Vector3 v) { return v.x; };
+                break;
+            case Axis.Y:
+                result = delegate (Vector3 v) { return v.y; };
+                break;
+            case Axis.Z:
+            default:
+                result = delegate (Vector3 v) { return v.z; };
+                break;
+        }
+        return result;
+    }
+
+    public AxisUtil3(Axis axis_) {
+        axis = axis_;
+        setPosition = GetSetPositionFor(axis_);
+        getAxisPosition = GetGetPositionFor(axis_);
+    }
+
+    public float axisPosition(Vector3 v) { return getAxisPosition(v); }
+    
+    public Vector3 positionOnAxis(Vector3 v, float axisPos) {
+        return GetSetPositionFor(axis)(v, axisPos);
+    }
+
+    
+
+}
+

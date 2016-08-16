@@ -10,7 +10,6 @@ public class GearSwitch : GearDrivenMechanism, IControllerAddOnProvider  {
     protected override void awake() {
         base.awake();
         proxySwitch = GetComponentInChildren<ProxySwitch>();
-        proxySwitch.shouldPositionOnConnect = false;
         proxySwitch.shouldFollowClient = false;
         rotationObserver = gearMesh.GetComponent<RotationObserver>();
         if (rotationObserver == null) {
@@ -18,7 +17,7 @@ public class GearSwitch : GearDrivenMechanism, IControllerAddOnProvider  {
         }
         rotationObserver.intervals = 2;
         rotationObserver.notifyRotation = onRotationEvent;
-        forceEarmarkedParentChildContractWithChild(proxySwitch, Earmark.A);
+        forcePermanentEarmarkedParentChildContract(proxySwitch, Earmark.A);
     }
 
     public void onRotationEvent(RotationEvent re) {

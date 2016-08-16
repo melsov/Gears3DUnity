@@ -32,7 +32,7 @@ public class PairCTARSiteSet
     }
 
     public static PairCTARSiteSet fromSocketSet(Cog cog, SocketSet socketSet, RigidRelationshipConstraint rrc) {
-        if (socketSet.sockets.Length == 0) { Debug.LogError("CSB returning empty pair for: " + cog.name); return emptyPair(); }
+        if (socketSet.sockets.Length == 0) { return emptyPair(); }
         SiteOrientation ori = SiteOrientation.fromRigidRelationshipConstraint(rrc);
         // ermmmmm...how to deal with rotation mode? (don't allow free rotations any more? and, instead, turn hinge joints into full-fledged cogs? <-- like)
         CTARSet tar = new CTARSet(new ContractTypeAndRole(
@@ -236,6 +236,29 @@ public class SiteSet : IEnumerable<ContractSite>
         }
     }
 
+    public static ProvisoPair Proviso(SiteSet offeree, SiteSet offerer) {
+        List<ProvisoPair> provisos = OrderedProvisos(offeree, offerer);
+        if (provisos.Count == 0) { return default(ProvisoPair); }
+        return provisos[0];
+    }
+
+    private static List<ProvisoPair> OrderedProvisos(SiteSet offeree, SiteSet offerer) {
+        List<ProvisoPair> result = new List<ProvisoPair>(12);
+        foreach(ContractSite offereeSite in offeree) {
+            if (offereeSite.occupied) { continue; }
+            foreach(ContractSite offererSite in offerer) {
+                if (offererSite.occupied) { continue; }
+                if (!offereeSite.canAccommodate(offererSite)) { continue; }
+                Debug.Log("adding");
+                result.Add(new ProvisoPair(offererSite, offereeSite));
+            }
+        }
+        Debug.Log("results: " + result.Count);
+        return new List<ProvisoPair>(result).OrderBy(delegate (ProvisoPair pp) {
+            return (pp.offereeSite.transform.position - pp.offererSite.transform.position).sqrMagnitude;
+        }).ToList();
+    }
+
     public List<ContractSite> sitesOrderedByDistanceFrom(VectorXZ pos) {
         return new List<ContractSite>(sites).OrderBy(delegate(ContractSite cs) {
             return (cs.transform.position - pos).magnitudeSquared;
@@ -319,9 +342,12 @@ public class ContractSite
         set { _orientation = value; }
     }
 
+    private CogContract _contract;
     public virtual CogContract contract {
-        get; 
-        set; 
+        get { return _contract; }
+        set {
+            _contract = value;
+        }
     }
 
     public virtual Transform transform {
@@ -373,6 +399,25 @@ public class ContractSite
         }
         return sites;
     }
+
+    #region debug
+
+    private DebugIndicatorCube _debugIndicatorCube;
+    public DebugIndicatorCube debugIndicatorCube {
+        get {
+            if (!_debugIndicatorCube) {
+                _debugIndicatorCube = transform.GetComponentInChildren<DebugIndicatorCube>();
+                if (!_debugIndicatorCube) {
+                    _debugIndicatorCube = GameObject.Instantiate<DebugIndicatorCube>(Resources.Load<DebugIndicatorCube>("Prefabs/Debug/DebugIndicatorCube"));
+                    UnityEngine.Assertions.Assert.IsFalse(_debugIndicatorCube == null, " still? ");
+                    _debugIndicatorCube.transform.parent = transform;
+                    _debugIndicatorCube.transform.localPosition = transform.localPosition * -.2f;
+                }
+            }
+            return _debugIndicatorCube;
+        }
+    }
+    #endregion
 }
 
 public class NonExistantContractSite : ContractSite
@@ -425,13 +470,15 @@ public class LocatableContractSite : ContractSite
 
     public static implicit operator Transform(LocatableContractSite connectionSite) { return connectionSite.transform; }
 
-    public static void align(Transform targetSite, Transform destinationSite, Transform target) {
-        target.position += destinationSite.position - targetSite.position;
+    public static void align(Transform targetSite, Transform destinationSite, Cog cog) {
+        cog.move(cog.transform.position + destinationSite.position - targetSite.position);
+        //cog.position += destinationSite.position - targetSite.position;
     }
 
-    public static void alignAndPushYLayer(Transform targetSite, Transform destinationSite, Transform target) {
-        align(targetSite, destinationSite, target);
-        target.position = TransformUtil.SetY(target.position, destinationSite.transform.position.y + YLayer.LayerHeight);
+    public static void alignAndPushYLayer(Transform targetSite, Transform destinationSite, Cog cog) {
+        align(targetSite, destinationSite, cog);
+        cog.move(TransformUtil.SetY(cog.transform.position, destinationSite.transform.position.y + YLayer.LayerHeight));
+        //cog.position = TransformUtil.SetY(cog.position, destinationSite.transform.position.y + YLayer.LayerHeight);
     }
 
 }

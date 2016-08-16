@@ -19,6 +19,22 @@ public class LineSegment : MonoBehaviour {
     public delegate void AdjustedExtents();
     public AdjustedExtents adjustedExtents;
 
+    internal void setEndPosition(VectorXZ global) {
+        end.position = new Vector3(global.x, end.position.y, global.z);
+    }
+
+    internal void setStartPosition(VectorXZ global) {
+        start.position = new Vector3(global.x, start.position.y, global.z);
+    }
+
+    internal VectorXZ midPoint() {
+        return startXZ + distance * .5f;
+    }
+
+    internal VectorXZ closestTerminus(VectorXZ global) {
+        return (global - startXZ).magnitudeSquared < (global - endXZ).magnitudeSquared ? startXZ : endXZ;
+    }
+
     // Use this for initialization
     void Awake () {
         lr = GetComponent<LineRenderer>();
@@ -54,6 +70,10 @@ public class LineSegment : MonoBehaviour {
 
     public VectorXZ closestPointOnLine(VectorXZ global) {
         return startXZ + normalized * normalized.dot(global - startXZ);
+    }
+
+    public float axisPosition(VectorXZ global) {
+        return dotWithNormalized(global - startXZ);
     }
 
     public float dotWithNormalized(VectorXZ v) {
@@ -97,9 +117,18 @@ public class LineSegment : MonoBehaviour {
         */
     }
 
+    public bool isOnSegment(VectorXZ global) {
+        return isOnSegment(global, .05f);
+    }
+    
+    public bool isOnSegment(VectorXZ global, float tolerance) {
+        VectorXZ fromStart = global - startXZ;
+        return withinSegmentDomain(global) && Mathf.Abs(fromStart.slope - slopeXZ) < tolerance;
+    }
+
     public float slopeXZ {
         get {
-            return (end.position.z - start.position.z) / (end.position.x - start.position.x);
+            return distance.slope;// (end.position.z - start.position.z) / (end.position.x - start.position.x);
         }
     }
 

@@ -6,7 +6,17 @@ using System.Collections.Generic;
 public class ControllerAddOn : AddOn {
 
     public delegate void SetScalar(float scalar);
-    public SetScalar setScalar;
+    protected SetScalar setScalar;
+    public virtual void addSetScalar(SetScalar setScalar) {
+        this.setScalar += setScalar;
+    }
+    public virtual void removeSetScalar(SetScalar setScalar) {
+        this.setScalar -= setScalar;
+    }
+    //DBUG
+    public bool debugSetScalarIsNull() {
+        return setScalar == null;
+    }
 
     protected override void awake() {
         base.awake();
@@ -53,11 +63,12 @@ public class ControllerAddOn : AddOn {
     public override ProducerActions producerActionsFor(Cog client, ContractSpecification specification) {
         ProducerActions pas = new ProducerActions();
         pas.initiate = delegate (Cog _client) {
-            print("init CAO contract");
-            if (shouldPositionOnConnect) {
+            if (false) { // shouldPositionOnConnect) {
+                Debug.LogError("trying to purge 'shouldPositionOnConnect'; do we really need it in the case of: " + name);
+                UnityEditor.EditorApplication.isPaused = true;
                 positionOnConnect(_client);
             } else {
-                _client.positionRelativeToAddOn(this);
+                //_client.positionRelativeToAddOn(this);
             }
             if (shouldFollowClient) {
                 follower.offset = transform.position - _client.transform.position;
@@ -65,7 +76,6 @@ public class ControllerAddOn : AddOn {
             }
         };
         pas.dissolve = delegate (Cog _client) {
-            print("dissoble CAO contract");
         };
         pas.fulfill = delegate (Cog _client) {
         };
@@ -77,7 +87,6 @@ public class ControllerAddOn : AddOn {
     }
 
     protected override ContractSiteBoss getContractSiteBoss() {
-        Dictionary<CTARSet, SiteSet> lookup = LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this);
         ContractSiteBoss csb = new ContractSiteBoss(LocatableSiteSetAndCTARSetSetup.connectionSiteLookupFor(this));
         addConnectionSiteEntriesForBackSocketSet(this, csb);
         return csb;
@@ -85,7 +94,7 @@ public class ControllerAddOn : AddOn {
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.CONTROLLER_ADDON_DRIVABLE) {
-            return ConnectionSiteAgreement.alignTarget(transform);
+            return ConnectionSiteAgreement.alignCog(this); // transform);
         }
         return ConnectionSiteAgreement.doNothing;
     }

@@ -20,12 +20,12 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
     //public void disconnect() {
     //}
 
-    public void dragOverride(VectorXZ cursorGlobal) {
-        handleRotator.dragOverride(cursorGlobal);
+    public void dragOverride(CursorInfo ci) { //VectorXZ cursorGlobal) {
+        handleRotator.dragOverride(ci.current); // cursorGlobal);
     }
 
-    public void endDragOverride(VectorXZ cursorGlobal) {
-        handleRotator.endDragOverride(cursorGlobal);
+    public void endDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal) {
+        handleRotator.endDragOverride(ci.current);// cursorGlobal);
     }
 
     public void handleTriggerEnter(Collider other) {
@@ -60,8 +60,8 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
         return null;
     }
 
-    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
-        handleRotator.startDragOverride(cursorGlobal, dragOverrideCollider);
+    public void startDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+        handleRotator.startDragOverride(ci.current, ci.collider); // cursorGlobal, dragOverrideCollider);
     }
 
     public void suspendConnection() {

@@ -29,6 +29,8 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         get { return _dragOverrideCollider; }
     }
 
+    private CursorInfo cursorInfo = CursorInfo.FakeNull();
+
     void Awake() {
         colliderDropper = GetComponent<ColliderDropper>();
         if (colliderDropper == null) {
@@ -48,10 +50,11 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         _cursorInteracting = true;
         _dragOverrideCollider = null;
         _dragOverrideCollider = RayCastUtil.getColliderUnderCursor(dragOverrideLayer, out rayHit);
+        cursorInfo = new CursorInfo(cursorGlobal, cursorGlobal, _dragOverrideCollider);
         if (urClient != null) {
             if (overridingDrag) {
                 if (isClient)
-                    client.startDragOverride(cursorGlobal, _dragOverrideCollider);
+                    client.startDragOverride(cursorInfo); // cursorGlobal, _dragOverrideCollider);
             } else {
                 //client.disconnect();
                 urClient.normalDragStart(cursorGlobal);
@@ -70,10 +73,11 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     public void cursorInteracting(VectorXZ cursorGlobal) {
+        cursorInfo.current = cursorGlobal;
         if (urClient == null) { return; }
         disableCollider(false);
         if (overridingDrag) {
-            if (isClient) client.dragOverride(cursorGlobal);
+            if (isClient) client.dragOverride(cursorInfo); // cursorGlobal);
         } else {
             urClient.normalDrag(cursorGlobal);
         }
@@ -88,11 +92,12 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {
+        cursorInfo.current = cursorGlobal;
         _cursorInteracting = false;
         unhighlight();
         if (urClient == null) { return; }
         if (overridingDrag) {
-            if (isClient) client.endDragOverride(cursorGlobal);
+            if (isClient) client.endDragOverride(cursorInfo); // cursorGlobal);
         } else {
             urClient.normalDragEnd(cursorGlobal);
         }
@@ -165,6 +170,29 @@ public interface ICursorAgentUrClient
 
 }
 
+public struct CursorInfo
+{
+    public readonly VectorXZ start;
+    public VectorXZ current;
+    public readonly Collider collider;
+
+    public VectorXZ relativeToStart { get { return current - start; } }
+    
+    public CursorInfo(VectorXZ start, VectorXZ current, Collider collider) {
+        this.start = start;
+        this.current = current;
+        this.collider = collider;
+    }
+
+    public static CursorInfo FakeNull() {
+        return new CursorInfo(VectorXZ.fakeNull, VectorXZ.fakeNull, null);
+    }
+
+    public bool isFakeNull() { return start.isFakeNull(); }
+
+    public static implicit operator VectorXZ(CursorInfo ci) { return ci.current; }
+}
+
 public interface ICursorAgentClient : ICursorAgentUrClient
 {
     void handleTriggerEnter(Collider other);
@@ -172,9 +200,9 @@ public interface ICursorAgentClient : ICursorAgentUrClient
     Collider shouldPreserveConnection();
     void onDragEnd();
     bool makeConnectionWithAfterCursorOverride(Collider other);
-    void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider);
-    void dragOverride(VectorXZ cursorGlobal);
-    void endDragOverride(VectorXZ cursorGlobal);
+    void startDragOverride(CursorInfo cursorInfo); // VectorXZ cursorGlobal, Collider dragOverrideCollider);
+    void dragOverride(CursorInfo cursorInfo); //  VectorXZ cursorGlobal);
+    void endDragOverride(CursorInfo cursorInfo); // VectorXZ cursorGlobal);
     Collider mainCollider();
     void triggerExitDuringDrag(Collider other);
 }

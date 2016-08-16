@@ -1,13 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Scale : Switch {
 
+
+public interface IObservableFloatProvider
+{
+    ObservableFloat getObservableFloat();
+}
+
+public class Scale : Switch , IObservableFloatProvider {
+
+    protected ObservableFloat _omass;
+    protected ObservableFloat omass {
+        get {
+            if (_omass == null) {
+                _omass = new ObservableFloat();
+            }
+            return _omass;
+        }
+    }
     private float lastMass;
     [SerializeField]
     private float threshhold = 4f;
 
-    //private SpringJoint sj;
     private Spring sj;
     private Rigidbody platformRB;
     private float startPosition;
@@ -22,8 +37,11 @@ public class Scale : Switch {
         getPosition = delegate () { return platformRB.transform.localPosition.z - sj.connectedBody.transform.localPosition.z; };
         startPosition = getPosition();
         getGravity = delegate () { return Physics.gravity.z; };
-        print(getGravity());
-        print(sj.spring);
+
+    }
+
+    public ObservableFloat getObservableFloat() {
+        return omass;
     }
 
     private float displacement {
@@ -38,20 +56,23 @@ public class Scale : Switch {
         get { return springForce / getGravity() - platformRB.mass; }
     }
 
-    private static int test;
     public void FixedUpdate() {
+        omass.Value = mass;
         checkToggle();
         lastMass = mass;
     }
 
     private void checkToggle() {
-        if (lastMass < threshhold != mass > threshhold) { return; }
-        toggle();
+        if (lastMass < threshhold == mass > threshhold) {
+            toggle();
+        }
     }
 
     protected override void toggle() {
         SwitchState state = mass - lastMass > 0f ? SwitchState.ON : SwitchState.OFF;
         on.setState(state);
+        updateIndicator();
+        updateClient();
     }
 
 }

@@ -8,8 +8,9 @@ public class Piston : GearDrivenMechanism , LinearDrive
     //protected Transform gearMesh;
     protected Transform shaft;
     protected Transform pistonHead;
-    protected LineSegment lineSegment;
 
+   
+    protected LineSegment lineSegment;
     [SerializeField]
     protected float headSpeed = .03f;
     private float progressor = 0f;

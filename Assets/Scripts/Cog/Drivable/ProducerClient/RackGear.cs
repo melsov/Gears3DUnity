@@ -156,7 +156,7 @@ public class RackGear : Gear {
                 adjustForCrowding();
             };
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
-            return ConnectionSiteAgreement.alignAndPushYLayer(transform);
+            return ConnectionSiteAgreement.alignAndPushYLayer(this); //transform);
         }
         return ConnectionSiteAgreement.doNothing;
     }

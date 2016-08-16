@@ -12,12 +12,12 @@ public class LocatableSiteSetAndCTARSetSetup : MonoBehaviour {
     }
 
     private List<LocatableContractSite> siteList() {
-        List<LocatableContractSite> sites = new List<LocatableContractSite>();
-        foreach(LocationOrientation lor in this.sites) {
-            LocatableContractSite lcs = new LocatableContractSite(Cog.FindCog(transform), SiteOrientation.OrientedOrientation(lor.direction), lor.trans);
-            sites.Add(lcs);
+        List<LocatableContractSite> result = new List<LocatableContractSite>();
+        foreach(LocationOrientation lor in sites) {
+            LocatableContractSite lcs = new LocatableContractSite(Cog.FindCog(transform), SiteOrientation.OrientedOrientation(lor.direction), lor.trans, lor.earmark);
+            result.Add(lcs);
         }
-        return sites;
+        return result;
     }
 
     public ExclusionarySiteSet getExclusionarySiteSiteSet() {
@@ -67,4 +67,5 @@ public struct LocationOrientation
 {
     public CardinalDirection direction;
     public Transform trans;
+    public Earmark earmark;
 }

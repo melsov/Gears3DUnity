@@ -44,7 +44,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
             return uniqueClientConnectionSiteBoss.uniqueConnectionSiteAgreement;
         }
     }
-//TODO: all unique client connection sites require locatability
+
     protected List<Drivable> drivables = new List<Drivable>();
     protected ControllerAddOn controllerAddOn;
     protected List<ReceiverAddOn> receiverAddOns = new List<ReceiverAddOn>();
@@ -141,7 +141,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.PARENT_CHILD) {
-            return ConnectionSiteAgreement.alignAndPushYLayer(transform);
+            return ConnectionSiteAgreement.alignAndPushYLayer(this); // transform);
         }
         return ConnectionSiteAgreement.doNothing;
     }
@@ -170,6 +170,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     #region drag
 
     protected override void suspendOnDragStart() {
+        base.suspendOnDragStart();
         if (uniqueClientConnectionSiteBoss.isInContractWithProducer) {
             Bug.contractLog(name + " %%%^^^%%%% suspends contract with uniq producer ");
             uniqueClientConnectionSiteBoss.producerSiteOfUniqueClientContractSite.contract.suspend();
@@ -177,6 +178,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     protected override void restoreOnDragEnd() {
+        base.restoreOnDragEnd();
         if (uniqueClientConnectionSiteBoss.isInContractWithProducer) {
             Bug.contractLog(name + " restores contract with uniq producer");
             uniqueClientConnectionSiteBoss.producerSiteOfUniqueClientContractSite.contract.restore();
@@ -552,14 +554,14 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         return null;
     }
 
-    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
-        vStartDragOverride(cursorGlobal, dragOverrideCollider);
+    public void startDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+        vStartDragOverride(ci); // cursorGlobal, dragOverrideCollider);
     }
-    public void dragOverride(VectorXZ cursorGlobal) { 
-        vDragOverride(cursorGlobal);
+    public void dragOverride(CursorInfo ci) { 
+        vDragOverride(ci);
     }
-    public void endDragOverride(VectorXZ cursorGlobal) {
-        vEndDragOverride(cursorGlobal);
+    public void endDragOverride(CursorInfo ci) {// VectorXZ cursorGlobal) {
+        vEndDragOverride(ci); // cursorGlobal);
     }
 
     protected virtual void updateCursorRotationPivot(Collider dragOverrideCollider) {
@@ -595,14 +597,16 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         }
     }
 
-    protected virtual void vStartDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+    protected virtual void vStartDragOverride(CursorInfo ci) {
+        VectorXZ cursorGlobal = ci.current; Collider dragOverrideCollider = ci.collider;
         removeConstraintsFromWidget(dragOverrideCollider.GetComponent<Handle>());
         _cursorRotationHandle = dragOverrideCollider.transform;
         _cursorRotationPivot = null;
         updateCursorRotationPivot (dragOverrideCollider);
     }
-    protected virtual void vDragOverride(VectorXZ cursorGlobal) {
+    protected virtual void vDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal) {
         // rotate around the pivot
+        VectorXZ cursorGlobal = ci;
         Vector3 current = _cursorRotationHandle.position - _cursorRotationPivot.position;
         Vector3 target = cursorGlobal.vector3(_cursorRotationPivot.position.y) - _cursorRotationPivot.position;
         dragOverrideTarget.RotateAround(_cursorRotationPivot.position, EnvironmentSettings.towardsCameraDirection, Quaternion.FromToRotation(current, target).eulerAngles.y);
@@ -760,7 +764,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         if (controllerAddOn == null) {
             print("controller add on connect " + cao.name + " parent cog: " + FindCog(cao.transform).name);
             controllerAddOn = cao;
-            controllerAddOn.setScalar += handleAddOnScalar;
+            controllerAddOn.addSetScalar(handleAddOnScalar);
             return true;
         }
         return false;

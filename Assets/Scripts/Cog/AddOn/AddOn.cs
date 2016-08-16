@@ -4,8 +4,8 @@ using System;
 
 public abstract class AddOn : Cog , ICursorAgentClient
 {
-    public bool shouldPositionOnConnect = true;
-    public bool shouldFollowClient = true;
+    //public bool shouldPositionOnConnect = true;
+    public bool shouldFollowClient = false; //??? WANT (hopefully we don't anymore)??? true;
     //public IAddOnClient client; //TODO: purge client from add on? or make into a property at least...don't use where unneeded
     //public bool hasClient {
     //    get { return client != null; }
@@ -48,7 +48,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
         if (aoc != null) {
             if (aoc.connectToAddOn(this)) {
                 if (!TransformUtil.IsDescendent(transform, cog.transform)) {
-                    if (shouldPositionOnConnect) {
+                    if (false) { // shouldPositionOnConnect) {
                         positionOnConnect(cog);                        
                     } else {
                         cog.positionRelativeToAddOn(this);
@@ -88,9 +88,9 @@ public abstract class AddOn : Cog , ICursorAgentClient
         }
     }
 */
-    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) { vStartDragOverride(cursorGlobal, dragOverrideCollider); }
-    public void dragOverride(VectorXZ cursorGlobal) { vDragOverride(cursorGlobal); }
-    public void endDragOverride(VectorXZ cursorGlobal) { vEndDragOverride(cursorGlobal); }
+    public void startDragOverride(CursorInfo ci) { vStartDragOverride(ci); }
+    public void dragOverride(CursorInfo ci) { vDragOverride(ci); }
+    public void endDragOverride(CursorInfo ci) { vEndDragOverride(ci); }
 
     private void updateRotationHandle(Collider dragOverrideCollider) {
         rotationHandle = null;
@@ -99,18 +99,18 @@ public abstract class AddOn : Cog , ICursorAgentClient
         }
     }
 
-    protected virtual void vStartDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
-        updateRotationHandle(dragOverrideCollider);
+    protected virtual void vStartDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+            updateRotationHandle(ci.collider); //dragOverrideCollider);
         if (rotationHandle != null) {
             rotationHandle.startRotateAround(transform);
         }
     }
-    protected virtual void vDragOverride(VectorXZ cursorGlobal) {
+    protected virtual void vDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal) {
         if (rotationHandle != null) {
-            rotationHandle.rotateAround(cursorGlobal);
+            rotationHandle.rotateAround(ci.current);
         }
     }
-    protected virtual void vEndDragOverride(VectorXZ cursorGlobal) {
+    protected virtual void vEndDragOverride(CursorInfo ci) {//  VectorXZ cursorGlobal) {
         
     }
 

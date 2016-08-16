@@ -46,17 +46,17 @@ public class Sticker : Cog, ICursorAgentClient
     //    }
     //}
     
-    public void startDragOverride(VectorXZ cursorGlobal, Collider dragOverrideCollider) {
+    public void startDragOverride(CursorInfo ci) { // VectorXZ cursorGlobal, Collider dragOverrideCollider) {
         //disconnect(); //pepperonis
-        handleRotator.startDragOverride(cursorGlobal, dragOverrideCollider);
+        handleRotator.startDragOverride(ci.current, ci.collider); // cursorGlobal, dragOverrideCollider);
     }
 
-    public void dragOverride(VectorXZ cursorGlobal) {
-        handleRotator.dragOverride(cursorGlobal);
+    public void dragOverride(CursorInfo ci) { //VectorXZ cursorGlobal) {
+        handleRotator.dragOverride(ci.current);// cursorGlobal);
     }
 
-    public void endDragOverride(VectorXZ cursorGlobal) {
-        handleRotator.endDragOverride(cursorGlobal);
+    public void endDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal) {
+        handleRotator.endDragOverride(ci.current);// cursorGlobal);
     }
 
     public void triggerExitDuringDrag(Collider other) {

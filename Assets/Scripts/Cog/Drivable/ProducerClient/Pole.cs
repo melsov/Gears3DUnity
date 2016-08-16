@@ -269,7 +269,7 @@ public class Pole : Drivable
 
     public override ConnectionSiteAgreement.ConnektAction connektActionAsTravellerFor(ContractSpecification specification) {
         if (specification.contractType == CogContractType.PARENT_CHILD) {
-            return ConnectionSiteAgreement.alignAndPushYLayer(transform);
+            return ConnectionSiteAgreement.alignAndPushYLayer(this); //transform);
         }
         return ConnectionSiteAgreement.doNothing;
     }

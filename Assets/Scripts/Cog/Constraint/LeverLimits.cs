@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class LeverLimits : MonoBehaviour {
 
@@ -35,7 +36,6 @@ public class LeverLimits : MonoBehaviour {
                 }
             }
         }
-        
     }
 
     public VectorXZ min {
@@ -58,7 +58,7 @@ public class LeverLimits : MonoBehaviour {
     public float distance { get { return _max.position.z - _min.position.z; } }
     public float notch { get { return distance / _increments; } }
 
-    public float gradientPosition(float globalZ) {
+    private float gradientPosition(float globalZ) {
         return Mathf.Clamp(globalZ - min.z, 0f, distance);
     }
 
@@ -67,16 +67,24 @@ public class LeverLimits : MonoBehaviour {
         return (int)res;
     }
 
-    public float localZPositionForLevel(int level) {
+    protected float localLinearPositionForLevel(int level) {
         return level * notch;
     }
     
-    public float globalZPositionForLevel(int level) {
-        return min.z + localZPositionForLevel(level);
+    protected float globalLinearPositionForLevel(int level) {
+        return min.z + localLinearPositionForLevel(level);
+    }
+
+    public void setTarget(Transform target, int level) {
+        target.position = Vector3.Scale(EnvironmentSettings.NotUp, target.position) + EnvironmentSettings.up * globalLinearPositionForLevel(level);
     }
 
     public float roundToClosestLevel(float zPos) {
-        float res = localZPositionForLevel(closestLevel(zPos));
+        float res = localLinearPositionForLevel(closestLevel(zPos));
         return res;
+    }
+
+    internal int levelFor(VectorXZ cursorGlobal) {
+        return closestLevel(gradientPosition(cursorGlobal.z));
     }
 }

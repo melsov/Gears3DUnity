@@ -12,8 +12,12 @@ public class Indicator : MonoBehaviour {
         awake();
 	}
     protected virtual void awake() {
-        _renderer = GetComponent<Renderer>();
+        _renderer = GetComponentInChildren<Renderer>();
     }
+
+    public virtual void Start() { }
+    public virtual void OnEnable() { }
+    public virtual void OnDisable() { }
 
     protected virtual void updateIndicator() { }
 }

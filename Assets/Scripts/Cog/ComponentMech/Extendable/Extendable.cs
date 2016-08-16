@@ -71,25 +71,6 @@ public class Extendable : MonoBehaviour {
             }
         }
 
-        //private void enableSections(int count) {
-        //    if (activeSections == count) { return; }
-        //    int limit = Mathf.Max(count, sections.Count);
-        //    for(int i = 0; i < limit; ++i) {
-        //        ExtendableSection section;
-        //        if (i >= sections.Count) {
-        //            section = createSection();
-        //            sections.Add(section);
-        //        } else {
-        //            section = sections[i];
-        //        }
-        //        section.transform.gameObject.SetActive(i < count);
-        //        float scaler = 1f - Mathf.Min(.3f * i / MAX_SCALED_SECTIONS, .3f);
-        //        section.transform.localScale = new Vector3(1f, scaler, scaler);
-        //    }
-        //    activeSections = count;
-        //}
-        
-/* TODO: make extension smooth */
         public void extend(float totalDistance) {
             for(int i = 0; i < SECTIONS; ++i) {
                 float placementScale = placementLookup.Evaluate(i / (float)SECTIONS);

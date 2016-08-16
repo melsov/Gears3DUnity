@@ -56,8 +56,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         }
     }
 
-    private ContractPortfolio.ClientTree.Node _node;
-    public ContractPortfolio.ClientTree.Node node {
+    protected ContractPortfolio.ClientTree.Node _node;
+    public virtual ContractPortfolio.ClientTree.Node node {
         get {
             if (_node == null) {
                 _node = new ContractPortfolio.ClientTree.Node(contractPortfolio);
@@ -66,8 +66,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         }
     }
 
-    private ContractPortfolio.ClientTree _clientTree;
-    public ContractPortfolio.ClientTree clientTree {
+    protected ContractPortfolio.ClientTree _clientTree;
+    public virtual ContractPortfolio.ClientTree clientTree {
         get {
             if (_clientTree == null) {
                 _clientTree = new ContractPortfolio.ClientTree(node);
@@ -81,6 +81,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
     }
 
     #region move-rotate
+
     public Rigidbody rb;
     private void setupRB() {
         rb = GetComponent<Rigidbody>();
@@ -99,7 +100,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
     public Rotate rotate;
     private delegate VectorXZ GetXZPosition();
     private GetXZPosition getXZPosition;
-    private void setupMoveAndRotate() {
+    protected virtual void setupMoveAndRotate() {
         if (GetComponent<Rigidbody>()) {
             move = delegate (Vector3 global) {
                 rb.MovePosition(global);
@@ -139,10 +140,14 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         if (!colliderSet) {
             colliderSet = gameObject.AddComponent<ColliderSet>();
         }
-        if (GetComponent<Highlighter>() == null) {
-            gameObject.AddComponent<Highlighter>();
-        }
+        TransformUtil.AddComponentIfNot<Highlighter>(transform);
     }
+
+    public virtual void Start() { }
+
+    public virtual void OnEnable() { }
+
+    public virtual void OnDisable() { }
 
     public void disableColliders() {
         colliderSet.disableForNextFixedFrame();
@@ -227,13 +232,13 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         }
 
         private ContractSpecification negotiate(ContractManager other, List<ContractSpecification> specifications) {
-            print("negotiate");
+            Bug.contractLog("negotiate");
             if (hasContractWith(other)) { return ContractSpecification.NonExistant(); }
             foreach(ContractSpecification specification in specifications) {
                 print(cog.name + " offering: " + specification.ToString());
                 ContractSpecification rSpecification = other.amenable(cog, specification);
                 if (rSpecification.exists()) {
-                    print(other.cog.name + " is amenable");
+                    Bug.contractLog(other.cog.name + " is amenable");
                     return rSpecification;
                 }
             }
@@ -243,6 +248,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         protected virtual ContractSpecification amenable(Cog other, ContractSpecification specification) {
             return negotiator.amenable(other, specification);
         }
+
+        
         
         /*
         * Setup a contract. 
@@ -260,9 +267,14 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
                 cog.producerActionsFor(client.cog, specification),
                 client.cog.clientActionsFor(cog, specification),
                 specification.connectionSiteAgreement);
-
             cc.unbreakable = cog.contractShouldBeUnbreakable(cc) || client.cog.contractShouldBeUnbreakable(cc);
             enter(client, cc);
+        }
+
+        private static void debugCubes(ContractSite producerSite, ContractSite clientSite, bool enteringInto) {
+            Color c = new ColorRange(15, enteringInto ? Color.red : new Color(.3f, 0f, 0f)).random();
+            producerSite.debugIndicatorCube.setColor(c);
+            clientSite.debugIndicatorCube.setColor(c);
         }
 
         public void forceUnbreakable(ContractManager client, CogContract cc) {
@@ -273,14 +285,29 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         private void enter(ContractManager client, CogContract cc) {
             client.accept(cc); 
             contractPortfolio.setContract(cc.connectionSiteAgreement.producerSite, cc);
+            debugCubes(cc.connectionSiteAgreement.producerSite, cc.connectionSiteAgreement.clientSite, true);
             initiateContract(cc);
         }
 
         public static void initiateContract(CogContract cc) {
-            Debug.Log("Prod: " + cc.producer.cog.name + " Cli: " + cc.client.cog.name);
+            DEBUGTETHEREDCC(cc, "bfr");
             cc.clientActions.receive(cc.producer.cog);
             cc.producerActions.initiate(cc.client.cog);
             cc.connectionSiteAgreement.connect();
+            DEBUGTETHEREDCC(cc, "AFT");
+        }
+
+        private static void DEBUGTETHEREDCC(CogContract cc, string msg) {
+            if (cc.client.cog is Tethered.TetheredInput || cc.client.cog is Tethered.TetheredOutput) {
+                Debug.Log(msg + "Prod: " + cc.producer.cog.name + " Cli: " + cc.client.cog.name);
+                if (cc.producer.cog is Tethered.TetheredInput) {
+                    Debug.LogError(cc.producer.cog.name + " set scalar is null? " + ((Tethered.TetheredInput)cc.producer.cog).debugSetScalarIsNull());
+                }
+                if (cc.client.cog is Tethered.TetheredOutput) {
+                    Debug.LogError(cc.client.cog.name + " set scalar is null? " + ((Tethered.TetheredOutput)cc.client.cog).debugSetScalarIsNull());
+                }
+            }
+            
         }
 
         protected virtual void accept(CogContract cc) { 
@@ -291,6 +318,8 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             if (cc.unbreakable) {
                 print("contract btwn: producer: " + cc.producer.cog.name + " and client: " + cc.client.cog.name + " was unbreakable.");
                 return; }
+            debugCubes(cc.connectionSiteAgreement.producerSite, cc.connectionSiteAgreement.clientSite, false);
+
             cc.producer.dissolveAsProducer(cc);
         }
 
@@ -519,11 +548,13 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             return RoleAvailablity.UNAVAILABLE;
         }
     }
-
-    protected void forceEarmarkedParentChildContractWithChild(Cog child, Earmark earmark) {
-        CogContractType cct = CogContractType.PARENT_CHILD;
+    protected void forcePermanentEarmarkedParentChildContract(Cog child, Earmark earmark) {
+        forcePermanentEarmarkedContract(child, earmark, CogContractType.PARENT_CHILD);
+    }
+    protected void forcePermanentEarmarkedContract(Cog client, Earmark earmark, CogContractType cct) {
+        //CogContractType cct = CogContractType.PARENT_CHILD;
         ContractSite parentSite = contractSiteBoss.findEarmarkedSite(earmark);
-        ContractSite childSite = child.contractSiteBoss.findEarmarkedSite(earmark);
+        ContractSite childSite = client.contractSiteBoss.findEarmarkedSite(earmark);
         if (!parentSite || !childSite) {
             Debug.LogError(string.Format(" an earmarked site wasn't found: parent: {0} child {1} ", parentSite != null, childSite != null));
             return;
@@ -532,23 +563,26 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             Debug.LogError("child site cannot accommodate parent site");
             return;
         }
-        Vector3 dif = child.transform.localPosition; // child.transform.position - transform.position;
-        child.transform.SetParent(null);
-        child.transform.position = transform.position + dif;
+        Vector3 dif = Vector3.zero;
+        if (cct == CogContractType.PARENT_CHILD && TransformUtil.IsDescendent(client.transform, transform)) {
+            dif = client.transform.localPosition; // child.transform.position - transform.position;
+            client.transform.SetParent(null);
+            client.transform.position = transform.position + dif;
+        }
 
         ConnectionSiteAgreement csa = ConnectionSiteAgreement.NoConnektActionConnectionSiteAgreement(parentSite, childSite);
         ContractSpecification fakeishSpecification = new ContractSpecification(cct, RoleType.PRODUCER);
-        ProducerActions prodActions = producerActionsFor(child, fakeishSpecification);
+        ProducerActions prodActions = producerActionsFor(client, fakeishSpecification);
         prodActions.fulfill = ProducerActions.getParentChildFulfillAction(parentSite.transform, childSite.transform, Quaternion.identity);
-        ClientActions cliActions = child.clientActionsFor(this, fakeishSpecification);
+        ClientActions cliActions = client.clientActionsFor(this, fakeishSpecification);
         CogContract cc = new CogContract(
             contractManager, 
-            child.contractManager, 
+            client.contractManager, 
             cct, 
             prodActions,
             cliActions,
             csa);
-        contractManager.forceUnbreakable(child.contractManager, cc);
+        contractManager.forceUnbreakable(client.contractManager, cc);
     }
 
     protected static void addConnectionSiteEntriesForBackSocketSet(Cog cog, ContractSiteBoss csb) {
@@ -587,9 +621,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
 
     #region ICursorAgentUrClient
 
-    private DragHistory dragHistory;
+    public DragHistory dragHistory;
 
-    protected class DragHistory
+    public class DragHistory
     {
         public readonly Vector3 start;
         public readonly VectorXZ cursorStart;
@@ -626,9 +660,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
     }
 
     protected virtual bool vConnectTo(Collider other) {
-        print(name + " vConn");
+        Bug.contractLog(name + " vConn");
         Cog cog = FindCog(other.transform);
-        if (cog == null) { return false; }
+        if (cog == null || cog == this) { return false; }
         return enterContractWith(cog, false);
     }
 
@@ -659,16 +693,23 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         return result;
     }
 
-    public void normalDragStart(VectorXZ cursorPos) {
+    public virtual void normalDragStart(VectorXZ cursorPos) {
         //CONSIDER: more efficient to generate client tree only once per drag session?
         dragHistory = new DragHistory(transform.position, cursorPos);
         clientTree.highlight();
         dragHistory.wasContractedToAProducer = contractPortfolio.contractedToProducer;
         Bug.contractLog(name + " contracted to a producer: " + dragHistory.wasContractedToAProducer);
+        if (nonKinematicWhilePositioning) {
+            collectRBsAndUnsetKinematic();
+        }
         suspendOnDragStart();
+
+        clientTree.bredthFirstAction(delegate (Cog cog) {
+            cog.onProducerWillStartDrag();
+        });
     }
 
-    public void normalDrag(VectorXZ cursorPos) {
+    public virtual void normalDrag(VectorXZ cursorPos) {
         if (dragHistory.wasContractedToAProducer && !dragHistory.startedDisconnect && dragHistory.beyond(cursorPos)) {
            dragHistory.startedDisconnect = true;
            vDisconnect(); 
@@ -676,16 +717,67 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         clientTree.moveRelative(dragHistory.updateLastCursorGetRelative(transform.position, cursorPos).vector3());
     }
 
-    public void normalDragEnd(VectorXZ cursorPos) {
+    public virtual void normalDragEnd(VectorXZ cursorPos) {
         clientTree.unhighlight();
+        resetNonKinematicRBs();
+
+        clientTree.bredthFirstAction(delegate (Cog client) {
+            client.onProducerWillEndDrag();
+        });
+
         if (dragHistory.wasContractedToAProducer && !dragHistory.startedDisconnect) {
             clientTree.moveRelative(dragHistory.start - transform.position);
             restoreOnDragEnd();
         }
     }
 
+    [SerializeField]
+    protected bool nonKinematicWhilePositioning = true;
+    private HashSet<Rigidbody> nonKinematicRBs = new HashSet<Rigidbody>();
+
+    private void collectRBsAndUnsetKinematic() {
+        nonKinematicRBs.Clear();
+        foreach(Rigidbody rb in GetComponentsInChildren<Rigidbody>()) {
+            if (!rb.isKinematic) {
+                rb.isKinematic = true;
+                nonKinematicRBs.Add(rb);
+            }
+        }
+    }
+    private void resetNonKinematicRBs() {
+        foreach(Rigidbody rb in nonKinematicRBs) {
+            rb.isKinematic = false;
+        }
+    }
+
+    public virtual void onProducerWillStartDrag() { }
+    public virtual void onProducerWillEndDrag() { }
+
     protected virtual void suspendOnDragStart() { }
     protected virtual void restoreOnDragEnd() { }
 
     #endregion;
+
+    #region debug
+    private Vector3 _OLDPOS = VectorXZ.fakeNull.vector3();
+    private Vector3 OLDPOS {
+        get {
+            if (_OLDPOS.Equals(VectorXZ.fakeNull.vector3())) { _OLDPOS = transform.position; }
+            return _OLDPOS;
+        }
+        set { _OLDPOS = value; }
+    }
+
+    public void DEBUGPOSCHANGE<T>() where T : MonoBehaviour {
+        DEBUGPOSCHANGE<T>(string.Format("--POS CHANGE FOR: {0}--", name));
+    }
+
+    private void DEBUGPOSCHANGE<T>(string msg) where T : MonoBehaviour {
+        if (!(this is T)) { return; }
+        if (!OLDPOS.Equals(transform.position)) {
+            Debug.LogError(msg);
+            OLDPOS = transform.position;
+        }
+    }
+    #endregion
 }
