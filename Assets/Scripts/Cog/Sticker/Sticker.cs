@@ -9,9 +9,8 @@ public class Sticker : Cog, ICursorAgentClient
     protected HandleRotator handleRotator;
     protected Collider _mainCollider;
     
-    void Awake() { awake(); }
-
-    protected void awake() {
+    protected override void awake() {
+        base.awake();
         handleRotator = GetComponent<HandleRotator>();
         _mainCollider = GetComponentInChildren<Collider>();
         transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(typeof(Sticker)));

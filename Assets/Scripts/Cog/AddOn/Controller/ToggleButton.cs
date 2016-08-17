@@ -33,14 +33,20 @@ public class ToggleButton : Switch , ICollisionProxyClient, ITriggerProxyClient 
     protected override void toggle() {
         if (isPulseButton) {
             on.setState(SwitchState.ON);
-            if (onOffIndicator != null) {
-                pulseTimer = Time.fixedTime;
-                onOffIndicator.state = on.getState();
-            }
+            pulseTimer = Time.fixedTime;
+            //if (onOffIndicator != null) {
+            //    onOffIndicator.state = on.getState();
+            //}
             updateClient();
+            StartCoroutine(pulseOff());
         } else {
             base.toggle();
         }
+    }
+
+    private IEnumerator pulseOff() {
+        yield return new WaitForSeconds(.4f);
+        on.setState(SwitchState.OFF);
     }
 
     protected Vector3 buttonTravel {
@@ -134,11 +140,11 @@ public class ToggleButton : Switch , ICollisionProxyClient, ITriggerProxyClient 
         //    }
         //}
 
-        if (isPulseButton) {
-            if (completedPulse()) {
-                onOffIndicator.state = SwitchState.OFF;
-            }
-        }
+        //if (isPulseButton) {
+        //    if (completedPulse()) {
+        //        onOffIndicator.state = SwitchState.OFF;
+        //    }
+        //}
     }
 
 

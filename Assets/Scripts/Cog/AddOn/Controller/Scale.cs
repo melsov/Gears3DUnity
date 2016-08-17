@@ -30,6 +30,16 @@ public class Scale : Switch , IObservableFloatProvider {
     private GetAFloat getPosition;
     private GetAFloat getGravity;
 
+    private Arc arc;
+
+    [SerializeField]
+    protected float maxWeight = 50f;
+
+    [SerializeField]
+    protected Transform threshholdIndicator;
+
+    protected NeedleDisplay needleDisplay;
+
     protected override void awake() {
         base.awake();
         sj = GetComponentInChildren<Spring>();
@@ -37,7 +47,9 @@ public class Scale : Switch , IObservableFloatProvider {
         getPosition = delegate () { return platformRB.transform.localPosition.z - sj.connectedBody.transform.localPosition.z; };
         startPosition = getPosition();
         getGravity = delegate () { return Physics.gravity.z; };
-
+        arc = GetComponentInChildren<Arc>();
+        needleDisplay = GetComponentInChildren<NeedleDisplay>();
+        needleDisplay.max = maxWeight;
     }
 
     public ObservableFloat getObservableFloat() {
@@ -75,4 +87,16 @@ public class Scale : Switch , IObservableFloatProvider {
         updateClient();
     }
 
+    protected override void vStartDragOverride(CursorInfo ci) {
+    }
+
+    protected override void vDragOverride(CursorInfo ci) {
+        float gradient = arc.gradient(ci.current.vector3());
+        threshholdIndicator.rotation = arc.between(gradient);
+        threshhold = gradient * maxWeight;
+    }
+
+    protected override void vEndDragOverride(CursorInfo ci) {
+        base.vEndDragOverride(ci);
+    }
 }

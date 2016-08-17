@@ -13,11 +13,13 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile></CompilerResponseFile>
+    <CompilerResponseFile>
+    </CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.5f1</UnityVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -105,6 +107,7 @@
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffReverseIndicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\OnOffReverseLight.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator.cs" />
+    <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator\NeedleDisplay.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator\RangeIndicator.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RangeIndicator\ValueDisplay.cs" />
     <Compile Include="Assets\Scripts\Cog\AddOn\Indicator\RotationIndicator.cs" />
@@ -134,7 +137,10 @@
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Ducts\TubeExit.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Extendable\Extendable.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\HingeMagnet.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\Interaction\Exchangable.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\Interaction\Exchanger.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\Magnet.cs" />
+    <Compile Include="Assets\Scripts\Cog\ComponentMech\MilestoneCounter.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\RailMagnet.cs" />
     <Compile Include="Assets\Scripts\Cog\ComponentMech\StretchyPole.cs" />
     <Compile Include="Assets\Scripts\Cog\Connection\BackendSocket.cs" />
@@ -181,6 +187,7 @@
     <Compile Include="Assets\Scripts\Cog\Drivable\Drivable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\DrivenDrivable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Pegboard.cs" />
+    <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\ExchangablePlaceable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\HingeJointPlaceable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\MagneticPlaceable.cs" />
     <Compile Include="Assets\Scripts\Cog\Drivable\Placeable\Placeable.cs" />

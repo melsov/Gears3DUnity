@@ -6,7 +6,8 @@ public class ValueDisplay : RangeIndicator {
 
     protected TextMesh textMesh;
     
-    public void Awake() {
+    public override void Awake() {
+        base.Awake();
         textMesh = GetComponentInChildren<TextMesh>();
     }
 

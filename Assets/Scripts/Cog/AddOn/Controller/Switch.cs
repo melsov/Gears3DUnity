@@ -12,7 +12,7 @@ public class Switch : ControllerAddOn , ISwitchStateProvider , IObservableSwitch
 
     public bool isReverseSwitch;
 
-    protected OnOffReverseIndicator onOffIndicator;
+    //protected OnOffReverseIndicator onOffIndicator;
     private RaycastHit rch;
 
     private ISwitchStateToggle _on;
@@ -39,7 +39,7 @@ public class Switch : ControllerAddOn , ISwitchStateProvider , IObservableSwitch
         //} else {
         //    on = new OnOffSwitchState(SwitchState.ON);
         //}
-        onOffIndicator = GetComponentInChildren<OnOffReverseIndicator>();
+        //onOffIndicator = GetComponentInChildren<OnOffReverseIndicator>();
     }
 
     public override void Start() {
@@ -62,10 +62,10 @@ public class Switch : ControllerAddOn , ISwitchStateProvider , IObservableSwitch
         if (underCursor == null) {
             return;
         }
-        OnOffReverseIndicator ooi = underCursor.GetComponent<OnOffReverseIndicator>();
-        if (ooi == onOffIndicator) {
-            toggle();
-        }
+        //OnOffReverseIndicator ooi = underCursor.GetComponent<OnOffReverseIndicator>();
+        //if (ooi == onOffIndicator) {
+        //    toggle();
+        //}
     }
 
     protected virtual void toggle() {
@@ -248,7 +248,7 @@ public class ObservableSwitchState
     }
 
     public ObservableSwitchState(SwitchState state) {
-        this.state = state;
+        _state = state;
     }
 }
 

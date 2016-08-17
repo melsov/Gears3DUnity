@@ -6,6 +6,8 @@ public abstract class RangeIndicator : MonoBehaviour {
 
     private ObservableFloat observableFloat;
 
+    public virtual void Awake() { }
+
     public void OnEnable() {
         if (observableFloat == null) {
             observableFloat = GetComponentInParent<IObservableFloatProvider>().getObservableFloat();

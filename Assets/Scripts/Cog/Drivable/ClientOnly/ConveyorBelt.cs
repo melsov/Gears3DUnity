@@ -50,7 +50,8 @@ public class ConveyorBelt : GearDrivenMechanism , ICollisionProxyClient // Driva
         }
     }
 
-    public void FixedUpdate() {
+    protected override void update() {
+        base.update();
         for (int i = 0; i < collisions.Count; ++i) {
             Collision coll = collisions[i];
             if (coll == null || coll.rigidbody == null) {

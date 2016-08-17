@@ -1,15 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
-public class RotateOffMotor : MonoBehaviour {
+public class RotateOffMotor : Motor {
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    private MilestoneCounter milestoneCounter = new MilestoneCounter(360f, true);
+
+    protected override void awake() {
+        base.awake();
+        milestoneCounter.register(onHitMilestone);
+    }
+
+    private void onHitMilestone() {
+        power = 0f;
+    }
+
+    protected override void update() {
+        base.update();
+        milestoneCounter.updateTotal(angle);
+    }
 }

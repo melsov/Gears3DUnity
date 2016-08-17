@@ -199,7 +199,7 @@ public class UniqueClientContractSiteBoss : ContractSiteBoss
         exclusionarySiteSet = uniqueClientSiteEntry.Value;
     }
 
-    public static UniqueClientContractSiteBoss emptyBoss() {
+    public static UniqueClientContractSiteBoss emptyUBoss() {
         return new UniqueClientContractSiteBoss(new KeyValuePair<ClientOnlyCTARSet, ExclusionarySiteSet>(ClientOnlyCTARSet.emptySet(),ExclusionarySiteSet.emptySet()));
     }
 }

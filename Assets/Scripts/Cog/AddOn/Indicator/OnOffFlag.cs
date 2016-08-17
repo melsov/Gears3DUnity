@@ -22,7 +22,11 @@ public class OnOffFlag : MonoBehaviour , IOnOffIndicatorProxy {
         for(int i = 0; i < transitionSegments; ++i) {
             float gradient = ((float)(i))/((float)transitionSegments);
             gradient = _on ? gradient : 1f - gradient;
-            flag.rotation = arc.between(curve.Evaluate(gradient));
+            try {
+                flag.rotation = arc.between(curve.Evaluate(gradient));
+            } catch(NullReferenceException e) {
+                print(Cog.FindCog(transform).name + " doesnt have an arc? " + (arc == null) + "\n " + e.ToString());
+            }
             yield return new WaitForFixedUpdate();
         }
         flag.rotation = arc.between(_on ? 1f : 0f);

@@ -27,6 +27,10 @@ public class TransformUtil : MonoBehaviour
     }
 
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
+        child.transform.position = GetAlignedXZ(child, parent, localOffsetObject);
+    }
+
+    public static Vector3 GetAlignedXZ(Transform child, Transform parent, Transform localOffsetObject) {
         Vector3 localOffset = Vector3.zero;
         if (localOffsetObject != null) {
             localOffset = localOffsetObject.transform.localPosition;
@@ -34,7 +38,7 @@ public class TransformUtil : MonoBehaviour
             localOffset = child.transform.rotation * localOffset;
         }
 
-        child.transform.position = new Vector3(
+        return new Vector3(
             -localOffset.x +
             parent.position.x,
             child.transform.position.y,

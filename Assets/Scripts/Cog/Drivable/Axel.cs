@@ -26,7 +26,8 @@ public class Axel : Peg {
     }
 
     public float turnTo(float d) {
-        transform.eulerAngles = new Vector3(0f, d, 0f);
+        rotate(Quaternion.Euler(Vector3.up * d));
+        //transform.eulerAngles = new Vector3(0f, d, 0f);
         _angleStep.update(axisRotation);
         return d;
     }
@@ -50,19 +51,21 @@ public struct AngleStep
         return 0f;
     }
 
+    public float getAngle() { return angle_; }
+
     private float timestamp;
     private float lastAngle;
     private float angle_;
-    public float getAngle() { return angle_; }
 
-    //public AngleStep(float _angle) {
-    //    lastAngle = 0f;
-    //    timestamp = Time.fixedTime; angle = _angle;
-    //}
+    public static AngleStep AngleStepWithStartRotation(float startRotation) {
+        AngleStep result = new AngleStep();
+        result.lastAngle = result.angle_ = startRotation;
+        return result;
+    }
 
     public void update(float nextAngle) {
         lastAngle = angle_;
-        timestamp = Time.deltaTime;
+        timestamp = Time.deltaTime; //CONSIDER: unreliable?? (what if we're not updating every frame?)
         angle_ = nextAngle;
     }
 

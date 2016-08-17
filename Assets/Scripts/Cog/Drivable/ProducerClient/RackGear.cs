@@ -281,7 +281,7 @@ public class RackGear : Gear {
     protected int closestToothOrdinal(VectorXZ global) {
         VectorXZ online = lineSegment.closestPointOnLine(global);
         VectorXZ dif = online - lineSegment.startXZ;
-        int tooth;
+
         if (lineSegment.sympatheticDirection(dif)) {
             return Mathf.FloorToInt(dif.magnitude / toothOffset);
         } else {

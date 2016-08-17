@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System;
 using System.Runtime.Serialization;
+using UnityEngine.SceneManagement;
 
 public class SaveManager : Singleton<SaveManager> {
 	protected SaveData mSaveData = new SaveData ();
@@ -90,7 +91,7 @@ public class SaveManager : Singleton<SaveManager> {
 	
 	protected void FillObjectsToSave()
 	{
-		mSaveData.levelName = Application.loadedLevelName;
+        mSaveData.levelName = SceneManager.GetActiveScene().name; // Application.loadedLevelName;
 		mSaveData.entries.Clear ();
 		
 		//SetDisabledGameObjectsActive (true);

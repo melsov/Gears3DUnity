@@ -266,8 +266,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     }
 
     protected virtual void vHandleTriggerEnter(Collider other) {
-        Socket otherSocket = null;
-        Peg peg = null;
         if (couldConnectTo(other)) { 
             highlight(other.transform);
         } 

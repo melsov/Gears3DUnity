@@ -4,11 +4,8 @@ using System.Collections;
 public abstract class Instrument : Cog , ICollisionProxyClient {
     protected Highlighter highlighter;
 
-    public void Awake () {
-        awake();
-	}
-
-    protected virtual void awake() {
+    protected override void awake() {
+        base.awake();
         highlighter = GetComponent<Highlighter>();
     }
 

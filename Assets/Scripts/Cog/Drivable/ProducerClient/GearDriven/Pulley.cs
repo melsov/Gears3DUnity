@@ -24,7 +24,8 @@ public class Pulley : GearDrivenMechanism , IPegProxy {
         }
     }
 
-    public void Start() {
+    public override void Start() {
+        base.Start();
         positionRopes();
     }
 

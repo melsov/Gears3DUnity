@@ -210,7 +210,7 @@ public abstract class Socket : MonoBehaviour, IRestoreConnection {
                 }
             }
         } catch (System.InvalidCastException ice) {
-            Debug.LogError("caught invalid cast exception for sock w parent " + transform.parent.parent.name);
+            Debug.LogError("caught invalid cast exception for sock w parent " + transform.parent.parent.name + " " + ice.ToString());
         }
     }
 

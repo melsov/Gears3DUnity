@@ -142,10 +142,6 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
         }
     }
 
-    void Awake() {
-        awake();
-    }
-
     #region serialize
     [System.Serializable]
     class SerializeStorage
@@ -167,7 +163,8 @@ public class Peg : Cog , ICursorAgentClient, IGameSerializable, IRestoreConnecti
     }
     #endregion
 
-    protected virtual void awake() {
+    protected override void awake() {
+        base.awake();
         setMesh();
         _isChildConstraint = GetComponent<Constraint>();
         gameObject.AddComponent<Highlighter>();
