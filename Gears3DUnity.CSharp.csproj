@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.5f1</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <LangVersion Condition=" '$(VisualStudioVersion)' != '10.0' ">4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -291,6 +289,7 @@
     <Compile Include="Assets\Scripts\Utility\ObservableValue\ObservableFloat.cs" />
     <Compile Include="Assets\Scripts\Utility\ObservableValue\ObservableTransform.cs" />
     <Compile Include="Assets\Scripts\Utility\RayCastUtil.cs" />
+    <Compile Include="Assets\Scripts\Utility\SharedPrefabs.cs" />
     <Compile Include="Assets\Scripts\Utility\Singleton\Singleton.cs" />
     <Compile Include="Assets\Scripts\Utility\TagLookup.cs" />
     <Compile Include="Assets\Scripts\Utility\TransformUtil.cs" />
@@ -300,6 +299,7 @@
     <None Include="Assets\Audio\ClassicGuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\GuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
+    <None Include="Assets\Materials\Shaders\YDepthToAlpha.shader" />
     <None Include="Assets\Models\broccoli\broccoli\EULA.txt" />
     <None Include="Assets\Models\broccoli\broccoli\Info.txt" />
     <None Include="Assets\Scad\SpinningCounter\LICENSE.txt" />

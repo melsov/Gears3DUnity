@@ -3,6 +3,11 @@ using System.Collections;
 
 public class ExchangablePlaceable : Placeable {
 
+    protected override void awake() {
+        base.awake();
+    }
+
+
     private Exchangable _exchangable;
     protected Exchangable exchangable {
         get {

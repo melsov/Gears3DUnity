@@ -175,7 +175,7 @@ public class Exchanger : MonoBehaviour {
             q = Quaternion.Slerp(exchangable_.transform.rotation, keep.rotation, i / frames);
             v = Vector3.Lerp(exchangable_.transform.position, destination, i / frames);
             exchangable_.move(v);
-            exchangable_.rotate(q);
+            //exchangable_.rotate(q);
         }
         isAnimatingRealign = false;
     }

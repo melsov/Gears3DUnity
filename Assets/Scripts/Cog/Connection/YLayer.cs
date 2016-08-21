@@ -18,7 +18,8 @@ public class YLayer {
         { typeof(HandCrank) , wall },
         { typeof(Rope), rope },
         { typeof(Sticker), sticker },
-        { typeof(Dispensable), dispenseable }
+        { typeof(Dispensable), dispenseable },
+        { typeof(ExchangablePlaceable), dispenseable },
     };
 
     public static float Layer(System.Type type) {

@@ -79,6 +79,7 @@
     <None Include="Assets\Audio\ClassicGuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\GuitarScale\_readme_and_license.txt" />
     <None Include="Assets\Audio\XylophoneScale\_readme_and_license.txt" />
+    <None Include="Assets\Materials\Shaders\YDepthToAlpha.shader" />
     <None Include="Assets\Models\broccoli\broccoli\EULA.txt" />
     <None Include="Assets\Models\broccoli\broccoli\Info.txt" />
     <None Include="Assets\Scad\SpinningCounter\LICENSE.txt" />

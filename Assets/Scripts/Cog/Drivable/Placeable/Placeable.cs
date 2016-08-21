@@ -42,9 +42,11 @@ public class Placeable : Drivable {
         ClientActions actions = ClientActions.getDoNothingActions();
         if (specification.contractType == CogContractType.PARENT_CHILD) {
             actions.receive = delegate (Cog cog) {
+                specification.connectionSiteAgreement.clientSite.setDecoration(SharedPrefabs.Instance.createSocket());
             };
             actions.beAbsolvedOf = delegate (Cog cog) {
                 transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType())); //TODO: deal with tubes being elevated to higher Ys
+                specification.connectionSiteAgreement.clientSite.destroyDecoration();
             };
         }
         return actions;

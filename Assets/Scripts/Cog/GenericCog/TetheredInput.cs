@@ -20,12 +20,7 @@ namespace Tethered
 
         public override void addSetScalar(SetScalar setScalar) {
             base.addSetScalar(setScalar);
-            Debug.LogError("teth input addSetScalar. null? " + (setScalar == null));
         }
-
-        //internal void setSetScalar(SetScalar setScalar) {
-        //    this.setScalar = setScalar;
-        //}
 
         public override ContractPortfolio.ClientTree.Node node {
             get {

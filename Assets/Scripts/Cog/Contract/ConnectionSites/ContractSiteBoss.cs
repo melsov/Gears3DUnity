@@ -354,6 +354,18 @@ public class ContractSite
         get { return cog.transform; }
     }
 
+    private Transform decoration;
+    public void setDecoration(Transform decoration) {
+        this.decoration = decoration;
+        TransformUtil.AlignXZ(decoration, transform, null);
+        decoration.position = TransformUtil.SetY(decoration.position, transform.position.y);
+        decoration.parent = transform;
+    }
+    public void destroyDecoration() {
+        if (!decoration) { return; }
+        GameObject.Destroy(decoration.gameObject);
+    }
+
     public bool occupied {
         get { return contract != null; }
     }

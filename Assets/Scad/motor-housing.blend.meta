@@ -1,0 +1,125 @@
+fileFormatVersion: 2
+guid: 48be8a7621c25cd45b087f8df461ab65
+timeCreated: 1471540362
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Counter_Right
+    100002: CounterMini
+    100004: Housing_001
+    100006: MainHousing0rig
+    100008: //RootNode
+    100010: NubOrig
+    100012: NubX
+    100014: NubY
+    100016: ReaderFrame
+    100018: ReadHole_Orig
+    100020: ReadHole_Orig_001
+    400000: Counter_Right
+    400002: CounterMini
+    400004: Housing_001
+    400006: MainHousing0rig
+    400008: //RootNode
+    400010: NubOrig
+    400012: NubX
+    400014: NubY
+    400016: ReaderFrame
+    400018: ReadHole_Orig
+    400020: ReadHole_Orig_001
+    2300000: Counter_Right
+    2300002: CounterMini
+    2300004: Housing_001
+    2300006: MainHousing0rig
+    2300008: NubOrig
+    2300010: NubX
+    2300012: NubY
+    2300014: ReaderFrame
+    2300016: ReadHole_Orig
+    2300018: ReadHole_Orig_001
+    3300000: Counter_Right
+    3300002: CounterMini
+    3300004: Housing_001
+    3300006: MainHousing0rig
+    3300008: NubOrig
+    3300010: NubX
+    3300012: NubY
+    3300014: ReaderFrame
+    3300016: ReadHole_Orig
+    3300018: ReadHole_Orig_001
+    4300000: ReadHole_Orig_001
+    4300002: ReadHole_Orig
+    4300004: Housing_001
+    4300006: NubOrig
+    4300008: CounterMini
+    4300010: Counter_Right
+    4300012: NubY
+    4300014: NubX
+    4300016: ReaderFrame
+    4300018: MainHousing0rig
+    7400000: Default Take
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleRotations: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

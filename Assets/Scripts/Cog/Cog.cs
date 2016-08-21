@@ -141,6 +141,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             colliderSet = gameObject.AddComponent<ColliderSet>();
         }
         TransformUtil.AddComponentIfNot<Highlighter>(transform);
+        transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType()));
     }
 
     public virtual void Start() { }

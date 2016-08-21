@@ -38,6 +38,9 @@ public class Scale : Switch , IObservableFloatProvider {
     [SerializeField]
     protected Transform threshholdIndicator;
 
+    [SerializeField]
+    protected TextMesh maxWeightText;
+
     protected NeedleDisplay needleDisplay;
 
     protected override void awake() {
@@ -50,6 +53,7 @@ public class Scale : Switch , IObservableFloatProvider {
         arc = GetComponentInChildren<Arc>();
         needleDisplay = GetComponentInChildren<NeedleDisplay>();
         needleDisplay.max = maxWeight;
+        maxWeightText.text = string.Format("{0}", maxWeight);
     }
 
     public ObservableFloat getObservableFloat() {

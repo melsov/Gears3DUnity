@@ -130,10 +130,13 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     public override ClientActions clientActionsFor(Cog producer, ContractSpecification specification) {
         ClientActions actions = ClientActions.getDoNothingActions();
         if (specification.contractType == CogContractType.PARENT_CHILD) {
-            actions.receive = delegate (Cog cog) { };
+            actions.receive = delegate (Cog cog) {
+                specification.connectionSiteAgreement.clientSite.setDecoration(SharedPrefabs.Instance.createSocket());
+            };
             actions.beAbsolvedOf = delegate (Cog cog) {
                 print(name + " be absolved  of " + cog.name);
                 transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType()));
+                specification.connectionSiteAgreement.clientSite.destroyDecoration();
             };
         }
         return actions;
