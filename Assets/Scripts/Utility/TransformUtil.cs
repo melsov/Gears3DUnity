@@ -11,6 +11,14 @@ public class TransformUtil : MonoBehaviour
         child.transform.SetParent(parent, true);
     }
 
+    /*
+     * Move target to align back with front.
+     * Rotate target to match front's rotation, offset by delta
+     * */
+    public static void AlignXZDisplacePushRotation(Transform front, Vector3 back, Quaternion delta, Vector3 displace, Cog target) {
+        target.move(target.transform.position + (front.position + displace - back));
+        target.rotate(front.rotation * delta);
+    }
 
     /*
      * Move target to align back with front.
@@ -19,11 +27,6 @@ public class TransformUtil : MonoBehaviour
     public static void AlignXZPushRotation(Transform front, Vector3 back, Quaternion delta, Cog target) {
         target.move(target.transform.position + new VectorXZ(front.position - back).vector3());
         target.rotate(front.rotation * delta);
-/* ** old way
-        target.position += new VectorXZ(front.position - back).vector3();
-        //TODO / CONSIDER: would it help to set the target's rotation pivot point (not here but during setup of PARENT_CHILD contracts)?
-        target.rotation = front.rotation * deltaQuaternion;
-*/ 
     }
 
     public static void AlignXZ(Transform child, Transform parent, Transform localOffsetObject) {
@@ -59,6 +62,51 @@ public class TransformUtil : MonoBehaviour
         foreach(Transform child in parent) {
             if (child.name.Equals(_name)) {
                 return child;
+            }
+        }
+        return null;
+    }
+
+    public static Transform FindTagWithin(Transform parent, string tag) {
+        foreach(Transform t in parent.GetComponentsInChildren<Transform>()) {
+            if (t.gameObject.tag.Equals(tag)) {
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public static List<Transform> FindAllWithTagWithin(Transform parent, string tag) {
+        List<Transform> result = new List<Transform>();
+        foreach(Transform t in parent.GetComponentsInChildren<Transform>()) {
+            if (t.gameObject.tag.Equals(tag)) { result.Add(t); }
+        }
+        return result;
+    }
+
+    public static List<Transform> FindAllEldestGenerationWithTag(Transform root, string tag) {
+        List<Transform> result = new List<Transform>();
+        Queue<Transform> search = new Queue<Transform>();
+        search.Enqueue(root);
+        while(search.Count > 0) {
+            Transform subject = search.Dequeue();
+            if(subject.tag.Equals(tag)) {
+                result.Add(subject);
+            } else {
+                foreach(Transform child in subject) {
+                    search.Enqueue(child);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static Transform FindChildWithTag(Transform parent, string tag) {
+        foreach (Transform child in parent) {
+            foreach (Transform t in child.GetComponentInChildren<Transform>()) {
+                if (t.gameObject.tag.Equals(tag)) {
+                    return t;
+                }
             }
         }
         return null;

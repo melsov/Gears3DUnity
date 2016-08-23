@@ -123,12 +123,15 @@ public class Exchangable : MonoBehaviour {
 
 
     protected virtual bool handleCollider(Collider other) {
+        print("1");
         if(unavailable) { return false; }
-        Exchanger exchanger = other.GetComponent<Exchanger>();
+        print("2");
+        Exchanger exchanger = other.GetComponentInParent<Exchanger>();
         if (!exchanger) { return false; }
+        print("3");
         if (blocked.Contains(exchanger)) { return false; }
         if (exchanger.accept(this)) {
-            block(exchanger);
+            //block(exchanger);
             StartCoroutine(closeDownForAMoment());
             onExchanged(this);
             return true;
@@ -145,21 +148,21 @@ public class Exchangable : MonoBehaviour {
         return false;
     }
 
-    private IEnumerator unblockCollider(Collider other) {
-        if(blocked.Contains(other.GetComponent<Exchanger>())) {
-            yield return new WaitForSeconds(.5f);
-            while(blocked.Contains(other.GetComponent<Exchanger>())) {
-                yield return new WaitForSeconds(Time.maximumDeltaTime);
-                if(!ColliderOverlaps(_collider, other)) {
-                    blocked.Remove(other.GetComponent<Exchanger>());
-                }
-            }
-        }
-    }
+    //private IEnumerator unblockCollider(Collider other) {
+    //    if(blocked.Contains(other.GetComponent<Exchanger>())) {
+    //        yield return new WaitForSeconds(.5f);
+    //        while(blocked.Contains(other.GetComponent<Exchanger>())) {
+    //            yield return new WaitForSeconds(Time.maximumDeltaTime);
+    //            if(!ColliderOverlaps(_collider, other)) {
+    //                blocked.Remove(other.GetComponent<Exchanger>());
+    //            }
+    //        }
+    //    }
+    //}
 
     public virtual void OnTriggerExit(Collider other) {
         //unblockCollider(other);
-        unblock(other.GetComponent<Exchanger>());
+        //unblock(other.GetComponent<Exchanger>());
     }
 
     private IEnumerator closeDownForAMoment() {
@@ -168,15 +171,15 @@ public class Exchangable : MonoBehaviour {
         ready = true;
     }
 
-    private void block(Exchanger ex) {
-        //if(!ex) { return; }
-        //blocked.Add(ex);
-    }
+    //private void block(Exchanger ex) {
+    //    //if(!ex) { return; }
+    //    //blocked.Add(ex);
+    //}
 
-    private void unblock(Exchanger ex) {
-        //if(!ex) { return; }
-        //blocked.Remove(ex);
-    }
+    //private void unblock(Exchanger ex) {
+    //    //if(!ex) { return; }
+    //    //blocked.Remove(ex);
+    //}
 
     
 }

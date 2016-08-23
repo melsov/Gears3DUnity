@@ -68,6 +68,12 @@ public class Gear : Drivable , GearDrivable
         //if (tag.Equals("TestThisGear"))
         //    StartCoroutine(testClockAngle());
     }
+
+    protected override void moveToDefaultY() {
+        base.moveToDefaultY();
+        resetYPosition();
+    }
+
     protected override void updateAngleStep() {
         if (isOnAxel()) {
             base.updateAngleStep();
@@ -139,8 +145,10 @@ public class Gear : Drivable , GearDrivable
             };
         } else if (specification.contractType == CogContractType.PARENT_CHILD) {
             actions.receive = delegate (Cog _producer) {
+                specification.connectionSiteAgreement.clientSite.setDecoration(SharedPrefabs.Instance.createPeg());
             };
             actions.beAbsolvedOf = delegate (Cog _producer) {
+                specification.connectionSiteAgreement.clientSite.destroyDecoration();
                 disconnectBackendSockets();
             };
         }
@@ -379,9 +387,9 @@ public class Gear : Drivable , GearDrivable
     public virtual void gearPositionRelativeTo(Drivable _someDriver, ConnektReconstruction cr) {
         if (_someDriver != null) {
             if (!(_someDriver is Gear)) { base.positionRelativeTo(_someDriver); return; }
-            print("$$$ pos rel to gear");
+
             Gear gear = (Gear)_someDriver;
-            moveToYPosOf(gear.gearTransform);
+            moveToYPosOf(gear.gearTransform.position.y);
             setDistanceFrom(gear, cr);
             gearTransform.eulerAngles = eulersRelativeToGear(gear);
         }
@@ -393,11 +401,11 @@ public class Gear : Drivable , GearDrivable
     }
 
     protected void resetYPosition() {
-        gearTransform.position = TransformUtil.SetY(gearTransform.position, YLayer.Layer(typeof(Gear)));
+        gearTransform.position = TransformUtil.SetY(gearTransform.position, YLayer.gearMeshBase);
     }
 
-    protected void moveToYPosOf(Transform other) {
-        gearTransform.position = TransformUtil.SetY(gearTransform.position, other.transform.position.y);
+    protected void moveToYPosOf(float yPos) {
+        gearTransform.position = TransformUtil.SetY(gearTransform.position, yPos);
     }
 
     protected Vector3 startEulerAnglesForAligningTeeth {

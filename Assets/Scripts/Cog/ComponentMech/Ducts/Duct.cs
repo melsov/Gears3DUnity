@@ -12,6 +12,6 @@ public class Duct : MonoBehaviour
     }
 
     protected virtual void awake() {
-        transform.position = TransformUtil.SetY(transform.position, YLayer.dispenseable);
+        transform.position = TransformUtil.SetY(transform.position, YLayer.dispensable);
     }
 }

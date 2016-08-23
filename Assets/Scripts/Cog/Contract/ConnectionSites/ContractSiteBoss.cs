@@ -489,8 +489,17 @@ public class LocatableContractSite : ContractSite
 
     public static void alignAndPushYLayer(Transform targetSite, Transform destinationSite, Cog cog) {
         align(targetSite, destinationSite, cog);
-        cog.move(TransformUtil.SetY(cog.transform.position, destinationSite.transform.position.y + YLayer.LayerHeight));
-        //cog.position = TransformUtil.SetY(cog.position, destinationSite.transform.position.y + YLayer.LayerHeight);
+        Debug.LogError("BFR:cog " + cog.name + " now has pos: " + cog.transform.position + " : rb : " + cog.rb.transform.position);
+        float yTarget = destinationSite.transform.position.y + YLayer.LayerHeight * 5f;
+        cog.move(TransformUtil.SetY(cog.transform.position, yTarget));
+        Debug.LogError("AFT: cog " + cog.name 
+            + " now has pos: " + cog.transform.position 
+            + " : rb : " + cog.rb.transform.position + "target pos: " +
+            yTarget);
+
+        //cheat test
+        cog.GetComponent<Rigidbody>().MovePosition(TransformUtil.SetY(cog.transform.position, yTarget));
+
     }
 
 }

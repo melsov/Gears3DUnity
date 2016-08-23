@@ -101,6 +101,16 @@ public class ConnectionSiteAgreement
         protected set;
     }
 
+    public Vector3 displacement {
+        get;
+        set;
+    }
+
+    public void setDisplacementYLayerUp() {
+        displacement = new Vector3(0f, YLayer.LayerHeight, 0f);
+    }
+    
+
     public ContractSite destination {
         get { return producerIsTraveller ? clientSite : producerSite; }
     }

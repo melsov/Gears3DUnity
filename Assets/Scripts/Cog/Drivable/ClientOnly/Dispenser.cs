@@ -23,7 +23,7 @@ public class Dispenser : Drivable {
             //enterPermanentContractWith(cao);
         }
         if (spawnPlatform) {
-            spawnPlatform.position = TransformUtil.SetY(spawnPlatform.position, YLayer.dispenseable);
+            spawnPlatform.position = TransformUtil.SetY(spawnPlatform.position, YLayer.dispensable);
         }
         if (autoDispenseTest) {
             StartCoroutine(testDi());

@@ -25,7 +25,7 @@ public class Catapult : Dispenser {
         jl.min = -10f;
         jl.max = 120f;
         hingeRB = hj.GetComponent<Rigidbody>();
-        lever.position = TransformUtil.SetY(lever.position, YLayer.dispenseable);
+        lever.position = TransformUtil.SetY(lever.position, YLayer.dispensable);
         StartCoroutine(testDi());
     }
 

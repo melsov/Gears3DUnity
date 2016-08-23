@@ -62,7 +62,7 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
     protected override void awake() {
         base.awake();
 
-        TransformUtil.PositionOnYLayer(transform);
+        //TransformUtil.PositionOnYLayer(transform);
         
         Pause.Instance.onPause += pause;
         setupSocketDelegates();
@@ -116,10 +116,17 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 
             };
             actions.fulfill = delegate (Cog cog) {
-                TransformUtil.AlignXZPushRotation(
+                //TransformUtil.AlignXZPushRotation(
+                //    ((Drivable)cog).uniqueContractSiteAgreement.producerSite.transform,
+                //    ((Drivable)cog).uniqueContractSiteAgreement.clientSite.transform.position,
+                //    ((Drivable)cog).uniqueContractSiteAgreement.deltaAngle,
+                //    cog
+                //    );
+                TransformUtil.AlignXZDisplacePushRotation(
                     ((Drivable)cog).uniqueContractSiteAgreement.producerSite.transform,
                     ((Drivable)cog).uniqueContractSiteAgreement.clientSite.transform.position,
                     ((Drivable)cog).uniqueContractSiteAgreement.deltaAngle,
+                    ((Drivable)cog).uniqueContractSiteAgreement.displacement,
                     cog
                     );
             };
@@ -131,7 +138,8 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
         ClientActions actions = ClientActions.getDoNothingActions();
         if (specification.contractType == CogContractType.PARENT_CHILD) {
             actions.receive = delegate (Cog cog) {
-                specification.connectionSiteAgreement.clientSite.setDecoration(SharedPrefabs.Instance.createSocket());
+                specification.connectionSiteAgreement.clientSite.setDecoration(SharedPrefabs.Instance.createPeg());
+                specification.connectionSiteAgreement.setDisplacementYLayerUp();
             };
             actions.beAbsolvedOf = delegate (Cog cog) {
                 print(name + " be absolved  of " + cog.name);

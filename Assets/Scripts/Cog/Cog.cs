@@ -29,7 +29,17 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             }
             return __pegboard;
         }
-    }        
+    }
+
+    private ComponentLayerBoss _componentLayerBoss;
+    protected ComponentLayerBoss componentLayerBoss {
+        get {
+            if (_componentLayerBoss == null) {
+                _componentLayerBoss = new ComponentLayerBoss(this);
+            }
+            return _componentLayerBoss;
+        }
+    }
 
     protected ContractPortfolio contractPortfolio {
         get {
@@ -141,8 +151,15 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             colliderSet = gameObject.AddComponent<ColliderSet>();
         }
         TransformUtil.AddComponentIfNot<Highlighter>(transform);
-        transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType()));
+        moveToDefaultY();
     }
+
+    protected virtual void moveToDefaultY() {
+        //transform.position = TransformUtil.SetY(transform.position, YLayer.Layer(GetType()));
+        componentLayerBoss.adjust();
+    }
+
+    
 
     public virtual void Start() { }
 
@@ -291,24 +308,9 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
         }
 
         public static void initiateContract(CogContract cc) {
-            DEBUGTETHEREDCC(cc, "bfr");
             cc.clientActions.receive(cc.producer.cog);
             cc.producerActions.initiate(cc.client.cog);
             cc.connectionSiteAgreement.connect();
-            DEBUGTETHEREDCC(cc, "AFT");
-        }
-
-        private static void DEBUGTETHEREDCC(CogContract cc, string msg) {
-            if (cc.client.cog is Tethered.TetheredInput || cc.client.cog is Tethered.TetheredOutput) {
-                Debug.Log(msg + "Prod: " + cc.producer.cog.name + " Cli: " + cc.client.cog.name);
-                if (cc.producer.cog is Tethered.TetheredInput) {
-                    Debug.LogError(cc.producer.cog.name + " set scalar is null? " + ((Tethered.TetheredInput)cc.producer.cog).debugSetScalarIsNull());
-                }
-                if (cc.client.cog is Tethered.TetheredOutput) {
-                    Debug.LogError(cc.client.cog.name + " set scalar is null? " + ((Tethered.TetheredOutput)cc.client.cog).debugSetScalarIsNull());
-                }
-            }
-            
         }
 
         protected virtual void accept(CogContract cc) { 

@@ -45,7 +45,7 @@ public class CombinerSlot : MonoBehaviour {
     private void boxColliderToDispensableLayer() {
         BoxCollider bc = GetComponent<BoxCollider>();
         if (!bc) { throw new Exception("Combiner slot needs a box collider. What gives."); }
-        bc.center = TransformUtil.SetY(bc.center, YLayer.dispenseable);
+        bc.center = TransformUtil.SetY(bc.center, YLayer.dispensable);
     }
 
     public virtual void addCombinable(Combinable combinable) {

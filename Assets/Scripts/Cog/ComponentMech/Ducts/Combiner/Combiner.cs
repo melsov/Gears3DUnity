@@ -26,7 +26,7 @@ public class Combiner : Cog {
         defaultRock = Resources.LoadAll<Rock>("Prefabs/Dispensables")[0];
         multiSlot = GetComponentInChildren<CombinerMultiSlot>();
 
-        inTube.position = TransformUtil.SetY(inTube.position, YLayer.dispenseable);
+        inTube.position = TransformUtil.SetY(inTube.position, YLayer.dispensable);
 	}
 
     protected void combine(Transform combined) {

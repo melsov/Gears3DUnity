@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-public class Exchanger : MonoBehaviour {
+public class Exchanger : MonoBehaviour  {
 
     [SerializeField]
     protected bool impartsRotation = true;
     private delegate void RotateExchangable(Quaternion q);
     private RotateExchangable rotateExchangable = delegate (Quaternion q) { };
     
+    [SerializeField]
+    protected Collider __collider;
+
     [SerializeField]
     protected Transform keep;
     private bool isAnimatingRealign;
@@ -69,7 +72,13 @@ public class Exchanger : MonoBehaviour {
         }
     }
 
-    private Collider _collider { get { return GetComponent<Collider>(); } }
+    private Collider _collider { get {
+            if(!__collider) {
+                __collider = GetComponent<Collider>();
+            }
+            return __collider;
+        }
+    }
 
     private bool outOfRange(Collider collider) {
         if (!collider) { return true; }
@@ -83,12 +92,6 @@ public class Exchanger : MonoBehaviour {
 
     private Exchangable getExchangable(Collider other) { return other.GetComponent<Exchangable>(); }
     private Exchanger findExchanger(Collider other) { return other.GetComponent<Exchanger>(); }
-
-    public virtual void OnTriggerEnter(Collider other) {
-        //Exchangable ex = getExchangable(other);
-        //if(!ex) { return; }
-        //pickupFreeAgent(ex);
-    }
 
     public virtual void OnTriggerStay(Collider other) {
         if (!available) { return; }
@@ -137,12 +140,12 @@ public class Exchanger : MonoBehaviour {
         currentPos = rb.position;
     }
 
-    private bool pickupFreeAgent(Exchangable ex) {
-        if(!ex.owner && !ex.unavailable) {
-            return accept(ex);
-        }
-        return false;
-    }
+    //private bool pickupFreeAgent(Exchangable ex) {
+    //    if(!ex.owner && !ex.unavailable) {
+    //        return accept(ex);
+    //    }
+    //    return false;
+    //}
 
     public bool accept(Exchangable _exchangable) {
         if (!canAccept(_exchangable)) { return false; }

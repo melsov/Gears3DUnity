@@ -6,11 +6,25 @@ ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
     100000: //RootNode
+    100002: bcube-Cli_W
+    100004: BCube-Motor
+    100006: Combiner-body
     400000: //RootNode
+    400002: bcube-Cli_W
+    400004: BCube-Motor
+    400006: Combiner-body
     2300000: //RootNode
+    2300002: bcube-Cli_W
+    2300004: BCube-Motor
+    2300006: Combiner-body
     3300000: //RootNode
+    3300002: bcube-Cli_W
+    3300004: BCube-Motor
+    3300006: Combiner-body
     4300000: Bcube-7-Stack_004
     4300002: BCube-Motor
+    4300004: bcube-Cli_W
+    4300006: Combiner-body
     7400000: Default Take
     9500000: //RootNode
   materials:
