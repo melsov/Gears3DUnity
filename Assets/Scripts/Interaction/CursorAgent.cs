@@ -79,16 +79,25 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
         if (overridingDrag) {
             if (isClient) client.dragOverride(cursorInfo); // cursorGlobal);
         } else {
+            checkWouldConnect();
             urClient.normalDrag(cursorGlobal);
         }
     }
-    
+
+    private void checkWouldConnect() {
+        if (!colliderDropper) { return; }
+        foreach(Collider c in colliderDropper.colliders) {
+            if (urClient.wouldConnectTo(c)) { return; }
+        }
+    }
+
     public void handleTriggerEnter(Collider other) {
         if (isClient) client.handleTriggerEnter(other);
     }
     public void handleTriggerExit(Collider other) {
         if (urClient == null) { return; }
-        if (isClient) client.triggerExitDuringDrag(other);
+        //if (isClient)
+            client.triggerExitDuringDrag(other);
     }
 
     public void endCursorInteraction(VectorXZ cursorGlobal) {
@@ -121,7 +130,6 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
     }
 
     private void connectToColliders(ColliderDropper dropper) {
-        if (dropper.colliders.Count == 0) { Bug.contractLog("dropper has this many: " + dropper.colliders.Count); } //DBUG
         if (dropper == null) {
             return;
         }
@@ -139,12 +147,11 @@ public class CursorAgent : MonoBehaviour, ICursorInteractable, IColliderDropperC
                 break;
             }
         }
-        if (urClient is ICursorAgentClientExtended) {
-            while (dropper.escapedFromColliders.Count > 0) {
-                Collider c = dropper.escapedFromColliders[0];
-                dropper.escapedFromColliders.RemoveAt(0);
-                ((ICursorAgentClientExtended)urClient).handleEscapedFromCollider(c);
-            }
+        
+        while (dropper.escapedFromColliders.Count > 0) {
+            Collider c = dropper.escapedFromColliders[0];
+            dropper.escapedFromColliders.RemoveAt(0);
+            urClient.handleEscapedFromCollider(c);
         }
         dropper.removeAll();
     }
@@ -163,10 +170,13 @@ public interface ICursorAgentUrClient
 {
     //void disconnect();
     bool connectTo(Collider other);
-
+    bool wouldConnectTo(Collider other);
     void normalDragStart(VectorXZ cursorPos);
     void normalDrag(VectorXZ cursorPos);
     void normalDragEnd(VectorXZ cursorPos);
+    void triggerExitDuringDrag(Collider other);
+
+    void handleEscapedFromCollider(Collider other);
 
 }
 
@@ -204,10 +214,10 @@ public interface ICursorAgentClient : ICursorAgentUrClient
     void dragOverride(CursorInfo cursorInfo); //  VectorXZ cursorGlobal);
     void endDragOverride(CursorInfo cursorInfo); // VectorXZ cursorGlobal);
     Collider mainCollider();
-    void triggerExitDuringDrag(Collider other);
+    //void triggerExitDuringDrag(Collider other);
 }
 
 public interface ICursorAgentClientExtended : ICursorAgentClient
 {
-    void handleEscapedFromCollider(Collider other);
+    //void handleEscapedFromCollider(Collider other);
 }

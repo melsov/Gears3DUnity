@@ -14,6 +14,11 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
         return false;
     }
 
+
+    public virtual bool wouldConnectTo(Collider collider) {
+        return false;
+    }
+
     //public void disconnect() {
     //}
     public void startDragOverride(CursorInfo ci) { //VectorXZ cursorGlobal, Collider dragOverrideCollider) {
@@ -60,6 +65,10 @@ public class GenericCursorAgentClient : MonoBehaviour , ICursorAgentClient {
     }
 
     public void normalDragEnd(VectorXZ cursorPos) {
+        throw new NotImplementedException();
+    }
+
+    public void handleEscapedFromCollider(Collider other) {
         throw new NotImplementedException();
     }
 }

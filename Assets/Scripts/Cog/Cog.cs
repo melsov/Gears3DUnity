@@ -253,7 +253,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             Bug.contractLog("negotiate");
             if (hasContractWith(other)) { return ContractSpecification.NonExistant(); }
             foreach(ContractSpecification specification in specifications) {
-                print(cog.name + " offering: " + specification.ToString());
                 ContractSpecification rSpecification = other.amenable(cog, specification);
                 if (rSpecification.exists()) {
                     Bug.contractLog(other.cog.name + " is amenable");
@@ -370,7 +369,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
 
         public virtual ContractSpecification amenable(Cog other, ContractSpecification specification) {
             if (amenableFor(lookup.availabilty(other, specification.contractType), specification.offererIsProducer)) {
-                print("amenable for");
                 return contractPortfolio.accommodatedSpecification(other, other.contractManager.contractPortfolio ,specification);
             }
             return ContractSpecification.NonExistant(); 
@@ -397,7 +395,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             List<ContractSpecification> result = new List<ContractSpecification>();
             foreach(ContractSpecification specification in orderedContractPreferencesAsOfferer(other)) {
                 if (canOffer (other, specification)) {
-                    print("I, " + cog.name + ", can offer " + other.name );
                     result.Add(specification);
                 }
             }
@@ -480,7 +477,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
 
     protected virtual bool contractShouldBeUnbreakable(CogContract contract) { return false; }
 
-
     private bool enterContractWith(Cog cog, bool permanent) {
         Bug.contractLog(name + "enter contract with " + cog.name);
         ContractSpecification spec = contractManager.negotiate(cog.contractManager);
@@ -531,7 +527,6 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             if (asProducerLookup.ContainsKey(cct)) {
                 return asProducerLookup[cct](other);
             }
-            print(cog.name + " doesn't have a key for: " + cct);
             return false;
         }
 
@@ -662,7 +657,7 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
 
     }
 
-    protected virtual bool vConnectTo(Collider other) {
+    protected bool vConnectTo(Collider other) {
         Bug.contractLog(name + " vConn");
         Cog cog = FindCog(other.transform);
         if (cog == null || cog == this) { return false; }
@@ -694,6 +689,53 @@ public abstract class Cog : MonoBehaviour, ICursorAgentUrClient
             }));
         }
         return result;
+    }
+
+
+    public virtual bool wouldConnectTo(Collider collider) {
+        Cog cog = FindCog(collider.transform);
+        if(cog == null || cog == this) { return false; }
+        ContractSpecification spec = contractManager.negotiate(cog.contractManager);
+        if (spec.contractType != CogContractType.NONEXISTENT) {
+            cog.contractHoverHighlight = true;
+            return true;
+        } 
+        return false;
+    }
+
+    public void handleEscapedFromCollider(Collider other) {
+        unhighlightCog(other);
+    }
+
+    public virtual void triggerExitDuringDrag(Collider other) {
+        unhighlightCog(other);
+    }
+
+    private void unhighlightCog(Collider other) {
+        print("tri exit dur drag");
+        Cog cog = FindCog(other.transform);
+        if (!cog) return;
+        print("found cog");
+        cog.contractHoverHighlight = false;
+    }
+
+    private bool _contractHoverHighlight;
+    public bool contractHoverHighlight {
+        set {
+            if (_contractHoverHighlight == value) { return; }
+            _contractHoverHighlight = value;
+            highlightForContractHover(value);
+        }
+    }
+
+    private void highlightForContractHover(bool highlight_) {
+        if (highlight_) {
+            print("highlight");
+            GetComponentInChildren<Highlighter>().highlight();
+        } else {
+            print("un highlight");
+            GetComponentInChildren<Highlighter>().unhighlight();
+        }
     }
 
     public virtual void normalDragStart(VectorXZ cursorPos) {

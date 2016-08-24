@@ -52,14 +52,14 @@ public class LinearActuator : Drivable , IPegProxy {
     }
     
 
-    protected override bool vConnectTo(Collider other) {
-        Pole pole = other.GetComponent<Pole>();
-        if (pole == null) { return false; }
-        if (drivingPole != null && pole != drivingPole) { 
-            return false;
-        }
-        return pole.acceptBackendPegOnDrivable(this);
-    }
+    //protected override bool vConnectTo(Collider other) {
+    //    Pole pole = other.GetComponent<Pole>();
+    //    if (pole == null) { return false; }
+    //    if (drivingPole != null && pole != drivingPole) { 
+    //        return false;
+    //    }
+    //    return pole.acceptBackendPegOnDrivable(this);
+    //}
 
     protected override void vOnDragEnd() {
         checkConstraint();

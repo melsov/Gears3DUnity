@@ -17,6 +17,9 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
         return false;
     }
 
+    public virtual bool wouldConnectTo(Collider collider) {
+        return false;
+    }
     //public void disconnect() {
     //}
 
@@ -68,5 +71,9 @@ public class HandleRotatorClient : MonoBehaviour , ICursorAgentClient {
     }
 
     public void triggerExitDuringDrag(Collider other) {
+    }
+
+    public void handleEscapedFromCollider(Collider other) {
+        throw new NotImplementedException();
     }
 }

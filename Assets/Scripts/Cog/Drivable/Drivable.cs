@@ -651,9 +651,6 @@ public abstract class Drivable : Cog , ICursorAgentClientExtended , IGameSeriali
 */
     }
 
-    public void triggerExitDuringDrag(Collider other) {
-        //vTriggerExit(other); // FOR NOW: just never do this
-    }
 //THIS DOESN'T GET TRIGGERED ?
     protected virtual void vTriggerExit(Collider other) {
         unhighlight(other.transform);

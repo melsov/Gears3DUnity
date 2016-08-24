@@ -49,7 +49,6 @@ public class Motor : Drivable , IObservableSwitchStateProvider
             AddOn addOn = findAddOn(cogForTypeWorkaround);
             if (addOn) {
                 if (addOn is ControllerAddOn) {
-                    print("motor found addOn: " + addOn.name + " of cog: " + FindCog(addOn.transform).name);
                     List<ContractSpecification> specs = new List<ContractSpecification>();
                     specs.Add(new ContractSpecification(CogContractType.CONTROLLER_ADDON_DRIVABLE, RoleType.CLIENT));
                     return specs;

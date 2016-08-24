@@ -61,6 +61,7 @@ public abstract class AddOn : Cog , ICursorAgentClient
         return false;
     }
 
+
     protected virtual void positionOnConnect(Cog cog) {
         Vector3 pos = transform.position;
         pos.x = cog.transform.position.x;

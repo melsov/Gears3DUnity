@@ -58,9 +58,9 @@ public class Sticker : Cog, ICursorAgentClient
         handleRotator.endDragOverride(ci.current);// cursorGlobal);
     }
 
-    public void triggerExitDuringDrag(Collider other) {
-        unhighlight(other.transform);
-    }
+    //public void triggerExitDuringDrag(Collider other) {
+    //    unhighlight(other.transform);
+    //}
 
     public Collider mainCollider() {
         return _mainCollider;

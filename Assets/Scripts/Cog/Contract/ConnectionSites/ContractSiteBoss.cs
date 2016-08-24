@@ -108,7 +108,6 @@ public class ContractSiteBoss : IEnumerable<ContractSite>
     public SiteSet getSiteSet(ContractTypeAndRole specification) {
         foreach(CTARSet ctar in contractSites.Keys) {
             if (ctar.set.Contains(specification)) {
-                MonoBehaviour.print("contains spec: " + specification.contractType);
                 return contractSites[ctar];
             }
         }
@@ -249,11 +248,9 @@ public class SiteSet : IEnumerable<ContractSite>
             foreach(ContractSite offererSite in offerer) {
                 if (offererSite.occupied) { continue; }
                 if (!offereeSite.canAccommodate(offererSite)) { continue; }
-                Debug.Log("adding");
                 result.Add(new ProvisoPair(offererSite, offereeSite));
             }
         }
-        Debug.Log("results: " + result.Count);
         return new List<ProvisoPair>(result).OrderBy(delegate (ProvisoPair pp) {
             return (pp.offereeSite.transform.position - pp.offererSite.transform.position).sqrMagnitude;
         }).ToList();
